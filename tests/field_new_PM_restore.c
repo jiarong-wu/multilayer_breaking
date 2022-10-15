@@ -90,6 +90,9 @@ int main(int argc, char * argv[])
 Read in the power spectrum and initialize the wave field. 
  */
 
+int phony = 1; // Used to reset the step index
+int j = 0;
+
 event init (i = 0)
 {
   if (!restore ("restart")) {
@@ -122,7 +125,7 @@ event init (i = 0)
     dump("initial");
   }
   else {
-
+    phony = 0;
   }
 }
 
@@ -166,10 +169,10 @@ event energy_after_remap (i++, last)
     foreach_layer () {
       double norm2 = sq(w[]);
       foreach_dimension()
-	norm2 += sq(u.x[]);
-      ke += norm2*h[]*dv();
-      gpe += (zc + h[]/2.)*h[]*dv();
-      zc += h[];
+	      norm2 += sq(u.x[]);
+        ke += norm2*h[]*dv();
+        gpe += (zc + h[]/2.)*h[]*dv();
+        zc += h[];
     }
   }
   static FILE * fp = fopen("energy_after_remap.dat","w");
@@ -267,19 +270,26 @@ int writefields (double t, const char *suffix) {
   return 0;
 }
 
-event output_before (i=0) {
-  char suffix[] = "matrix_before";
-  writefields (t, suffix);
-}
-
-event output_after (i=1) {
-  char suffix[] = "matrix_after";
-  writefields (t, suffix);
+event output_before (i++) {
+  /**  Ad hoc way of going around resetting the index i. This event is 
+   *   executed twice in total.
+   */
+  if (phony == 0) {
+    j = i;
+    phony = 1; // Only execute once when phony = 0
+    fprintf (stderr, "Index starts at to j = %d!\n", j);
+    char *suffix = "matrix_before"; // pointer directly to string is fine
+    writefields (t, suffix);
+  }
+  if (i == j+1) {
+    char *suffix = "matrix_after";
+    writefields (t, suffix);
+  }
 }
 
 #if PARAVIEW
-event paraview (t>100; t += 0.2; t <= TEND) {
-  char suffix[] = "matrix";
+event paraview (t=100; t += 0.2; t <= TEND) {
+  char *suffix = "matrix";
   writefields (t, suffix);
 }
 #endif
