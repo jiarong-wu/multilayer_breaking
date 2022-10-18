@@ -10,7 +10,7 @@
 #include "layered/remap.h"
 //#include "remap_test.h"
 #include "layered/perfs.h"
-// #include "input.h" // Used for older input method (matrices of quantities)
+#include "input.h" // Used for older input method (matrices of quantities)
 #include "output_mpi.h" // Antoon's function for MPI compatible matrix output
 
 /**
@@ -26,7 +26,7 @@ double TEND = 50.; // t end
 int NLAYER = 10; // number of layers
 int LEVEL_data = 7;
 
-#include "spectrum.h" // Used for new input method (the spectrum info)
+#include "./spectrum.h" // Used for new input method (the spectrum info)
 
 /** 
 ## Parameters

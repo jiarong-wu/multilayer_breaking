@@ -11951,13 +11951,13 @@ int _view_set_json (void * q, char * s, int len) {
   s += i, len -= i, len1 += i;
   i = snprintf (s, len, ",\n    \"cache\": { \"type\": \"pint\", \"cardinality\": 1, \"value\": \"%d\" }", p->cache);
   s += i, len -= i, len1 += i;
+  i = snprintf (s, len, ",\n    \"p2y\": { \"type\": \"pfloat\", \"cardinality\": 1, \"value\": \"%f\" }", p->p2y);
+  s += i, len -= i, len1 += i;
   i = snprintf (s, len, ",\n    \"p1x\": { \"type\": \"pfloat\", \"cardinality\": 1, \"value\": \"%f\" }", p->p1x);
   s += i, len -= i, len1 += i;
   i = snprintf (s, len, ",\n    \"p1y\": { \"type\": \"pfloat\", \"cardinality\": 1, \"value\": \"%f\" }", p->p1y);
   s += i, len -= i, len1 += i;
   i = snprintf (s, len, ",\n    \"p2x\": { \"type\": \"pfloat\", \"cardinality\": 1, \"value\": \"%f\" }", p->p2x);
-  s += i, len -= i, len1 += i;
-  i = snprintf (s, len, ",\n    \"p2y\": { \"type\": \"pfloat\", \"cardinality\": 1, \"value\": \"%f\" }", p->p2y);
   s += i, len -= i, len1 += i;
   i = snprintf (s, len, "\n  }");
   s += i, len -= i, len1 += i;
@@ -12193,13 +12193,13 @@ int _travelling_json (void * q, char * s, int len) {
   s += i, len -= i, len1 += i;
   i = snprintf (s, len, ",\n    \"end\": { \"type\": \"pdouble\", \"cardinality\": 1, \"value\": \"%lf\" }", p->end);
   s += i, len -= i, len1 += i;
+  i = snprintf (s, len, ",\n    \"fov\": { \"type\": \"pfloat\", \"cardinality\": 1, \"value\": \"%f\" }", p->fov);
+  s += i, len -= i, len1 += i;
   i = snprintf (s, len, ",\n    \"tx\": { \"type\": \"pfloat\", \"cardinality\": 1, \"value\": \"%f\" }", p->tx);
   s += i, len -= i, len1 += i;
   i = snprintf (s, len, ",\n    \"ty\": { \"type\": \"pfloat\", \"cardinality\": 1, \"value\": \"%f\" }", p->ty);
   s += i, len -= i, len1 += i;
   i = snprintf (s, len, ",\n    \"quat\": { \"type\": \"pfloat\", \"cardinality\": 4, \"value\": [%f,%f,%f,%f] }", p->quat[0], p->quat[1], p->quat[2], p->quat[3]);
-  s += i, len -= i, len1 += i;
-  i = snprintf (s, len, ",\n    \"fov\": { \"type\": \"pfloat\", \"cardinality\": 1, \"value\": \"%f\" }", p->fov);
   s += i, len -= i, len1 += i;
   i = snprintf (s, len, "\n  }");
   s += i, len -= i, len1 += i;
@@ -12623,10 +12623,10 @@ bool _view_set_get (struct _view_set * p) {
     {"res", pfloat, &p->res},
     {"camera", pstring, &p->camera},
     {"cache", pint, &p->cache},
+    {"p2y", pfloat, &p->p2y},
     {"p1x", pfloat, &p->p1x},
     {"p1y", pfloat, &p->p1y},
     {"p2x", pfloat, &p->p2x},
-    {"p2y", pfloat, &p->p2y},
     {NULL}
   };
   return parse_params (params);
@@ -12772,10 +12772,10 @@ bool _travelling_get (struct _travelling * p) {
   Params params[] = {
     {"start", pdouble, &p->start},
     {"end", pdouble, &p->end},
+    {"fov", pfloat, &p->fov},
     {"tx", pfloat, &p->tx},
     {"ty", pfloat, &p->ty},
     {"quat", pfloat, p->quat, 4},
-    {"fov", pfloat, &p->fov},
     {NULL}
   };
   return parse_params (params);

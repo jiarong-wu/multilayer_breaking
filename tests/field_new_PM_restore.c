@@ -106,7 +106,7 @@ event init (i = 0)
       eta[] = wave(x, y);
       double H = wave(x, y) - zb[];
       foreach_layer() {
-	h[] = H/nl;
+	      h[] = H/nl;
       }
     }
     // remap?
@@ -114,11 +114,11 @@ event init (i = 0)
     foreach() {
       double z = zb[];
       foreach_layer() {
-	z += h[]/2.;
-	u.x[] = u_x(x, y, z);
-	u.y[] = u_y(x, y, z);
-	w[] = u_z(x, y, z);
-	z += h[]/2.;
+        z += h[]/2.;
+        u.x[] = u_x(x, y, z);
+        u.y[] = u_y(x, y, z);
+        w[] = u_z(x, y, z);
+        z += h[]/2.;
       }
     }
     fprintf (stderr,"Done initialization!\n");
@@ -146,10 +146,10 @@ event energy_before_remap (i++, last)
     foreach_layer () {
       double norm2 = sq(w[]);
       foreach_dimension()
-	norm2 += sq(u.x[]);
-      ke += norm2*h[]*dv();
-      gpe += (zc + h[]/2.)*h[]*dv();
-      zc += h[];
+        norm2 += sq(u.x[]);
+        ke += norm2*h[]*dv();
+        gpe += (zc + h[]/2.)*h[]*dv();
+        zc += h[];
     }
   }
   static FILE * fp = fopen("energy_before_remap.dat","w");
@@ -169,10 +169,10 @@ event energy_after_remap (i++, last)
     foreach_layer () {
       double norm2 = sq(w[]);
       foreach_dimension()
-	      norm2 += sq(u.x[]);
-        ke += norm2*h[]*dv();
-        gpe += (zc + h[]/2.)*h[]*dv();
-        zc += h[];
+	norm2 += sq(u.x[]);
+      ke += norm2*h[]*dv();
+      gpe += (zc + h[]/2.)*h[]*dv();
+      zc += h[];
     }
   }
   static FILE * fp = fopen("energy_after_remap.dat","w");
