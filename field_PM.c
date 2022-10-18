@@ -17,6 +17,8 @@
 Definition of some controlling parameters. */
 
 #define g_ 9.8
+double kp_ = 2.*pi/10.; // Peak wave number, not used for initialization
+                        // just for scaling the water depth
 double h_ = 10; // depth of the water
 double gpe_base = 0; // gauge of potential energy
 /* double ETAE = 0.1; // refinement criteria for eta */
@@ -50,8 +52,12 @@ int main(int argc, char * argv[])
     L0 = atof(argv[6]); // Box size (not necessarily related to peak wave number)
   else
     L0 = 50.;
-  if (argc > 7)
-    theta_H = atof(argv[7]); // Numerical parameter to dump fast barotropic modes
+  if (argc > 7) 
+    kp_ = 2.*pi/atof(argv[7]); // Peak wavelength 
+  else 
+    kp_ = 2.*pi/(L0/5.); // By default it is 1/5 boxsize
+  if (argc > 8)
+    theta_H = atof(argv[8]); // Numerical parameter to dump fast barotropic modes
   else
     theta_H = 0.5;
   origin (-L0/2., -L0/2.);
@@ -60,7 +66,7 @@ int main(int argc, char * argv[])
   N = 1 << LEVEL_data; 
   nl = NLAYER;
   G = g_;
-  h_ = L0/5.; // set the water depth to be 1/5 the field size (ad hoc)
+  h_ = 2.*pi/kp_; // set the water depth to be the peak wave length (should be enough for the deep water assumption)
 #if dimension == 2
   gpe_base = -0.5*sq(h_)*sq(L0)*g_;
 #else
