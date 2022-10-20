@@ -224,20 +224,35 @@ event movie (t += 0.1; t <= TEND)
 }
 #endif
 
-/**
-   Output 3-D field (not just the surface laye) if needed for Paraview visualization or 
-   other analyses. */
-#if PARAVIEW
-event paraview (t = 100; t += 0.2; t <= TEND) {
+/** Function for writing fields at time t.
+*/
+int writefields (double t, const char *suffix) {
   char s[80];
   char filename1[50], filename2[50], filename3[50], filename4[50];
+  vector u_temp;
+  scalar w_temp, h_temp;
   for (int j=0; j<nl; ++j) {
-    sprintf (filename1, "field/ux_matrix_t%g_l%d", t, j);
-    sprintf (filename2, "field/uy_matrix_t%g_l%d", t, j);  
-    sprintf (filename3, "field/uz_matrix_t%g_l%d", t, j);  
-    sprintf (filename4, "field/h_matrix_t%g_l%d", t, j);  
-    sprintf (s, "u%d", j);
-    vector u_temp = lookup_vector (s);
+    sprintf (filename1, "field/ux_%s_t%g_l%d", suffix, t, j);
+    sprintf (filename2, "field/uy_%s_t%g_l%d", suffix, t, j);  
+    sprintf (filename3, "field/uz_%s_t%g_l%d", suffix, t, j);  
+    sprintf (filename4, "field/h_%s_t%g_l%d", suffix, t, j);  
+    if (j==0) {
+      // The first layer is named u instead of u0
+      sprintf (s, "u");
+      u_temp = lookup_vector (s);
+      sprintf (s, "w");
+      w_temp = lookup_field (s);
+      sprintf (s, "h");
+      h_temp = lookup_field (s);
+    }
+    else {
+      sprintf (s, "u%d", j);
+      u_temp = lookup_vector (s);
+      sprintf (s, "w%d", j);
+      w_temp = lookup_field (s);
+      sprintf (s, "h%d", j);
+      h_temp = lookup_field (s);
+    }
     FILE * fux = fopen (filename1, "w");
     output_matrix_mpi (u_temp.x, fux, N, linear = true);
     fclose (fux);
@@ -245,16 +260,22 @@ event paraview (t = 100; t += 0.2; t <= TEND) {
     output_matrix_mpi (u_temp.y, fuy, N, linear = true);
     fclose (fuy);
     FILE * fuz = fopen (filename3, "w");
-    sprintf (s, "w%d", j);
-    scalar w_temp = lookup_field (s);
     output_matrix_mpi (w_temp, fuz, N, linear = true);
     fclose (fuz);
     FILE * fh = fopen (filename4, "w");
-    sprintf (s, "h%d", j);
-    scalar h_temp = lookup_field (s);
     output_matrix_mpi (h_temp, fh, N, linear = true);
     fclose (fh);    
   }
+  return 0;
+}
+
+/**
+   Output 3-D field (not just the surface laye) if needed for Paraview visualization or 
+   other analyses. */
+#if PARAVIEW
+event paraview (t = 100; t += 0.2; t <= TEND) {
+  char *suffix = "matrix";
+  writefields (t, suffix);
 }
 #endif
 
