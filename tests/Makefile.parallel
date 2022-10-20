@@ -7,7 +7,7 @@ OUT_FOLDER = ./
 
 #SET C FLAGS AND BASILISK COMPILER, LINKING FLAGS
 #CC = gcc
-CFLAGS += -D_MPI=1 -DPARAVIEW=1 -O2 -source 
+CFLAGS += -D_MPI=1 -DPARAVIEW=0 -O2 -source 
 #CFLAGS += -DDUMBGL -DDISPLAY=1
 MPICCFLAGS += -Wall -O2 -std=c99 -D_MPI=1
 #MPICCFLAGS += -Wall -std=c99 -O1 -D_MPI=1 -fno-strict-aliasing

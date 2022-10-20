@@ -74,6 +74,7 @@ int main(int argc, char * argv[])
 #endif
   CFL_H = 1; // Smaller time step
   // max_slope = 0.8; // Change the slope limiter threshold
+  fprintf (stderr, "Read in parameters!\n");
   run();
 }
 

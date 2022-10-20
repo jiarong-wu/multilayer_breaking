@@ -7,4 +7,5 @@ To compile, run
 ```make -f Makefile.parallel OUTPUT=field_PM```
 which will generate an executable under the current fold.
 
+`slurm_example.sh` is an example slurm script.
 Folder ./test/ contains files that are still under testing

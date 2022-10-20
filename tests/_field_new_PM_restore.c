@@ -24816,7 +24816,7 @@ foreach_stencil(){
       _stencil_val(__FILE__,__LINE__,eta,0,0,0) = wave(x, y);
       double H = wave(x, y) - _stencil_val(__FILE__,__LINE__,zb,0,0,0);
        { foreach_block_inner() {
- _stencil_val(__FILE__,__LINE__,h,0,0,0) = H/nl;
+       _stencil_val(__FILE__,__LINE__,h,0,0,0) = H/nl;
       } end_foreach_block_inner(); }
     } } end_foreach_stencil(); if (_first_call) {
  if (h_ != _h_)
@@ -24838,7 +24838,7 @@ foreach(){
       val(eta,0,0,0) = wave(x, y);
       double H = wave(x, y) - val(zb,0,0,0);
        { foreach_block_inner() {
- val(h,0,0,0) = H/nl;
+       val(h,0,0,0) = H/nl;
       } end_foreach_block_inner(); }
     } } end_foreach(); }
 
@@ -24856,11 +24856,11 @@ foreach_stencil(){
  {
       double z = _stencil_val(__FILE__,__LINE__,zb,0,0,0);
        { foreach_block_inner() {
- z += _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.;
- _stencil_val(__FILE__,__LINE__,u.x,0,0,0) = u_x(x, y, z);
- _stencil_val(__FILE__,__LINE__,u.y,0,0,0) = u_y(x, y, z);
- _stencil_val(__FILE__,__LINE__,w,0,0,0) = u_z(x, y, z);
- z += _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.;
+        z += _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.;
+        _stencil_val(__FILE__,__LINE__,u.x,0,0,0) = u_x(x, y, z);
+        _stencil_val(__FILE__,__LINE__,u.y,0,0,0) = u_y(x, y, z);
+        _stencil_val(__FILE__,__LINE__,w,0,0,0) = u_z(x, y, z);
+        z += _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.;
       } end_foreach_block_inner(); }
     } } end_foreach_stencil();  _first_call = false;
 }}
@@ -24872,11 +24872,11 @@ foreach(){
  {
       double z = val(zb,0,0,0);
        { foreach_block_inner() {
- z += val(h,0,0,0)/2.;
- val(u.x,0,0,0) = u_x(x, y, z);
- val(u.y,0,0,0) = u_y(x, y, z);
- val(w,0,0,0) = u_z(x, y, z);
- z += val(h,0,0,0)/2.;
+        z += val(h,0,0,0)/2.;
+        val(u.x,0,0,0) = u_x(x, y, z);
+        val(u.y,0,0,0) = u_y(x, y, z);
+        val(w,0,0,0) = u_z(x, y, z);
+        z += val(h,0,0,0)/2.;
       } end_foreach_block_inner(); }
     } } end_foreach(); }
     fprintf (ferr,"Done initialization!\n");
@@ -24929,13 +24929,13 @@ foreach_stencil(){
       {
 #line 148
 
- norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
+        norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
 #line 148
 
- norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
-      ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-      gpe += (zc + _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.)*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-      zc += _stencil_val(__FILE__,__LINE__,h,0,0,0);
+        norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
+        ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+        gpe += (zc + _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.)*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+        zc += _stencil_val(__FILE__,__LINE__,h,0,0,0);
     } end_foreach_block_inner(); }
   } } end_foreach_stencil(); }
 strongif (is_constant(cm)) {
@@ -24958,13 +24958,13 @@ foreach_stencil(){
       {
 #line 148
 
- norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
+        norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
 #line 148
 
- norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
-      ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-      gpe += (zc + _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.)*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-      zc += _stencil_val(__FILE__,__LINE__,h,0,0,0);
+        norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
+        ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+        gpe += (zc + _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.)*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+        zc += _stencil_val(__FILE__,__LINE__,h,0,0,0);
     } end_foreach_block_inner(); }
   } } end_foreach_stencil(); }  _first_call = false;
 }}
@@ -24995,13 +24995,13 @@ foreach (){
       {
 #line 148
 
- norm2 += sq(val(u.x,0,0,0));
+        norm2 += sq(val(u.x,0,0,0));
 #line 148
 
- norm2 += sq(val(u.y,0,0,0));}
-      ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-      gpe += (zc + val(h,0,0,0)/2.)*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-      zc += val(h,0,0,0);
+        norm2 += sq(val(u.y,0,0,0));}
+        ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+        gpe += (zc + val(h,0,0,0)/2.)*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+        zc += val(h,0,0,0);
     } end_foreach_block_inner(); }
   } } end_foreach(); }
 strongif (is_constant(cm)) {
@@ -25024,13 +25024,13 @@ foreach (){
       {
 #line 148
 
- norm2 += sq(val(u.x,0,0,0));
+        norm2 += sq(val(u.x,0,0,0));
 #line 148
 
- norm2 += sq(val(u.y,0,0,0));}
-      ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-      gpe += (zc + val(h,0,0,0)/2.)*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-      zc += val(h,0,0,0);
+        norm2 += sq(val(u.y,0,0,0));}
+        ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+        gpe += (zc + val(h,0,0,0)/2.)*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+        zc += val(h,0,0,0);
     } end_foreach_block_inner(); }
   } } end_foreach(); }mpi_all_reduce_array (&ke, double, MPI_SUM, 1);
 mpi_all_reduce_array (&gpe, double, MPI_SUM, 1);
@@ -25082,13 +25082,13 @@ foreach_stencil(){
       {
 #line 171
 
-       norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
+ norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
 #line 171
 
-       norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
-        ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        gpe += (zc + _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.)*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        zc += _stencil_val(__FILE__,__LINE__,h,0,0,0);
+ norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
+      ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+      gpe += (zc + _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.)*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+      zc += _stencil_val(__FILE__,__LINE__,h,0,0,0);
     } end_foreach_block_inner(); }
   } } end_foreach_stencil(); }
 strongif (is_constant(cm)) {
@@ -25111,13 +25111,13 @@ foreach_stencil(){
       {
 #line 171
 
-       norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
+ norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
 #line 171
 
-       norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
-        ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        gpe += (zc + _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.)*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        zc += _stencil_val(__FILE__,__LINE__,h,0,0,0);
+ norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
+      ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+      gpe += (zc + _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.)*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+      zc += _stencil_val(__FILE__,__LINE__,h,0,0,0);
     } end_foreach_block_inner(); }
   } } end_foreach_stencil(); }  _first_call = false;
 }}
@@ -25148,13 +25148,13 @@ foreach (){
       {
 #line 171
 
-       norm2 += sq(val(u.x,0,0,0));
+ norm2 += sq(val(u.x,0,0,0));
 #line 171
 
-       norm2 += sq(val(u.y,0,0,0));}
-        ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        gpe += (zc + val(h,0,0,0)/2.)*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        zc += val(h,0,0,0);
+ norm2 += sq(val(u.y,0,0,0));}
+      ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+      gpe += (zc + val(h,0,0,0)/2.)*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+      zc += val(h,0,0,0);
     } end_foreach_block_inner(); }
   } } end_foreach(); }
 strongif (is_constant(cm)) {
@@ -25177,13 +25177,13 @@ foreach (){
       {
 #line 171
 
-       norm2 += sq(val(u.x,0,0,0));
+ norm2 += sq(val(u.x,0,0,0));
 #line 171
 
-       norm2 += sq(val(u.y,0,0,0));}
-        ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        gpe += (zc + val(h,0,0,0)/2.)*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        zc += val(h,0,0,0);
+ norm2 += sq(val(u.y,0,0,0));}
+      ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+      gpe += (zc + val(h,0,0,0)/2.)*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+      zc += val(h,0,0,0);
     } end_foreach_block_inner(); }
   } } end_foreach(); }mpi_all_reduce_array (&ke, double, MPI_SUM, 1);
 mpi_all_reduce_array (&gpe, double, MPI_SUM, 1);
@@ -25293,12 +25293,6 @@ static int output_before_expr0 (int * ip, double * tp, Event * _ev) {  int i = *
     writefields (t, suffix);
   }
  end_trace("output_before", "field_new_PM_restore.c", 288); } return 0; } 
-
-
-static int paraview_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t=100);   *ip = i; *tp = t;   return ret; } static int paraview_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t += 0.2);   *ip = i; *tp = t;   return ret; } static int paraview_expr2 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t <= TEND);   *ip = i; *tp = t;   return ret; } static int paraview (const int i, const double t, Event * _ev) { trace ("paraview", "field_new_PM_restore.c", 291);  {
-  char *suffix = "matrix";
-  writefields (t, suffix);
- end_trace("paraview", "field_new_PM_restore.c", 294); } return 0; } 
 #line 309 "field_new_PM_restore.c"
 static int endrun_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t = TEND);   *ip = i; *tp = t;   return ret; } static int endrun (const int i, const double t, Event * _ev) { trace ("endrun", "field_new_PM_restore.c", 309);  {
   dump ((struct Dump){0});
@@ -25369,10 +25363,6 @@ static int movie_expr0 (int * ip, double * tp, Event * _ev);
 static int movie_expr1 (int * ip, double * tp, Event * _ev);
 static int output_before (const int i, const double t, Event * _ev);
 static int output_before_expr0 (int * ip, double * tp, Event * _ev);
-static int paraview (const int i, const double t, Event * _ev);
-static int paraview_expr0 (int * ip, double * tp, Event * _ev);
-static int paraview_expr1 (int * ip, double * tp, Event * _ev);
-static int paraview_expr2 (int * ip, double * tp, Event * _ev);
 static int endrun (const int i, const double t, Event * _ev);
 static int endrun_expr0 (int * ip, double * tp, Event * _ev);
 void _init_solver (void) {
@@ -25404,8 +25394,6 @@ void _init_solver (void) {
     "field_new_PM_restore.c", 187, "movie"});
   event_register ((Event){ 0, 1, output_before, {output_before_expr0}, ((int *)0), ((double *)0),
     "field_new_PM_restore.c", 273, "output_before"});
-  event_register ((Event){ 0, 3, paraview, {paraview_expr0, paraview_expr1, paraview_expr2}, ((int *)0), ((double *)0),
-    "field_new_PM_restore.c", 291, "paraview"});
   event_register ((Event){ 0, 1, endrun, {endrun_expr0}, ((int *)0), ((double *)0),
     "field_new_PM_restore.c", 309, "endrun"});
   event_register ((Event){ 0, 1, cleanup, {cleanup_expr0}, ((int *)0), ((double *)0),
