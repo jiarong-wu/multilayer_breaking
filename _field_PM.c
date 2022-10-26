@@ -24600,21 +24600,17 @@ void power_input () {
 
 
   if (rank == root) {
-    fprintf (ferr, "rank == root! \n");
 
     length2D = 32*(32 +1);
     float * a = (float*) pmalloc (sizeof(float)*length2D,__func__,__FILE__,__LINE__);
     char filename[100];
     sprintf (filename, "F_kxky");
-    fprintf (ferr, "Before reading! \n");
     FILE * fp = fopen (filename, "rb");
     fread (a, sizeof(float), length2D, fp);
-    fprintf (ferr, "After reading! \n");
     for (int i=0;i<length2D;i++) {
       F_kxky_[i] = (double)a[i];
     }
     fclose (fp);
-    fprintf (ferr, "After assignment! \n");
 
 
     length1D = 32;
@@ -24668,7 +24664,7 @@ void power_input () {
   for (int i=0; i<length1D+1; i++)
     fprintf (fout, "%g ", ky_[i]);
   fclose (fout);
-#line 160 "././spectrum.h"
+#line 156 "././spectrum.h"
 }
 
 
@@ -25216,37 +25212,7 @@ static int movie_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; doub
   static FILE * fp =NULL; strongif (!fp || i == 0) fp = pid() > 0 ? fopen("/dev/null", "w") :  fopen ("ux" ".ppm", "a");
   save ((struct _save){.fp = fp});
   }
-  scalar slope= new_scalar("slope");
-   { 
-disable_fpe (FE_DIVBYZERO|FE_INVALID);
-{ {  static bool _first_call = true;
-  ForeachData _foreach_data = {
-    .fname = "field_PM.c", .line = 197,
-    .each = "foreach", .first = _first_call
-  };
-foreach_stencil(){
-
-#line 197 "field_PM.c"
- {
-    _stencil_val(__FILE__,__LINE__,slope,0,0,0) = (_stencil_val(__FILE__,__LINE__,eta,1,0,0)-_stencil_val(__FILE__,__LINE__,eta,-1,0,0))/(2.*Delta);
-  } } end_foreach_stencil();  _first_call = false;
-}}
-enable_fpe (FE_DIVBYZERO|FE_INVALID);
-#line 199
-foreach (){
-
-#line 197 "field_PM.c"
- {
-    val(slope,0,0,0) = (val(eta,1,0,0)-val(eta,-1,0,0))/(2.*Delta);
-  } } end_foreach(); }
-  clear();
-  squares ((struct _squares){"slope", .linear = true, .z = "eta", .min = -1./50.*L0, .max = 1./50.*L0});
-  sprintf (s, "t = %.2f", t);
-  draw_string ((struct _draw_string){s, .size = 30});
-  {
-  static FILE * fp =NULL; strongif (!fp || i == 0) fp = pid() > 0 ? fopen("/dev/null", "w") :  fopen ("slope" ".ppm", "a");
-  save ((struct _save){.fp = fp});
-  }
+#line 208 "field_PM.c"
   char filename1[50], filename2[50], filename3[50];
   sprintf (filename1, "surface/eta_matrix_%g", t);
   sprintf (filename2, "surface/ux_matrix_%g", t);
@@ -25263,23 +25229,38 @@ foreach (){
   FILE * fuy = fopen (filename3, "w");
   output_matrix_mpi ((struct OutputMatrix){u_temp.y, fuy, N, .linear = true});
   fclose (fuy);
- delete (((scalar []){slope,{-1}}));  end_trace("movie", "field_PM.c", 224); } return 0; } 
+ end_trace("movie", "field_PM.c", 224); } return 0; } 
 
 
 
 
-
-
-static int paraview_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t = 100);   *ip = i; *tp = t;   return ret; } static int paraview_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t += 0.2);   *ip = i; *tp = t;   return ret; } static int paraview_expr2 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t <= TEND);   *ip = i; *tp = t;   return ret; } static int paraview (const int i, const double t, Event * _ev) { trace ("paraview", "field_PM.c", 231);  {
+int writefields (double t, const char *suffix) {
   char s[80];
   char filename1[50], filename2[50], filename3[50], filename4[50];
+  vector u_temp;
+  scalar w_temp, h_temp;
   for (int j=0; j<nl; ++j) {
-    sprintf (filename1, "field/ux_matrix_t%g_l%d", t, j);
-    sprintf (filename2, "field/uy_matrix_t%g_l%d", t, j);
-    sprintf (filename3, "field/uz_matrix_t%g_l%d", t, j);
-    sprintf (filename4, "field/h_matrix_t%g_l%d", t, j);
-    sprintf (s, "u%d", j);
-    vector u_temp = lookup_vector (s);
+    sprintf (filename1, "field/ux_%s_t%g_l%d", suffix, t, j);
+    sprintf (filename2, "field/uy_%s_t%g_l%d", suffix, t, j);
+    sprintf (filename3, "field/uz_%s_t%g_l%d", suffix, t, j);
+    sprintf (filename4, "field/h_%s_t%g_l%d", suffix, t, j);
+    if (j==0) {
+
+      sprintf (s, "u");
+      u_temp = lookup_vector (s);
+      sprintf (s, "w");
+      w_temp = lookup_field (s);
+      sprintf (s, "h");
+      h_temp = lookup_field (s);
+    }
+    else {
+      sprintf (s, "u%d", j);
+      u_temp = lookup_vector (s);
+      sprintf (s, "w%d", j);
+      w_temp = lookup_field (s);
+      sprintf (s, "h%d", j);
+      h_temp = lookup_field (s);
+    }
     FILE * fux = fopen (filename1, "w");
     output_matrix_mpi ((struct OutputMatrix){u_temp.x, fux, N, .linear = true});
     fclose (fux);
@@ -25287,21 +25268,32 @@ static int paraview_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; d
     output_matrix_mpi ((struct OutputMatrix){u_temp.y, fuy, N, .linear = true});
     fclose (fuy);
     FILE * fuz = fopen (filename3, "w");
-    sprintf (s, "w%d", j);
-    scalar w_temp = lookup_field (s);
     output_matrix_mpi ((struct OutputMatrix){w_temp, fuz, N, .linear = true});
     fclose (fuz);
     FILE * fh = fopen (filename4, "w");
-    sprintf (s, "h%d", j);
-    scalar h_temp = lookup_field (s);
     output_matrix_mpi ((struct OutputMatrix){h_temp, fh, N, .linear = true});
     fclose (fh);
   }
- end_trace("paraview", "field_PM.c", 258); } return 0; } 
-#line 272 "field_PM.c"
-static int endrun_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t = TEND);   *ip = i; *tp = t;   return ret; } static int endrun (const int i, const double t, Event * _ev) { trace ("endrun", "field_PM.c", 272);  {
+  return 0;
+}
+
+
+
+
+static int field_log_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t=0);   *ip = i; *tp = t;   return ret; } static int field_log_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t+=5);   *ip = i; *tp = t;   return ret; } static int field_log_expr2 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t<=TEND);   *ip = i; *tp = t;   return ret; } static int field_log (const int i, const double t, Event * _ev) { trace ("field_log", "field_PM.c", 275);  {
+  char *suffix = "matrix";
+  writefields (t, suffix);
+ end_trace("field_log", "field_PM.c", 278); } return 0; } 
+#line 298 "field_PM.c"
+static int regulardump_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t = 0);   *ip = i; *tp = t;   return ret; } static int regulardump_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t += 10);   *ip = i; *tp = t;   return ret; } static int regulardump_expr2 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t < TEND);   *ip = i; *tp = t;   return ret; } static int regulardump (const int i, const double t, Event * _ev) { trace ("regulardump", "field_PM.c", 298);  {
+  char dname[100];
+  sprintf (dname, "dump_t%g", t);
+  dump ((struct Dump){dname});
+ end_trace("regulardump", "field_PM.c", 302); } return 0; } 
+
+static int endrun_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t = TEND);   *ip = i; *tp = t;   return ret; } static int endrun (const int i, const double t, Event * _ev) { trace ("endrun", "field_PM.c", 304);  {
   dump ((struct Dump){0});
- end_trace("endrun", "field_PM.c", 274); } return 0; } 
+ end_trace("endrun", "field_PM.c", 306); } return 0; } 
 size_t datasize = 1*sizeof (double);
 static int defaults0 (const int i, const double t, Event * _ev);
 static int defaults0_expr0 (int * ip, double * tp, Event * _ev);
@@ -25366,10 +25358,14 @@ static int energy_after_remap_expr0 (int * ip, double * tp, Event * _ev);
 static int movie (const int i, const double t, Event * _ev);
 static int movie_expr0 (int * ip, double * tp, Event * _ev);
 static int movie_expr1 (int * ip, double * tp, Event * _ev);
-static int paraview (const int i, const double t, Event * _ev);
-static int paraview_expr0 (int * ip, double * tp, Event * _ev);
-static int paraview_expr1 (int * ip, double * tp, Event * _ev);
-static int paraview_expr2 (int * ip, double * tp, Event * _ev);
+static int field_log (const int i, const double t, Event * _ev);
+static int field_log_expr0 (int * ip, double * tp, Event * _ev);
+static int field_log_expr1 (int * ip, double * tp, Event * _ev);
+static int field_log_expr2 (int * ip, double * tp, Event * _ev);
+static int regulardump (const int i, const double t, Event * _ev);
+static int regulardump_expr0 (int * ip, double * tp, Event * _ev);
+static int regulardump_expr1 (int * ip, double * tp, Event * _ev);
+static int regulardump_expr2 (int * ip, double * tp, Event * _ev);
 static int endrun (const int i, const double t, Event * _ev);
 static int endrun_expr0 (int * ip, double * tp, Event * _ev);
 void _init_solver (void) {
@@ -25399,10 +25395,12 @@ void _init_solver (void) {
     "/home/jiarongw/basilisk/src/layered/perfs.h", 30, "perf_plot"});
   event_register ((Event){ 0, 2, movie, {movie_expr0, movie_expr1}, ((int *)0), ((double *)0),
     "field_PM.c", 184, "movie"});
-  event_register ((Event){ 0, 3, paraview, {paraview_expr0, paraview_expr1, paraview_expr2}, ((int *)0), ((double *)0),
-    "field_PM.c", 231, "paraview"});
+  event_register ((Event){ 0, 3, field_log, {field_log_expr0, field_log_expr1, field_log_expr2}, ((int *)0), ((double *)0),
+    "field_PM.c", 275, "field_log"});
+  event_register ((Event){ 0, 3, regulardump, {regulardump_expr0, regulardump_expr1, regulardump_expr2}, ((int *)0), ((double *)0),
+    "field_PM.c", 298, "regulardump"});
   event_register ((Event){ 0, 1, endrun, {endrun_expr0}, ((int *)0), ((double *)0),
-    "field_PM.c", 272, "endrun"});
+    "field_PM.c", 304, "endrun"});
   event_register ((Event){ 0, 1, cleanup, {cleanup_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/run.h", 50, "cleanup"});
   event_register ((Event){ 0, 1, cleanup_0, {cleanup_0_expr0}, ((int *)0), ((double *)0),

@@ -193,18 +193,18 @@ event movie (t += 0.1; t <= TEND)
   static FILE * fp = POPEN ("ux", "a");
   save (fp = fp);
   }
-  scalar slope[];
-  foreach () {
-    slope[] = (eta[1]-eta[-1])/(2.*Delta);
-  }
-  clear();
-  squares ("slope", linear = true, z = "eta", min = -1./50.*L0, max = 1./50.*L0);
-  sprintf (s, "t = %.2f", t);
-  draw_string (s, size = 30);
-  {
-  static FILE * fp = POPEN ("slope", "a");
-  save (fp = fp);
-  }
+  /* scalar slope[]; */
+  /* foreach () { */
+  /*   slope[] = (eta[1]-eta[-1])/(2.*Delta); */
+  /* } */
+  /* clear(); */
+  /* squares ("slope", linear = true, z = "eta", min = -1./50.*L0, max = 1./50.*L0); */
+  /* sprintf (s, "t = %.2f", t); */
+  /* draw_string (s, size = 30); */
+  /* { */
+  /* static FILE * fp = POPEN ("slope", "a"); */
+  /* save (fp = fp); */
+  /* } */
   char filename1[50], filename2[50], filename3[50];
   sprintf (filename1, "surface/eta_matrix_%g", t);
   sprintf (filename2, "surface/ux_matrix_%g", t);
@@ -270,8 +270,13 @@ int writefields (double t, const char *suffix) {
 }
 
 /**
-   Output 3-D field (not just the surface laye) if needed for Paraview visualization or 
-   other analyses. */
+   Output 3-D field (not just the surface laye) if needed for Paraview visualization or other analyses. */
+
+event field_log (t=0; t+=5; t<=TEND) {
+  char *suffix = "matrix";
+  writefields (t, suffix);
+}
+
 #if PARAVIEW
 event paraview (t = 100; t += 0.2; t <= TEND) {
   char *suffix = "matrix";
@@ -289,6 +294,12 @@ event adapt (i++) {
   my_adapt();
 }
 #endif
+
+event regulardump (t = 0; t += 10; t < TEND) {
+  char dname[100];
+  sprintf (dname, "dump_t%g", t);
+  dump(dname);
+}
 
 event endrun (t = TEND) {
   dump();
