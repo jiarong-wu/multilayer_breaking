@@ -128,15 +128,17 @@ event init (i = 0)
 
 /** 
 ## The effect of vertical and horizontal diffusion
+All vertical diffusions have been added by either the hydro.h or nh.h header files.
+If the DIFFUSION flag is 1, the additional horizontal diffusion will be added as well. Currently using the same viscoisty as the vertical ones. 
 */
 
 #if DIFFUSION
 event viscous_term (i++) {
-  foreach () {
-    vertical_diffusion (point, h, u.x, dt, nu, 0., 0., 0.);
-    vertical_diffusion (point, h, u.y, dt, nu, 0., 0., 0.);
-  }
-  // horizontal_diffusion ((scalar *){u}, nu, dt); 
+  /* foreach () { */
+  /*   vertical_diffusion (point, h, u.x, dt, nu, 0., 0., 0.); */
+  /*   vertical_diffusion (point, h, u.y, dt, nu, 0., 0., 0.); */
+  /* } */
+  horizontal_diffusion ((scalar *){u}, nu, dt); 
 }
 #endif
 
