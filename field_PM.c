@@ -126,6 +126,20 @@ event init (i = 0)
   }
 }
 
+/** 
+## The effect of vertical and horizontal diffusion
+*/
+
+#if DIFFUSION
+event viscous_term (i++) {
+  foreach () {
+    vertical_diffusion (point, h, u.x, dt, nu, 0., 0., 0.);
+    vertical_diffusion (point, h, u.y, dt, nu, 0., 0., 0.);
+  }
+  // horizontal_diffusion ((scalar *){u}, nu, dt); 
+}
+#endif
+
 /**
 ## Outputs
 This is not necessary. It seems that the remapping does not change the energy.
@@ -154,28 +168,28 @@ event energy_before_remap (i++, last)
   fflush (fp);
 }
 
-event energy_after_remap (i++, last)
-{
-  if (i==10) {
-    fprintf(stderr, "energy output after remap!\n");
-    fflush(stderr);
-  }
-  double ke = 0., gpe = 0.;
-  foreach (reduction(+:ke) reduction(+:gpe)) {
-    double zc = zb[];
-    foreach_layer () {
-      double norm2 = sq(w[]);
-      foreach_dimension()
-        norm2 += sq(u.x[]);
-        ke += norm2*h[]*dv();
-        gpe += (zc + h[]/2.)*h[]*dv();
-        zc += h[];
-    }
-  }
-  static FILE * fp = fopen("energy_after_remap.dat","w");
-  fprintf (fp, "%g %g %g\n", t, ke/2., g_*gpe - gpe_base);
-  fflush (fp);
-}
+/* event energy_after_remap (i++, last) */
+/* { */
+/*   if (i==10) { */
+/*     fprintf(stderr, "energy output after remap!\n"); */
+/*     fflush(stderr); */
+/*   } */
+/*   double ke = 0., gpe = 0.; */
+/*   foreach (reduction(+:ke) reduction(+:gpe)) { */
+/*     double zc = zb[]; */
+/*     foreach_layer () { */
+/*       double norm2 = sq(w[]); */
+/*       foreach_dimension() */
+/*         norm2 += sq(u.x[]); */
+/*         ke += norm2*h[]*dv(); */
+/*         gpe += (zc + h[]/2.)*h[]*dv(); */
+/*         zc += h[]; */
+/*     } */
+/*   } */
+/*   static FILE * fp = fopen("energy_after_remap.dat","w"); */
+/*   fprintf (fp, "%g %g %g\n", t, ke/2., g_*gpe - gpe_base); */
+/*   fflush (fp); */
+/* } */
 
 /**
    Note that the movie generation below is very expensive. */
