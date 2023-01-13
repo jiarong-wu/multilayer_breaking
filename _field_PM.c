@@ -24890,7 +24890,55 @@ foreach(){
 
 
 
-static int energy_before_remap_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (i++);   *ip = i; *tp = t;   return ret; } static int energy_before_remap (const int i, const double t, Event * _ev) { trace ("energy_before_remap", "field_PM.c", 134); 
+static int viscous_term_1_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (i++);   *ip = i; *tp = t;   return ret; } static int viscous_term_1 (const int i, const double t, Event * _ev) { trace ("viscous_term_1", "field_PM.c", 134);  {
+   { 
+#define vertical_diffusion _vertical_diffusion
+disable_fpe (FE_DIVBYZERO|FE_INVALID);
+{  double _dt = dt;
+ double _nu = nu;
+{ double dt = _dt; NOT_UNUSED(dt);
+ double nu = _nu; NOT_UNUSED(nu);
+  static bool _first_call = true;
+  ForeachData _foreach_data = {
+    .fname = "field_PM.c", .line = 135,
+    .each = "foreach", .first = _first_call
+  };
+foreach_stencil(){
+
+#line 135 "field_PM.c"
+ {
+    vertical_diffusion (point, h, u.x, dt, nu, 0., 0., 0.);
+    vertical_diffusion (point, h, u.y, dt, nu, 0., 0., 0.);
+  } } end_foreach_stencil(); if (_first_call) {
+ if (dt != _dt)
+   reduction_warning ("field_PM.c", 135, "dt");
+ }
+ if (_first_call) {
+ if (nu != _nu)
+   reduction_warning ("field_PM.c", 135, "nu");
+ }
+  _first_call = false;
+}}
+enable_fpe (FE_DIVBYZERO|FE_INVALID);
+#undef vertical_diffusion
+#line 138
+foreach (){
+
+#line 135 "field_PM.c"
+ {
+    vertical_diffusion (point, h, u.x, dt, nu, 0., 0., 0.);
+    vertical_diffusion (point, h, u.y, dt, nu, 0., 0., 0.);
+  } } end_foreach(); }
+
+ end_trace("viscous_term_1", "field_PM.c", 140); } return 0; } 
+
+
+
+
+
+
+
+static int energy_before_remap_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (i++);   *ip = i; *tp = t;   return ret; } static int energy_before_remap (const int i, const double t, Event * _ev) { trace ("energy_before_remap", "field_PM.c", 148); 
 {
   if (i==10) {
     fprintf(ferr, "energy output before remap!\n");
@@ -24905,7 +24953,7 @@ disable_fpe (FE_DIVBYZERO|FE_INVALID);
  double gpe = _gpe; NOT_UNUSED(gpe);
   static bool _first_call = true;
   ForeachData _foreach_data = {
-    .fname = "field_PM.c", .line = 141,
+    .fname = "field_PM.c", .line = 155,
     .each = "foreach", .first = _first_call
   };
 
@@ -24916,19 +24964,19 @@ strongif (!is_constant(cm)) {
 #define fine_cm(a,i,j,k) _stencil_fine(__FILE__,__LINE__,a,i,j,k)
 #undef coarse_cm
 #define coarse_cm(a,i,j,k) _stencil_coarse(__FILE__,__LINE__,a,i,j,k)
-#line 141
+#line 155
 foreach_stencil(){
 
-#line 141 "field_PM.c"
+#line 155 "field_PM.c"
  {
     double zc = _stencil_val(__FILE__,__LINE__,zb,0,0,0);
      { foreach_block_inner() {
       double norm2 = sq(_stencil_val(__FILE__,__LINE__,w,0,0,0));
       {
-#line 145
+#line 159
 
         norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
-#line 145
+#line 159
 
         norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
         ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
@@ -24945,19 +24993,19 @@ NOT_UNUSED(_const_cm);
 #define fine_cm(a,i,j,k) _const_cm
 #undef coarse_cm
 #define coarse_cm(a,i,j,k) _const_cm
-#line 141
+#line 155
 foreach_stencil(){
 
-#line 141 "field_PM.c"
+#line 155 "field_PM.c"
  {
     double zc = _stencil_val(__FILE__,__LINE__,zb,0,0,0);
      { foreach_block_inner() {
       double norm2 = sq(_stencil_val(__FILE__,__LINE__,w,0,0,0));
       {
-#line 145
+#line 159
 
         norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
-#line 145
+#line 159
 
         norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
         ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
@@ -24967,13 +25015,13 @@ foreach_stencil(){
   } } end_foreach_stencil(); }  _first_call = false;
 }}
 enable_fpe (FE_DIVBYZERO|FE_INVALID);
-#line 151
+#line 165
 
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(+:ke)  reduction(+:gpe)) {
 
-#line 141
+#line 155
 
 strongif (!is_constant(cm)) {
 #undef val_cm
@@ -24982,19 +25030,19 @@ strongif (!is_constant(cm)) {
 #define fine_cm(a,i,j,k) fine(a,i,j,k)
 #undef coarse_cm
 #define coarse_cm(a,i,j,k) coarse(a,i,j,k)
-#line 141
+#line 155
 foreach (){
 
-#line 141 "field_PM.c"
+#line 155 "field_PM.c"
  {
     double zc = val(zb,0,0,0);
      { foreach_block_inner() {
       double norm2 = sq(val(w,0,0,0));
       {
-#line 145
+#line 159
 
         norm2 += sq(val(u.x,0,0,0));
-#line 145
+#line 159
 
         norm2 += sq(val(u.y,0,0,0));}
         ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
@@ -25011,19 +25059,19 @@ NOT_UNUSED(_const_cm);
 #define fine_cm(a,i,j,k) _const_cm
 #undef coarse_cm
 #define coarse_cm(a,i,j,k) _const_cm
-#line 141
+#line 155
 foreach (){
 
-#line 141 "field_PM.c"
+#line 155 "field_PM.c"
  {
     double zc = val(zb,0,0,0);
      { foreach_block_inner() {
       double norm2 = sq(val(w,0,0,0));
       {
-#line 145
+#line 159
 
         norm2 += sq(val(u.x,0,0,0));
-#line 145
+#line 159
 
         norm2 += sq(val(u.y,0,0,0));}
         ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
@@ -25036,171 +25084,14 @@ mpi_all_reduce_array (&gpe, double, MPI_SUM, 1);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 151
+#line 165
  }
   static FILE * fp =NULL; strongif (!fp || i == 0) fp = pid() > 0 ? fopen("/dev/null", "w") :  fopen("energy_before_remap.dat","w");
   fprintf (fp, "%g %g %g\n", t, ke/2., 9.8*gpe - gpe_base);
   fflush (fp);
- end_trace("energy_before_remap", "field_PM.c", 155); } return 0; } 
-
-static int energy_after_remap_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (i++);   *ip = i; *tp = t;   return ret; } static int energy_after_remap (const int i, const double t, Event * _ev) { trace ("energy_after_remap", "field_PM.c", 157); 
-{
-  if (i==10) {
-    fprintf(ferr, "energy output after remap!\n");
-    fflush(ferr);
-  }
-  double ke = 0., gpe = 0.;
-   { 
-disable_fpe (FE_DIVBYZERO|FE_INVALID);
-{  double _ke = ke;
- double _gpe = gpe;
-{ double ke = _ke; NOT_UNUSED(ke);
- double gpe = _gpe; NOT_UNUSED(gpe);
-  static bool _first_call = true;
-  ForeachData _foreach_data = {
-    .fname = "field_PM.c", .line = 164,
-    .each = "foreach", .first = _first_call
-  };
-
-strongif (!is_constant(cm)) {
-#undef val_cm
-#define val_cm(a,i,j,k) _stencil_val(__FILE__,__LINE__,a,i,j,k)
-#undef fine_cm
-#define fine_cm(a,i,j,k) _stencil_fine(__FILE__,__LINE__,a,i,j,k)
-#undef coarse_cm
-#define coarse_cm(a,i,j,k) _stencil_coarse(__FILE__,__LINE__,a,i,j,k)
-#line 164
-foreach_stencil(){
-
-#line 164 "field_PM.c"
- {
-    double zc = _stencil_val(__FILE__,__LINE__,zb,0,0,0);
-     { foreach_block_inner() {
-      double norm2 = sq(_stencil_val(__FILE__,__LINE__,w,0,0,0));
-      {
-#line 168
-
-        norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
-#line 168
-
-        norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
-        ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        gpe += (zc + _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.)*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        zc += _stencil_val(__FILE__,__LINE__,h,0,0,0);
-    } end_foreach_block_inner(); }
-  } } end_foreach_stencil(); }
-strongif (is_constant(cm)) {
-const double _const_cm = _constant[cm.i -_NVARMAX];
-NOT_UNUSED(_const_cm);
-#undef val_cm
-#define val_cm(a,i,j,k) _const_cm
-#undef fine_cm
-#define fine_cm(a,i,j,k) _const_cm
-#undef coarse_cm
-#define coarse_cm(a,i,j,k) _const_cm
-#line 164
-foreach_stencil(){
-
-#line 164 "field_PM.c"
- {
-    double zc = _stencil_val(__FILE__,__LINE__,zb,0,0,0);
-     { foreach_block_inner() {
-      double norm2 = sq(_stencil_val(__FILE__,__LINE__,w,0,0,0));
-      {
-#line 168
-
-        norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
-#line 168
-
-        norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
-        ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        gpe += (zc + _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.)*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        zc += _stencil_val(__FILE__,__LINE__,h,0,0,0);
-    } end_foreach_block_inner(); }
-  } } end_foreach_stencil(); }  _first_call = false;
-}}
-enable_fpe (FE_DIVBYZERO|FE_INVALID);
-#line 174
-
-#undef OMP_PARALLEL
-#define OMP_PARALLEL()
-OMP(omp parallel reduction(+:ke)  reduction(+:gpe)) {
-
-#line 164
-
-strongif (!is_constant(cm)) {
-#undef val_cm
-#define val_cm(a,i,j,k) val(a,i,j,k)
-#undef fine_cm
-#define fine_cm(a,i,j,k) fine(a,i,j,k)
-#undef coarse_cm
-#define coarse_cm(a,i,j,k) coarse(a,i,j,k)
-#line 164
-foreach (){
-
-#line 164 "field_PM.c"
- {
-    double zc = val(zb,0,0,0);
-     { foreach_block_inner() {
-      double norm2 = sq(val(w,0,0,0));
-      {
-#line 168
-
-        norm2 += sq(val(u.x,0,0,0));
-#line 168
-
-        norm2 += sq(val(u.y,0,0,0));}
-        ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        gpe += (zc + val(h,0,0,0)/2.)*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        zc += val(h,0,0,0);
-    } end_foreach_block_inner(); }
-  } } end_foreach(); }
-strongif (is_constant(cm)) {
-const double _const_cm = _constant[cm.i -_NVARMAX];
-NOT_UNUSED(_const_cm);
-#undef val_cm
-#define val_cm(a,i,j,k) _const_cm
-#undef fine_cm
-#define fine_cm(a,i,j,k) _const_cm
-#undef coarse_cm
-#define coarse_cm(a,i,j,k) _const_cm
-#line 164
-foreach (){
-
-#line 164 "field_PM.c"
- {
-    double zc = val(zb,0,0,0);
-     { foreach_block_inner() {
-      double norm2 = sq(val(w,0,0,0));
-      {
-#line 168
-
-        norm2 += sq(val(u.x,0,0,0));
-#line 168
-
-        norm2 += sq(val(u.y,0,0,0));}
-        ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        gpe += (zc + val(h,0,0,0)/2.)*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        zc += val(h,0,0,0);
-    } end_foreach_block_inner(); }
-  } } end_foreach(); }mpi_all_reduce_array (&ke, double, MPI_SUM, 1);
-mpi_all_reduce_array (&gpe, double, MPI_SUM, 1);
-
-#undef OMP_PARALLEL
-#define OMP_PARALLEL() OMP(omp parallel)
-}
-#line 174
- }
-  static FILE * fp =NULL; strongif (!fp || i == 0) fp = pid() > 0 ? fopen("/dev/null", "w") :  fopen("energy_after_remap.dat","w");
-  fprintf (fp, "%g %g %g\n", t, ke/2., 9.8*gpe - gpe_base);
-  fflush (fp);
- end_trace("energy_after_remap", "field_PM.c", 178); } return 0; } 
-
-
-
-
-
-static int movie_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t += 0.1);   *ip = i; *tp = t;   return ret; } static int movie_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t <= TEND);   *ip = i; *tp = t;   return ret; } static int movie (const int i, const double t, Event * _ev) { trace ("movie", "field_PM.c", 184); 
+ end_trace("energy_before_remap", "field_PM.c", 169); } return 0; } 
+#line 198 "field_PM.c"
+static int movie_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t += 0.1);   *ip = i; *tp = t;   return ret; } static int movie_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t <= TEND);   *ip = i; *tp = t;   return ret; } static int movie (const int i, const double t, Event * _ev) { trace ("movie", "field_PM.c", 198); 
 {
   char s[80];
   view ((struct _view_set){.fov = 20, .quat = {0.475152,0.161235,0.235565,0.832313}, .width = 800, .height = 600});
@@ -25212,7 +25103,7 @@ static int movie_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; doub
   static FILE * fp =NULL; strongif (!fp || i == 0) fp = pid() > 0 ? fopen("/dev/null", "w") :  fopen ("ux" ".ppm", "a");
   save ((struct _save){.fp = fp});
   }
-#line 208 "field_PM.c"
+#line 222 "field_PM.c"
   char filename1[50], filename2[50], filename3[50];
   sprintf (filename1, "surface/eta_matrix_%g", t);
   sprintf (filename2, "surface/ux_matrix_%g", t);
@@ -25229,7 +25120,7 @@ static int movie_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; doub
   FILE * fuy = fopen (filename3, "w");
   output_matrix_mpi ((struct OutputMatrix){u_temp.y, fuy, N, .linear = true});
   fclose (fuy);
- end_trace("movie", "field_PM.c", 224); } return 0; } 
+ end_trace("movie", "field_PM.c", 238); } return 0; } 
 
 
 
@@ -25280,20 +25171,20 @@ int writefields (double t, const char *suffix) {
 
 
 
-static int field_log_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t=0);   *ip = i; *tp = t;   return ret; } static int field_log_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t+=5);   *ip = i; *tp = t;   return ret; } static int field_log_expr2 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t<=TEND);   *ip = i; *tp = t;   return ret; } static int field_log (const int i, const double t, Event * _ev) { trace ("field_log", "field_PM.c", 275);  {
+static int field_log_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t=0);   *ip = i; *tp = t;   return ret; } static int field_log_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t+=5);   *ip = i; *tp = t;   return ret; } static int field_log_expr2 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t<=TEND);   *ip = i; *tp = t;   return ret; } static int field_log (const int i, const double t, Event * _ev) { trace ("field_log", "field_PM.c", 289);  {
   char *suffix = "matrix";
   writefields (t, suffix);
- end_trace("field_log", "field_PM.c", 278); } return 0; } 
-#line 298 "field_PM.c"
-static int regulardump_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t = 0);   *ip = i; *tp = t;   return ret; } static int regulardump_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t += 10);   *ip = i; *tp = t;   return ret; } static int regulardump_expr2 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t < TEND);   *ip = i; *tp = t;   return ret; } static int regulardump (const int i, const double t, Event * _ev) { trace ("regulardump", "field_PM.c", 298);  {
+ end_trace("field_log", "field_PM.c", 292); } return 0; } 
+#line 312 "field_PM.c"
+static int regulardump_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t = 0);   *ip = i; *tp = t;   return ret; } static int regulardump_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t += 10);   *ip = i; *tp = t;   return ret; } static int regulardump_expr2 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t < TEND);   *ip = i; *tp = t;   return ret; } static int regulardump (const int i, const double t, Event * _ev) { trace ("regulardump", "field_PM.c", 312);  {
   char dname[100];
   sprintf (dname, "dump_t%g", t);
   dump ((struct Dump){dname});
- end_trace("regulardump", "field_PM.c", 302); } return 0; } 
+ end_trace("regulardump", "field_PM.c", 316); } return 0; } 
 
-static int endrun_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t = TEND);   *ip = i; *tp = t;   return ret; } static int endrun (const int i, const double t, Event * _ev) { trace ("endrun", "field_PM.c", 304);  {
+static int endrun_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t = TEND);   *ip = i; *tp = t;   return ret; } static int endrun (const int i, const double t, Event * _ev) { trace ("endrun", "field_PM.c", 318);  {
   dump ((struct Dump){0});
- end_trace("endrun", "field_PM.c", 306); } return 0; } 
+ end_trace("endrun", "field_PM.c", 320); } return 0; } 
 size_t datasize = 1*sizeof (double);
 static int defaults0 (const int i, const double t, Event * _ev);
 static int defaults0_expr0 (int * ip, double * tp, Event * _ev);
@@ -25351,10 +25242,10 @@ static int perf_plot (const int i, const double t, Event * _ev);
 static int perf_plot_expr0 (int * ip, double * tp, Event * _ev);
 static int init_0 (const int i, const double t, Event * _ev);
 static int init_0_expr0 (int * ip, double * tp, Event * _ev);
+static int viscous_term_1 (const int i, const double t, Event * _ev);
+static int viscous_term_1_expr0 (int * ip, double * tp, Event * _ev);
 static int energy_before_remap (const int i, const double t, Event * _ev);
 static int energy_before_remap_expr0 (int * ip, double * tp, Event * _ev);
-static int energy_after_remap (const int i, const double t, Event * _ev);
-static int energy_after_remap_expr0 (int * ip, double * tp, Event * _ev);
 static int movie (const int i, const double t, Event * _ev);
 static int movie_expr0 (int * ip, double * tp, Event * _ev);
 static int movie_expr1 (int * ip, double * tp, Event * _ev);
@@ -25394,13 +25285,13 @@ void _init_solver (void) {
   event_register ((Event){ 0, 1, perf_plot, {perf_plot_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/layered/perfs.h", 30, "perf_plot"});
   event_register ((Event){ 0, 2, movie, {movie_expr0, movie_expr1}, ((int *)0), ((double *)0),
-    "field_PM.c", 184, "movie"});
+    "field_PM.c", 198, "movie"});
   event_register ((Event){ 0, 3, field_log, {field_log_expr0, field_log_expr1, field_log_expr2}, ((int *)0), ((double *)0),
-    "field_PM.c", 275, "field_log"});
+    "field_PM.c", 289, "field_log"});
   event_register ((Event){ 0, 3, regulardump, {regulardump_expr0, regulardump_expr1, regulardump_expr2}, ((int *)0), ((double *)0),
-    "field_PM.c", 298, "regulardump"});
+    "field_PM.c", 312, "regulardump"});
   event_register ((Event){ 0, 1, endrun, {endrun_expr0}, ((int *)0), ((double *)0),
-    "field_PM.c", 304, "endrun"});
+    "field_PM.c", 318, "endrun"});
   event_register ((Event){ 0, 1, cleanup, {cleanup_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/run.h", 50, "cleanup"});
   event_register ((Event){ 0, 1, cleanup_0, {cleanup_0_expr0}, ((int *)0), ((double *)0),
@@ -25421,6 +25312,8 @@ void _init_solver (void) {
     "/home/jiarongw/basilisk/src/layered/diffusion.h", 144, "viscous_term"});
   event_register ((Event){ 0, 1, viscous_term_0, {viscous_term_0_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/layered/nh.h", 76, "viscous_term"});
+  event_register ((Event){ 0, 1, viscous_term_1, {viscous_term_1_expr0}, ((int *)0), ((double *)0),
+    "field_PM.c", 134, "viscous_term"});
   event_register ((Event){ 0, 1, acceleration, {acceleration_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/layered/hydro.h", 396, "acceleration"});
   event_register ((Event){ 0, 1, acceleration_0, {acceleration_0_expr0}, ((int *)0), ((double *)0),
@@ -25438,9 +25331,7 @@ void _init_solver (void) {
   event_register ((Event){ 0, 1, remap_0, {remap_0_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/layered/remap.h", 111, "remap"});
   event_register ((Event){ 0, 1, energy_before_remap, {energy_before_remap_expr0}, ((int *)0), ((double *)0),
-    "field_PM.c", 134, "energy_before_remap"});
-  event_register ((Event){ 0, 1, energy_after_remap, {energy_after_remap_expr0}, ((int *)0), ((double *)0),
-    "field_PM.c", 157, "energy_after_remap"});
+    "field_PM.c", 148, "energy_before_remap"});
   void allocate_globals (int);
   allocate_globals (1);
   set_fpe();
