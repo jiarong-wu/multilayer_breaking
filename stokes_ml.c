@@ -25,6 +25,7 @@
 //#include "remap_test.h"
 #include "layered/remap.h"
 #include "layered/perfs.h"
+#include "output_mpi.h" // Antoon's function for MPI compatible matrix output
 
 /**
    The initial conditions are given by the wave steepness $ak$ and the
@@ -37,7 +38,7 @@ double gpe_base = 0;
 #define k_  (2.*pi)
 #define h_   0.5
 #define g_   1
-#define T0  (2.*pi/sqrt(g_*k_))
+#define T0  (k_/sqrt(g_*k_))
 
 /**
    The domain is periodic in $x$ and resolved using 256$^2$
@@ -128,7 +129,7 @@ event logfile (i++)
 /**
    And generate the movie of the free surface (this is quite expensive). */
 
-event movie (t += 0.1*T0; t <= 10.*T0)
+event movie (t += 0.01*T0)
 {
   /* view (width = 1600, height = 1200, theta = pi/4, phi = -pi/6, fov = 20); */
   /* view (fov = 20, theta = 0, phi = -pi/3, psi = pi/4, width = 800, height = 600);  */
@@ -144,6 +145,78 @@ event movie (t += 0.1*T0; t <= 10.*T0)
     static FILE * fp = fopen ("movie.ppm", "w");
     save (fp = fp);
   }
+  char filename1[50], filename2[50], filename3[50], filename4[50];
+  sprintf (filename1, "surface/eta_matrix_%g", t/T0);
+  sprintf (filename2, "surface/ux_matrix_%g", t/T0);
+  sprintf (filename3, "surface/uy_matrix_%g", t/T0);  
+  sprintf (filename4, "surface/uz_matrix_%g", t/T0);
+  FILE * feta = fopen (filename1, "w");
+  // Might need to change to mpi function later
+  output_matrix_mpi (eta, feta, N, linear = true);
+  fclose (feta);
+  sprintf (s, "u%d", nl-1);
+  vector u_temp = lookup_vector (s);
+  FILE * fux = fopen (filename2, "w");
+  output_matrix_mpi (u_temp.x, fux, N, linear = true);
+  fclose (fux);
+  FILE * fuy = fopen (filename3, "w");
+  output_matrix_mpi (u_temp.y, fuy, N, linear = true);
+  fclose (fuy);  
+  sprintf (s, "w%d", nl-1);
+  scalar w_temp = lookup_field (s);
+  FILE *fuz = fopen (filename4, "w");
+  output_matrix_mpi (w_temp, fuz, N, linear = true);
+  fclose (fuz);
+}
+
+/** Function for writing fields at time t.
+*/
+int writefields (double t, const char *suffix) {
+  char s[80];
+  char filename1[50], filename2[50], filename3[50], filename4[50];
+  vector u_temp;
+  scalar w_temp, h_temp;
+  for (int j=0; j<nl; ++j) {
+    sprintf (filename1, "field/ux_%s_t%g_l%d", suffix, t/T0, j);
+    sprintf (filename2, "field/uy_%s_t%g_l%d", suffix, t/T0, j);  
+    sprintf (filename3, "field/uz_%s_t%g_l%d", suffix, t/T0, j);  
+    sprintf (filename4, "field/h_%s_t%g_l%d", suffix, t/T0, j);  
+    if (j==0) {
+      // The first layer is named u instead of u0
+      sprintf (s, "u");
+      u_temp = lookup_vector (s);
+      sprintf (s, "w");
+      w_temp = lookup_field (s);
+      sprintf (s, "h");
+      h_temp = lookup_field (s);
+    }
+    else {
+      sprintf (s, "u%d", j);
+      u_temp = lookup_vector (s);
+      sprintf (s, "w%d", j);
+      w_temp = lookup_field (s);
+      sprintf (s, "h%d", j);
+      h_temp = lookup_field (s);
+    }
+    FILE * fux = fopen (filename1, "w");
+    output_matrix_mpi (u_temp.x, fux, N, linear=true);
+    fclose (fux);
+    FILE * fuy = fopen (filename2, "w");
+    output_matrix_mpi (u_temp.y, fuy, N, linear=true);
+    fclose (fuy);
+    FILE * fuz = fopen (filename3, "w");
+    output_matrix_mpi (w_temp, fuz, N, linear=true);
+    fclose (fuz);
+    FILE * fh = fopen (filename4, "w");
+    output_matrix_mpi (h_temp, fh, N, linear=true);
+    fclose (fh);    
+  }
+  return 0;
+}
+
+event field_log (t += 0.1*T0) {
+  char *suffix = "matrix";
+  writefields (t, suffix);
 }
 
 event snapshot (t += 0.1*T0) {
@@ -151,6 +224,12 @@ event snapshot (t += 0.1*T0) {
   sprintf (dname, "dump%g", t/T0);
   dump (dname);
 }
+
+event end (t = 6.*T0) {
+  fprintf (fout, "i = %d t = %g\n", i, t);
+  dump ("end");
+}
+
 
 /**
    ## Parallel run

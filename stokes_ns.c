@@ -14,6 +14,7 @@ results are visualised using Basilisk view. */
 #include "view.h"
 #include "tag.h"
 
+
 /**
    We log some profiling information. */
 
@@ -56,6 +57,7 @@ these values. */
 #define k_  (2.*pi)
 #define h_   0.5
 #define g_   1.
+#define T0  (k_/sqrt(g_*k_))
 
 /**
 The program takes optional arguments which are the level of
@@ -280,79 +282,79 @@ int dissipation_rate (double* rates)
 /**
    We also want to count the drops and bubbles in the flow. */
 
-event countDropsBubble(i++)
-{
-  scalar m1[]; //droplets
-  scalar m2[]; //bubbles
-  foreach(){
-    m1[] = f[] > 0.5; //i.e. set m true if f[] is close to unity (droplets)
-    m2[] = f[] < 0.5; //m true if f[] close to zero (bubbles)
-  }
-  int n1 = tag(m1);
-  int n2 = tag(m2);
-  /**
-     Having counted the bubbles, now we find their size. This example
-     is similar to the jet atomization problem. We are interested in
-     the volumes and positions of each droplet/bubble.*/
-  double v1[n1]; //droplet
-  coord b1[n1];  //droplet
-  double v2[n2]; //bubble
-  coord b2[n2];  //bubble
-  /**
-     We initialize: */
-  for (int j=0; j<n1; j++)
-    {
-      v1[j] = b1[j].x = b1[j].y = b1[j].z = 0.0;
-    }
-  for (int j=0; j<n2; j++)
-    {
-      v2[j] = b2[j].x = b2[j].y = b2[j].z = 0.0;
-    }
-  /**
-     We proceed with calculation. */
-  foreach_leaf() //droplets
-    {
-      if (m1[] > 0) {
-	int j = m1[] - 1;
-	v1[j] += dv()*f[]; //increment the volume of the droplet
-	coord p = {x,y,z};
-	foreach_dimension()
-	  b1[j].x += dv()*f[]*p.x;
-      }
-    }
-  foreach_leaf() //bubbles
-    {
-      if (m2[] > 0) {
-	int j = m2[] - 1;
-	v2[j] += dv()*(1.0-f[]);
-	coord p = {x,y,z};
-	foreach_dimension()
-	  b2[j].x += dv()*(1.0-f[])*p.x;
-      }
-    }
-  /**
-     Reduce for MPI. */
-#if _MPI
-  MPI_Allreduce (MPI_IN_PLACE, v1, n1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-  MPI_Allreduce (MPI_IN_PLACE, b1, 3*n1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-  MPI_Allreduce (MPI_IN_PLACE, v2, n2, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-  MPI_Allreduce (MPI_IN_PLACE, b2, 3*n2, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD);
-#endif
-  /**
-     Output the volume and position of each droplet to file. */
-  static FILE * fdrop = fopen("droplets.dat","w");
-  static FILE * fbubb = fopen("bubbles.dat","w");
-  for (int j=0; j<n1; j++)
-    {
-      fprintf (fdrop, "%d %g %d %g %g %g\n", i, t,
-	       j, v1[j], b1[j].x/v1[j], b1[j].y/v1[j]);
-    }
-  for (int j=0; j<n2; j++)
-    {
-      fprintf (fbubb, "%d %g %d %g %g %g\n", i, t,
-	       j, v2[j], b2[j].x/v2[j], b2[j].y/v2[j]);
-    }
-}
+/* event countDropsBubble(i++) */
+/* { */
+/*   scalar m1[]; //droplets */
+/*   scalar m2[]; //bubbles */
+/*   foreach(){ */
+/*     m1[] = f[] > 0.5; //i.e. set m true if f[] is close to unity (droplets) */
+/*     m2[] = f[] < 0.5; //m true if f[] close to zero (bubbles) */
+/*   } */
+/*   int n1 = tag(m1); */
+/*   int n2 = tag(m2); */
+/*   /\** */
+/*      Having counted the bubbles, now we find their size. This example */
+/*      is similar to the jet atomization problem. We are interested in */
+/*      the volumes and positions of each droplet/bubble.*\/ */
+/*   double v1[n1]; //droplet */
+/*   coord b1[n1];  //droplet */
+/*   double v2[n2]; //bubble */
+/*   coord b2[n2];  //bubble */
+/*   /\** */
+/*      We initialize: *\/ */
+/*   for (int j=0; j<n1; j++) */
+/*     { */
+/*       v1[j] = b1[j].x = b1[j].y = b1[j].z = 0.0; */
+/*     } */
+/*   for (int j=0; j<n2; j++) */
+/*     { */
+/*       v2[j] = b2[j].x = b2[j].y = b2[j].z = 0.0; */
+/*     } */
+/*   /\** */
+/*      We proceed with calculation. *\/ */
+/*   foreach_leaf() //droplets */
+/*     { */
+/*       if (m1[] > 0) { */
+/* 	int j = m1[] - 1; */
+/* 	v1[j] += dv()*f[]; //increment the volume of the droplet */
+/* 	coord p = {x,y,z}; */
+/* 	foreach_dimension() */
+/* 	  b1[j].x += dv()*f[]*p.x; */
+/*       } */
+/*     } */
+/*   foreach_leaf() //bubbles */
+/*     { */
+/*       if (m2[] > 0) { */
+/* 	int j = m2[] - 1; */
+/* 	v2[j] += dv()*(1.0-f[]); */
+/* 	coord p = {x,y,z}; */
+/* 	foreach_dimension() */
+/* 	  b2[j].x += dv()*(1.0-f[])*p.x; */
+/*       } */
+/*     } */
+/*   /\** */
+/*      Reduce for MPI. *\/ */
+/* #if _MPI */
+/*   MPI_Allreduce (MPI_IN_PLACE, v1, n1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD); */
+/*   MPI_Allreduce (MPI_IN_PLACE, b1, 3*n1, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD); */
+/*   MPI_Allreduce (MPI_IN_PLACE, v2, n2, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD); */
+/*   MPI_Allreduce (MPI_IN_PLACE, b2, 3*n2, MPI_DOUBLE, MPI_SUM, MPI_COMM_WORLD); */
+/* #endif */
+/*   /\** */
+/*      Output the volume and position of each droplet to file. *\/ */
+/*   static FILE * fdrop = fopen("droplets.dat","w"); */
+/*   static FILE * fbubb = fopen("bubbles.dat","w"); */
+/*   for (int j=0; j<n1; j++) */
+/*     { */
+/*       fprintf (fdrop, "%d %g %d %g %g %g\n", i, t, */
+/* 	       j, v1[j], b1[j].x/v1[j], b1[j].y/v1[j]); */
+/*     } */
+/*   for (int j=0; j<n2; j++) */
+/*     { */
+/*       fprintf (fbubb, "%d %g %d %g %g %g\n", i, t, */
+/* 	       j, v2[j], b2[j].x/v2[j], b2[j].y/v2[j]); */
+/*     } */
+/* } */
 
 
 /**
@@ -383,14 +385,118 @@ event graphs (i++) {
     fprintf (fpair, "t ke gpe dissipation\n");
   }
   fprintf (fpwater, "%g %g %g %g\n",
-	   t/(k_/sqrt(g_*k_)), ke/2., gpe + 0.125, dissWater);
+	   t, ke/2., gpe + 0.125, dissWater);
   fprintf (fpair, "%g %g %g %g\n",
-	   t/(k_/sqrt(g_*k_)), keAir/2., gpeAir + 0.125, dissAir);
+	   t, keAir/2., gpeAir + 0.125, dissAir);
   fprintf (ferr, "%g %g %g %g\n",
-	   t/(k_/sqrt(g_*k_)), ke/2., gpe + 0.125, dissWater);
+	   t, ke/2., gpe + 0.125, dissWater);
+}
+
+/** 
+Output velocity field */
+/** 
+    Outputting slices on the fly. */
+void sliceXY(char * fname,scalar s,double zp, int maxlevel){
+  FILE *fpver =fopen (fname,"w"); 
+  int nn = (1<<maxlevel);
+  double ** field = matrix_new (nn, nn, sizeof(double));
+  double stp = L0/(double)nn;
+  for (int i = 0; i < nn; i++)
+    {
+      double xp = stp*i + X0 + stp/2.;
+      for (int j = 0; j < nn; j++) 
+	{
+	  double yp = stp*j + Y0 + stp/2.;
+	  Point point = locate (xp, yp,zp);
+	  field[i][j] = point.level >= 0 ? s[] : nodata;
+	}
+    }
+  if (pid() == 0){ // master
+#if _MPI
+    MPI_Reduce (MPI_IN_PLACE, field[0], sq(nn), MPI_DOUBLE, MPI_MIN, 0,
+		MPI_COMM_WORLD);
+#endif
+    for (int i = 0; i < nn; i++) {
+      for (int j = 0; j < nn; j++) {
+	fprintf (fpver, "%g\t", field[i][j]);
+      }
+      fputc ('\n', fpver);
+    }
+    fflush (fpver);
+  }
+#if _MPI
+  else // slave
+    MPI_Reduce (field[0], NULL, nn*nn, MPI_DOUBLE, MPI_MIN, 0,
+		MPI_COMM_WORLD);
+#endif
+  matrix_free (field);
 }
 
 
+/**
+   Output eta on the fly. */
+void output_twophase_locate (double snapshot_time) {
+  scalar pos[];
+  coord G = {0.,1.,0.}, Z = {0.,0.,0.};
+  position (f, pos, G, Z);
+  char etaname[100];
+  sprintf (etaname, "./eta/eta_t%g_%d", snapshot_time, pid());
+  FILE * feta = fopen (etaname, "w");
+  fprintf(feta, "x,z,pos,nx,ny,nz\n");
+  foreach(){
+    if (interfacial (point, f)){
+      if (point.level == LEVEL) {
+	coord n = mycs (point, f);
+	double eta = pos[];
+	if (point.level > 0) {
+	  POINT_VARIABLES;
+	  fprintf (feta, "%g,%g,%g,%g,%g,%g\n", x, z, eta, n.x, n.y, n.z);
+	}
+      }
+    }
+  }
+  fflush (feta);
+  fclose (feta);
+}
+
+
+event eta_output (t += 0.1*T0) {
+    output_twophase_locate (t/T0);
+}
+
+
+/* event output_slice (t += 0.05)  */
+/* { */
+/*   char filename[100]; */
+/*   double zslice = 0.; */
+/*   sprintf (filename, "./field/ux_t%g_center", t); */
+/*   sliceXY (filename,u.x,zslice,MAXLEVEL-1); */
+/*   sprintf (filename, "./field/uy_t%g_center", t); */
+/*   sliceXY (filename,u.y,zslice,MAXLEVEL-1); */
+/*   sprintf (filename, "./field/uz_t%g_center", t); */
+/*   sliceXY (filename,u.z,zslice,MAXLEVEL-1); */
+/*   sprintf (filename, "./field/f_t%g_center", t); */
+/*   sliceXY (filename,f,zslice,MAXLEVEL-1); */
+/* } */
+
+scalar pair[];
+event turbulence_stat (t += 0.1*T0) {
+  char filename[100];
+  int Nslice = 256;
+  double L0 = 2*pi;
+  double zslice = -L0/2+L0/2./Nslice;
+  for (int i=0; i<Nslice; i++) {
+    zslice += L0/Nslice;
+    sprintf (filename, "./field/ux_t%g_slice%d", t/T0, i);
+    sliceXY (filename,u.x,zslice,9);
+    sprintf (filename, "./field/uy_t%g_slice%d", t/T0, i);
+    sliceXY (filename,u.y,zslice,9);
+    sprintf (filename, "./field/uz_t%g_slice%d", t/T0, i);
+    sliceXY (filename,u.z,zslice,9);
+    sprintf (filename, "./field/f_t%g_slice%d", t/T0, i);
+    sliceXY (filename,f,zslice,9);
+  }
+}
 
 /**
 ~~gnuplot Evolution of kinetic, potential and total energies and dissipation rate.
@@ -413,7 +519,8 @@ ffmpeg). */
 #else
 #  define POPEN(name, mode) popen ("ppm2mp4 > " name ".mp4", mode)
 #endif
-event movies (t += 0.01*k_/sqrt(g_*k_)) {
+
+event movies (t += 0.01*T0) {
 
   /**
   We first do simple movies of the volume fraction, level of
@@ -475,7 +582,7 @@ event movies (t += 0.01*k_/sqrt(g_*k_)) {
   view (width = 1600, height = 1200, theta = pi/4, phi = -pi/6, fov = 20);
   clear();
   char s[80];
-  sprintf (s, "t = %.2f T0", t/(k_/sqrt(g_*k_)));
+  sprintf (s, "t = %.2f T0", t/T0);
   draw_string (s, size = 80);
   for (double x = -2*L0; x <= L0; x += L0)
     translate (x) {
@@ -502,8 +609,8 @@ event movies (t += 0.01*k_/sqrt(g_*k_)) {
     translate (x) {
       squares ("omega", linear = true, n = {0,0,1}, alpha = -L0/2);
       for (double z = -3*L0; z <= L0; z += L0)
-translate (z = z)
-  draw_vof ("f");
+	translate (z = z)
+      draw_vof ("f");
     }
 #endif // dimension == 3
   {
@@ -518,9 +625,9 @@ translate (z = z)
 To be able to restart, we dump the entire simulation at regular
 intervals. */
 
-event snapshot_dt (t += 0.1*k_/sqrt(g_*k_)) {
+event snapshot_dt (t += 0.1*T0) {
   char dumpname[100];
-  sprintf(dumpname, "dump%g", t/k_*sqrt(g_*k_));
+  sprintf(dumpname, "dump%g", t/T0);
   dump ( dumpname );
 }
 
@@ -530,7 +637,7 @@ event snapshot_dt (t += 0.1*k_/sqrt(g_*k_)) {
 The wave period is `k_/sqrt(g_*k_)`. We want to run up to 2
 (alternatively 4) periods. */
 
-event end (t = 4.*k_/sqrt(g_*k_)) {
+event end (t = 6.*T0) {
   fprintf (fout, "i = %d t = %g\n", i, t);
   dump ("end");
 }
