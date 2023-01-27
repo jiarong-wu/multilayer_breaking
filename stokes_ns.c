@@ -362,8 +362,8 @@ We log the evolution of the kinetic and potential energies and
 dissipation rate as functions of the non-dimensional time. */
 
 event graphs (i++) {
-  static FILE * fpwater = fopen("budgetWater.dat", "w");
-  static FILE * fpair = fopen("budgetAir.dat", "w");
+  static FILE * fpwater = fopen("budgetWater.dat", "a");
+  static FILE * fpair = fopen("budgetAir.dat", "a");
   double ke = 0., gpe = 0.;
   double keAir = 0., gpeAir = 0.;
   foreach(reduction(+:ke) reduction(+:gpe) 
@@ -397,7 +397,7 @@ Output velocity field */
 /** 
     Outputting slices on the fly. */
 void sliceXY(char * fname,scalar s,double zp, int maxlevel){
-  FILE *fpver =fopen (fname,"w"); 
+  FILE *fpver = fopen (fname,"w"); 
   int nn = (1<<maxlevel);
   double ** field = matrix_new (nn, nn, sizeof(double));
   double stp = L0/(double)nn;

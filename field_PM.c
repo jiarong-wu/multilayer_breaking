@@ -34,6 +34,51 @@ int LEVEL_data = 7;
 ## Parameters
 */
 
+/** Function for writing fields at time t.
+*/
+int writefields (double t, const char *suffix) {
+  char s[80];
+  char filename1[50], filename2[50], filename3[50], filename4[50];
+  vector u_temp;
+  scalar w_temp, h_temp;
+  for (int j=0; j<nl; ++j) {
+    sprintf (filename1, "field/ux_%s_t%g_l%d", suffix, t, j);
+    sprintf (filename2, "field/uy_%s_t%g_l%d", suffix, t, j);  
+    sprintf (filename3, "field/uz_%s_t%g_l%d", suffix, t, j);  
+    sprintf (filename4, "field/h_%s_t%g_l%d", suffix, t, j);  
+    if (j==0) {
+      // The first layer is named u instead of u0
+      sprintf (s, "u");
+      u_temp = lookup_vector (s);
+      sprintf (s, "w");
+      w_temp = lookup_field (s);
+      sprintf (s, "h");
+      h_temp = lookup_field (s);
+    }
+    else {
+      sprintf (s, "u%d", j);
+      u_temp = lookup_vector (s);
+      sprintf (s, "w%d", j);
+      w_temp = lookup_field (s);
+      sprintf (s, "h%d", j);
+      h_temp = lookup_field (s);
+    }
+    FILE * fux = fopen (filename1, "w");
+    output_matrix_mpi (u_temp.x, fux, N, linear = true);
+    fclose (fux);
+    FILE * fuy = fopen (filename2, "w");
+    output_matrix_mpi (u_temp.y, fuy, N, linear = true);
+    fclose (fuy);
+    FILE * fuz = fopen (filename3, "w");
+    output_matrix_mpi (w_temp, fuz, N, linear = true);
+    fclose (fuz);
+    FILE * fh = fopen (filename4, "w");
+    output_matrix_mpi (h_temp, fh, N, linear = true);
+    fclose (fh);    
+  }
+  return 0;
+}
+
 int main(int argc, char * argv[])
 {
   if (argc > 1)
@@ -124,6 +169,13 @@ event init (i = 0)
     fprintf (stderr,"Done initialization!\n");
     dump("initial");
   }
+  else {
+    // We limit the first time step after the restart
+    dtmax = 0.01;
+    dt = dtnext (dtmax);
+    char *suffix = "matrix";
+    writefields (t, suffix);
+  }
 }
 
 /**
@@ -154,28 +206,28 @@ event energy_before_remap (i++, last)
   fflush (fp);
 }
 
-event energy_after_remap (i++, last)
-{
-  if (i==10) {
-    fprintf(stderr, "energy output after remap!\n");
-    fflush(stderr);
-  }
-  double ke = 0., gpe = 0.;
-  foreach (reduction(+:ke) reduction(+:gpe)) {
-    double zc = zb[];
-    foreach_layer () {
-      double norm2 = sq(w[]);
-      foreach_dimension()
-        norm2 += sq(u.x[]);
-        ke += norm2*h[]*dv();
-        gpe += (zc + h[]/2.)*h[]*dv();
-        zc += h[];
-    }
-  }
-  static FILE * fp = fopen("energy_after_remap.dat","w");
-  fprintf (fp, "%g %g %g\n", t, ke/2., g_*gpe - gpe_base);
-  fflush (fp);
-}
+/* event energy_after_remap (i++, last) */
+/* { */
+/*   if (i==10) { */
+/*     fprintf(stderr, "energy output after remap!\n"); */
+/*     fflush(stderr); */
+/*   } */
+/*   double ke = 0., gpe = 0.; */
+/*   foreach (reduction(+:ke) reduction(+:gpe)) { */
+/*     double zc = zb[]; */
+/*     foreach_layer () { */
+/*       double norm2 = sq(w[]); */
+/*       foreach_dimension() */
+/*         norm2 += sq(u.x[]); */
+/*         ke += norm2*h[]*dv(); */
+/*         gpe += (zc + h[]/2.)*h[]*dv(); */
+/*         zc += h[]; */
+/*     } */
+/*   } */
+/*   static FILE * fp = fopen("energy_after_remap.dat","w"); */
+/*   fprintf (fp, "%g %g %g\n", t, ke/2., g_*gpe - gpe_base); */
+/*   fflush (fp); */
+/* } */
 
 /**
    Note that the movie generation below is very expensive. */
@@ -224,50 +276,6 @@ event movie (t += 0.1; t <= TEND)
 }
 #endif
 
-/** Function for writing fields at time t.
-*/
-int writefields (double t, const char *suffix) {
-  char s[80];
-  char filename1[50], filename2[50], filename3[50], filename4[50];
-  vector u_temp;
-  scalar w_temp, h_temp;
-  for (int j=0; j<nl; ++j) {
-    sprintf (filename1, "field/ux_%s_t%g_l%d", suffix, t, j);
-    sprintf (filename2, "field/uy_%s_t%g_l%d", suffix, t, j);  
-    sprintf (filename3, "field/uz_%s_t%g_l%d", suffix, t, j);  
-    sprintf (filename4, "field/h_%s_t%g_l%d", suffix, t, j);  
-    if (j==0) {
-      // The first layer is named u instead of u0
-      sprintf (s, "u");
-      u_temp = lookup_vector (s);
-      sprintf (s, "w");
-      w_temp = lookup_field (s);
-      sprintf (s, "h");
-      h_temp = lookup_field (s);
-    }
-    else {
-      sprintf (s, "u%d", j);
-      u_temp = lookup_vector (s);
-      sprintf (s, "w%d", j);
-      w_temp = lookup_field (s);
-      sprintf (s, "h%d", j);
-      h_temp = lookup_field (s);
-    }
-    FILE * fux = fopen (filename1, "w");
-    output_matrix_mpi (u_temp.x, fux, N, linear = true);
-    fclose (fux);
-    FILE * fuy = fopen (filename2, "w");
-    output_matrix_mpi (u_temp.y, fuy, N, linear = true);
-    fclose (fuy);
-    FILE * fuz = fopen (filename3, "w");
-    output_matrix_mpi (w_temp, fuz, N, linear = true);
-    fclose (fuz);
-    FILE * fh = fopen (filename4, "w");
-    output_matrix_mpi (h_temp, fh, N, linear = true);
-    fclose (fh);    
-  }
-  return 0;
-}
 
 /**
    Output 3-D field (not just the surface laye) if needed for Paraview visualization or other analyses. */
