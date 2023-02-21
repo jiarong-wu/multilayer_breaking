@@ -11,7 +11,7 @@
 EXE=stokes_ns
 LEVEL=9
 ak=0.35
-BO=200
+BO=1000
 RE=40000
 
 mkdir eta

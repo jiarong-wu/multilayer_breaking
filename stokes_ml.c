@@ -40,6 +40,59 @@ double gpe_base = 0;
 #define g_   1
 #define T0  (k_/sqrt(g_*k_))
 
+/** Function for writing fields at time t.
+*/
+int writefields (double t, const char *suffix) {
+  char s[80];
+  char filename1[50], filename2[50], filename3[50], filename4[50], filename5[50];
+  vector u_temp;
+  scalar w_temp, h_temp, phi_temp;
+  for (int j=0; j<nl; ++j) {
+    sprintf (filename1, "field/ux_%s_t%g_l%d", suffix, t/T0, j);
+    sprintf (filename2, "field/uy_%s_t%g_l%d", suffix, t/T0, j);  
+    sprintf (filename3, "field/uz_%s_t%g_l%d", suffix, t/T0, j);  
+    sprintf (filename4, "field/h_%s_t%g_l%d", suffix, t/T0, j);  
+    sprintf (filename5, "field/phi_%s_t%g_l%d", suffix, t/T0, j);
+    if (j==0) {
+      // The first layer is named u instead of u0
+      sprintf (s, "u");
+      u_temp = lookup_vector (s);
+      sprintf (s, "w");
+      w_temp = lookup_field (s);
+      sprintf (s, "h");
+      h_temp = lookup_field (s);
+      sprintf (s, "phi");
+      phi_temp = lookup_field (s);
+    }
+    else {
+      sprintf (s, "u%d", j);
+      u_temp = lookup_vector (s);
+      sprintf (s, "w%d", j);
+      w_temp = lookup_field (s);
+      sprintf (s, "h%d", j);
+      h_temp = lookup_field (s);
+      sprintf (s, "phi%d", j);
+      phi_temp = lookup_field (s);
+    }
+    FILE * fux = fopen (filename1, "w");
+    output_matrix_mpi (u_temp.x, fux, N, linear=true);
+    fclose (fux);
+    FILE * fuy = fopen (filename2, "w");
+    output_matrix_mpi (u_temp.y, fuy, N, linear=true);
+    fclose (fuy);
+    FILE * fuz = fopen (filename3, "w");
+    output_matrix_mpi (w_temp, fuz, N, linear=true);
+    fclose (fuz);
+    FILE * fh = fopen (filename4, "w");
+    output_matrix_mpi (h_temp, fh, N, linear=true);
+    fclose (fh);    
+    FILE * fphi = fopen (filename5, "w");
+    output_matrix_mpi (phi_temp, fphi, N, linear=true);
+    fclose (fphi);
+  }
+  return 0;
+}
+
 /**
    The domain is periodic in $x$ and resolved using 256$^2$
    points and 60 layers. */
@@ -64,6 +117,7 @@ int main(int argc, char * argv[])
   gpe_base = -0.5*sq(h_)*sq(L0)*g_;
   nu = 1./RE;
   CFL = 0.8;
+  max_slope = 0.4; // Change the slope limiting value 
   run();
 }
 
@@ -75,25 +129,34 @@ int main(int argc, char * argv[])
 
 event init (i = 0)
 {
-  geometric_beta (1./3., true);
-  foreach() {
-    /* zb[] = - 0.5 + sin(pi*y)/4.; */
-    zb[] = -h_;
-    eta[] = wave(x,y);
-    double H = wave(x, 0) - zb[];
-    foreach_layer() {
-      h[] = H/nl;
+  if (!restore("restart")) {
+    geometric_beta (1./3., true);
+    foreach() {
+      /* zb[] = - 0.5 + sin(pi*y)/4.; */
+      zb[] = -h_;
+      eta[] = wave(x,y);
+      double H = wave(x, 0) - zb[];
+      foreach_layer() {
+	h[] = H/nl;
+      }
+    }
+    vertical_remapping (h,tracers);
+    foreach() {
+      double z = zb[];
+      foreach_layer() {
+	z += h[]/2.;
+	u.x[] = u_x(x, z);
+	w[] = u_y(x, z);
+	z += h[]/2.;
+      }
     }
   }
-  vertical_remapping (h,tracers);
-  foreach() {
-    double z = zb[];
-    foreach_layer() {
-      z += h[]/2.;
-      u.x[] = u_x(x, z);
-      w[] = u_y(x, z);
-      z += h[]/2.;
-    }
+  else {
+    geometric_beta (1./3., true);
+    dtmax = 0.01;
+    dt = dtnext (dtmax);
+    char *suffix = "matrix";
+    writefields (t, suffix);
   }
 }
 
@@ -169,50 +232,6 @@ event movie (t += 0.01*T0)
   fclose (fuz);
 }
 
-/** Function for writing fields at time t.
-*/
-int writefields (double t, const char *suffix) {
-  char s[80];
-  char filename1[50], filename2[50], filename3[50], filename4[50];
-  vector u_temp;
-  scalar w_temp, h_temp;
-  for (int j=0; j<nl; ++j) {
-    sprintf (filename1, "field/ux_%s_t%g_l%d", suffix, t/T0, j);
-    sprintf (filename2, "field/uy_%s_t%g_l%d", suffix, t/T0, j);  
-    sprintf (filename3, "field/uz_%s_t%g_l%d", suffix, t/T0, j);  
-    sprintf (filename4, "field/h_%s_t%g_l%d", suffix, t/T0, j);  
-    if (j==0) {
-      // The first layer is named u instead of u0
-      sprintf (s, "u");
-      u_temp = lookup_vector (s);
-      sprintf (s, "w");
-      w_temp = lookup_field (s);
-      sprintf (s, "h");
-      h_temp = lookup_field (s);
-    }
-    else {
-      sprintf (s, "u%d", j);
-      u_temp = lookup_vector (s);
-      sprintf (s, "w%d", j);
-      w_temp = lookup_field (s);
-      sprintf (s, "h%d", j);
-      h_temp = lookup_field (s);
-    }
-    FILE * fux = fopen (filename1, "w");
-    output_matrix_mpi (u_temp.x, fux, N, linear=true);
-    fclose (fux);
-    FILE * fuy = fopen (filename2, "w");
-    output_matrix_mpi (u_temp.y, fuy, N, linear=true);
-    fclose (fuy);
-    FILE * fuz = fopen (filename3, "w");
-    output_matrix_mpi (w_temp, fuz, N, linear=true);
-    fclose (fuz);
-    FILE * fh = fopen (filename4, "w");
-    output_matrix_mpi (h_temp, fh, N, linear=true);
-    fclose (fh);    
-  }
-  return 0;
-}
 
 event field_log (t += 0.1*T0) {
   char *suffix = "matrix";
