@@ -171,6 +171,7 @@ event init (i = 0)
   }
   else {
     // We limit the first time step after the restart
+    geometric_beta (1./3., true); // when restarting, remember to specify the grid mapping method
     dtmax = 0.01;
     dt = dtnext (dtmax);
     char *suffix = "matrix";
@@ -183,7 +184,7 @@ event init (i = 0)
 This is not necessary. It seems that the remapping does not change the energy.
 */
 
-event energy_before_remap (i++, last)
+event energy_before_remap (i+=10, last)
 {
   if (i==10) {
     fprintf(stderr, "energy output before remap!\n");
@@ -233,7 +234,7 @@ event energy_before_remap (i++, last)
    Note that the movie generation below is very expensive. */
 #  define POPEN(name, mode) fopen (name ".ppm", mode)
 #if 1
-event movie (t += 0.1; t <= TEND)
+event movie (t += 1; t <= TEND)
 {
   char s[80];
   view (fov = 20, quat = {0.475152,0.161235,0.235565,0.832313}, width = 800, height = 600);
@@ -280,7 +281,7 @@ event movie (t += 0.1; t <= TEND)
 /**
    Output 3-D field (not just the surface laye) if needed for Paraview visualization or other analyses. */
 
-event field_log (t=0; t+=5; t<=TEND) {
+event field_log (t=0; t+=10; t<=TEND) {
   char *suffix = "matrix";
   writefields (t, suffix);
 }
@@ -303,7 +304,7 @@ event adapt (i++) {
 }
 #endif
 
-event regulardump (t = 0; t += 10; t < TEND) {
+event regulardump (t = 0; t += 20; t < TEND) {
   char dname[100];
   sprintf (dname, "dump_t%g", t);
   dump(dname);

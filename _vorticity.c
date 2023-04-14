@@ -1,9 +1,9 @@
-#line 1 "field_PM-cpp.c"
+#line 1 "vorticity-cpp.c"
 #line 1 "<built-in>"
 #line 1 "<command-line>"
 #line 1 "/usr/include/stdc-predef.h"
 #line 1 "<command-line>"
-#line 1 "field_PM-cpp.c"
+#line 1 "vorticity-cpp.c"
 #if _XOPEN_SOURCE < 700
 #undef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 700
@@ -1696,8 +1696,8 @@ int _layer = 0;
 #undef val
 #define val(a,k,p,m) data(k,p,m)[_index(a,m)]
 #line 1495 "/home/jiarongw/basilisk/src/common.h"
-#line 15 "field_PM-cpp.c"
-#line 1 "field_PM.c"
+#line 15 "vorticity-cpp.c"
+#line 1 "vorticity.c"
 
 
 
@@ -2502,7 +2502,18 @@ static int event_cond (Event * ev, int i, double t)
     return true;
   return (* ev->expr[1]) (&i, &t, ev);
 }
-#line 131 "/home/jiarongw/basilisk/src/grid/events.h"
+
+
+static void event_print (Event * ev, FILE * fp)
+{
+  char * root = strstr (ev->file, "/home/jiarongw/basilisk/src");
+  fprintf (fp, "  %-25s %s%s:%d\n", ev->name,
+    root ? "src" : "",
+    root ? &ev->file[strlen("/home/jiarongw/basilisk/src")] : ev->file,
+    ev->line);
+}
+
+
 static int event_do (Event * ev, bool action)
 {
   if ((iter > ev->i && t > ev->t) || !event_cond (ev, iter, t))
@@ -2512,7 +2523,7 @@ static int event_do (Event * ev, bool action)
       bool finished = false;
       for (Event * e = ev; e; e = e->next) {
 
-
+ event_print (e, ferr);
 
  if ((* e->action) (iter, t, e))
    finished = true;
@@ -2549,14 +2560,14 @@ static int event_do (Event * ev, bool action)
 static void end_event_do (bool action)
 {
 
-
-
+  if (action)
+    fprintf (ferr, "\nend events (i = %d, t = %g)\n", iter, t);
 
   for (Event * ev = Events; !ev->last; ev++)
     if (ev->i == 1234567890 && action)
       for (Event * e = ev; e; e = e->next) {
 
-
+ event_print (e, ferr);
 
  e->action (iter, t, e);
       }
@@ -2565,8 +2576,8 @@ static void end_event_do (bool action)
 int events (bool action)
 {
 
-
-
+  if (action)
+    fprintf (ferr, "\nevents (i = %d, t = %g)\n", iter, t);
 
 
   if (iter == 0)
@@ -2607,7 +2618,7 @@ void event (const char * name)
     if (!strcmp (ev->name, name))
       for (Event * e = ev; e; e = e->next) {
 
-
+ event_print (e, ferr);
 
  (* e->action) (0, 0, e);
       }
@@ -5822,7 +5833,7 @@ double z_indexing (scalar index, bool leaves)
   { double _ret =  pid() == 0 ? i*npe() - 1 : -1; end_trace("z_indexing", "/home/jiarongw/basilisk/src/grid/multigrid-mpi.h", 147);  return _ret; }
  end_trace("z_indexing", "/home/jiarongw/basilisk/src/grid/multigrid-mpi.h", 148); }
 #line 900 "/home/jiarongw/basilisk/src/grid/multigrid.h"
-#line 6 "field_PM.c"
+#line 6 "vorticity.c"
 #line 1 "view.h"
 #line 1 "/home/jiarongw/basilisk/src/view.h"
 #line 67 "/home/jiarongw/basilisk/src/view.h"
@@ -12989,7 +13000,7 @@ bool load (struct _load p) {
   }
   return true;
 }
-#line 7 "field_PM.c"
+#line 7 "vorticity.c"
 #line 1 "layered/hydro.h"
 #line 1 "/home/jiarongw/basilisk/src/layered/hydro.h"
 #line 46 "/home/jiarongw/basilisk/src/layered/hydro.h"
@@ -17489,8 +17500,7 @@ void output_fluxes (Flux * fluxes, scalar h, vector u)
     }
   }
 }
-#line 8 "field_PM.c"
-
+#line 8 "vorticity.c"
 #line 1 "layered/nh.h"
 #line 1 "/home/jiarongw/basilisk/src/layered/nh.h"
 #line 44 "/home/jiarongw/basilisk/src/layered/nh.h"
@@ -24166,7 +24176,7 @@ foreach(){
 static int cleanup_1_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (i = 1234567890);   *ip = i; *tp = t;   return ret; } static int cleanup_1 (const int i, const double t, Event * _ev) { trace ("cleanup_1", "/home/jiarongw/basilisk/src/layered/nh.h", 458);  {
   delete (((scalar []){w,phi,{-1}}));
  end_trace("cleanup_1", "/home/jiarongw/basilisk/src/layered/nh.h", 460); } return 0; } 
-#line 10 "field_PM.c"
+#line 9 "vorticity.c"
 #line 1 "layered/remap.h"
 #line 1 "/home/jiarongw/basilisk/src/layered/remap.h"
 #line 11 "/home/jiarongw/basilisk/src/layered/remap.h"
@@ -24378,8 +24388,7 @@ static int cleanup_2_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; 
 {
   pfree (beta,__func__,__FILE__,__LINE__), beta = NULL;
  end_trace("cleanup_2", "/home/jiarongw/basilisk/src/layered/remap.h", 122); } return 0; } 
-#line 11 "field_PM.c"
-
+#line 10 "vorticity.c"
 #line 1 "layered/perfs.h"
 #line 1 "/home/jiarongw/basilisk/src/layered/perfs.h"
 
@@ -24417,7 +24426,7 @@ static int perf_plot_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; 
     "$BASILISK/layered/perfs.plot 2> /dev/null "
     "& read dummy; kill $!", "w");
  end_trace("perf_plot", "/home/jiarongw/basilisk/src/layered/perfs.h", 35); } return 0; } 
-#line 13 "field_PM.c"
+#line 11 "vorticity.c"
 
 #line 1 "output_mpi.h"
 #line 1 "./output_mpi.h"
@@ -24547,202 +24556,1148 @@ void output_matrix_part_mpi (struct OutputMatrix_part p)
 
   matrix_free (field);
 }
-#line 15 "field_PM.c"
+#line 13 "vorticity.c"
 
 
 
 
-
-double kp_ = 2.*pi/10.;
-
-double h_ = 10;
-double gpe_base = 0;
-
-
-
-double TEND = 50.;
+double TRESTORE = 50.;
 int NLAYER = 10;
 int LEVEL_data = 7;
 
-#line 1 "./spectrum.h"
-#line 1 "././spectrum.h"
+int main (int argc, char * argv[])
+{ _init_solver();
+  if (argc > 1)
+    NLAYER = atoi(argv[1]);
+  if (argc > 2)
+    LEVEL_data = atoi(argv[2]);
+  if (argc > 3)
+    TRESTORE = atof(argv[3]);
+  if (argc > 4)
+    L0 = atof(argv[4]);
+  else
+    L0 = 50.;
+  origin ((struct _origin){-L0/2., -L0/2.});
+  periodic (right);
+  periodic (top);
+  N = 1 << LEVEL_data;
+  nl = NLAYER;
+  run();
+ free_solver(); }
 
 
 
 
 
+vector hu, hf, ha;
+vector omega;
+scalar omegaz;
 
-double F_kxky_[32*(32 +1)], omega[32*(32 +1)], phase[32*(32 +1)];
-double kx_[32], ky_[32 +1];
-double dkx_, dky_;
-int RANDOM;
-
-
-
-double randInRange (int min, int max)
+void vort ()
 {
-  return min + (rand() / (double) (RAND_MAX) * (max - min + 1));
+  hu = new_block_face_vector("hu", nl);
+  hf = new_block_face_vector("hf", nl);
+  ha = new_block_face_vector("ha", nl);
+   { 
+disable_fpe (FE_DIVBYZERO|FE_INVALID);
+{  double _G = G;
+ double _dry = dry;
+ double _dtmax = dtmax;
+{ double G = _G; NOT_UNUSED(G);
+ double dry = _dry; NOT_UNUSED(dry);
+ double dtmax = _dtmax; NOT_UNUSED(dtmax);
+  static bool _first_call = true;
+  ForeachData _foreach_data = {
+    .fname = "vorticity.c", .line = 54,
+    .each = "foreach_face", .first = _first_call
+  };
+
+strongif (!is_constant(fm.x) && !is_constant(cm)) {
+#undef val_fm_x
+#define val_fm_x(a,i,j,k) _stencil_val(__FILE__,__LINE__,a,i,j,k)
+#undef fine_fm_x
+#define fine_fm_x(a,i,j,k) _stencil_fine(__FILE__,__LINE__,a,i,j,k)
+#undef coarse_fm_x
+#define coarse_fm_x(a,i,j,k) _stencil_coarse(__FILE__,__LINE__,a,i,j,k)
+#undef val_fm_y
+#define val_fm_y(a,i,j,k) _stencil_val(__FILE__,__LINE__,a,i,j,k)
+#undef fine_fm_y
+#define fine_fm_y(a,i,j,k) _stencil_fine(__FILE__,__LINE__,a,i,j,k)
+#undef coarse_fm_y
+#define coarse_fm_y(a,i,j,k) _stencil_coarse(__FILE__,__LINE__,a,i,j,k)
+#undef val_cm
+#define val_cm(a,i,j,k) _stencil_val(__FILE__,__LINE__,a,i,j,k)
+#undef fine_cm
+#define fine_cm(a,i,j,k) _stencil_fine(__FILE__,__LINE__,a,i,j,k)
+#undef coarse_cm
+#define coarse_cm(a,i,j,k) _stencil_coarse(__FILE__,__LINE__,a,i,j,k)
+#line 54
+foreach_face_stencil() { int ig = -1; VARIABLES;  strongif (is_stencil_face_x()) {
+#line 54
+{
+
+#line 54 "vorticity.c"
+ {
+    double ax = (G*(2.*val_fm_x(fm.x,0,0,0)/(val_cm(cm,0,0,0) + val_cm(cm,0 -1,0,0)))*(_stencil_val(__FILE__,__LINE__,eta,0 -1,0,0) - _stencil_val(__FILE__,__LINE__,eta,0,0,0))/Delta);
+    double H = 0.;
+     { foreach_block_inner() {
+
+
+
+
+
+      double hl = _stencil_val(__FILE__,__LINE__,h,-1,0,0) > dry ? _stencil_val(__FILE__,__LINE__,h,-1,0,0) : 0.;
+      double hr = _stencil_val(__FILE__,__LINE__,h,0,0,0) > dry ? _stencil_val(__FILE__,__LINE__,h,0,0,0) : 0.;
+      _stencil_val(__FILE__,__LINE__,hu.x,0,0,0) = hl > 0. || hr > 0. ? (hl*_stencil_val(__FILE__,__LINE__,u.x,-1,0,0) + hr*_stencil_val(__FILE__,__LINE__,u.x,0,0,0))/(hl + hr) : 0.;
+
+
+
+
+
+      double hff;
+      hff = _stencil_val(__FILE__,__LINE__,h,0,0,0);
+
+
+
+
+
+
+      _stencil_val(__FILE__,__LINE__,hf.x,0,0,0) = val_fm_x(fm.x,0,0,0)*hff;
+
+
+
+
+      _stencil_val(__FILE__,__LINE__,hu.x,0,0,0) *= _stencil_val(__FILE__,__LINE__,hf.x,0,0,0);
+      _stencil_val(__FILE__,__LINE__,ha.x,0,0,0) = _stencil_val(__FILE__,__LINE__,hf.x,0,0,0)*ax;
+
+      H += hff;
+    } end_foreach_block_inner(); }
+  } }  }}  { int jg = -1; VARIABLES;  strongif (is_stencil_face_y()) {
+#line 54
+{
+
+#line 54 "vorticity.c"
+ {
+    double ax = (G*(2.*val_fm_y(fm.y,0,0,0)/(val_cm(cm,0,0,0) + val_cm(cm,0,0 -1,0)))*(_stencil_val(__FILE__,__LINE__,eta,0,0 -1,0) - _stencil_val(__FILE__,__LINE__,eta,0,0,0))/Delta);
+    double H = 0.;
+     { foreach_block_inner() {
+
+
+
+
+
+      double hl = _stencil_val(__FILE__,__LINE__,h,0,-1,0) > dry ? _stencil_val(__FILE__,__LINE__,h,0,-1,0) : 0.;
+      double hr = _stencil_val(__FILE__,__LINE__,h,0,0,0) > dry ? _stencil_val(__FILE__,__LINE__,h,0,0,0) : 0.;
+      _stencil_val(__FILE__,__LINE__,hu.y,0,0,0) = hl > 0. || hr > 0. ? (hl*_stencil_val(__FILE__,__LINE__,u.y,0,-1,0) + hr*_stencil_val(__FILE__,__LINE__,u.y,0,0,0))/(hl + hr) : 0.;
+
+
+
+
+
+      double hff;
+      hff = _stencil_val(__FILE__,__LINE__,h,0,0,0);
+
+
+
+
+
+
+      _stencil_val(__FILE__,__LINE__,hf.y,0,0,0) = val_fm_y(fm.y,0,0,0)*hff;
+
+
+
+
+      _stencil_val(__FILE__,__LINE__,hu.y,0,0,0) *= _stencil_val(__FILE__,__LINE__,hf.y,0,0,0);
+      _stencil_val(__FILE__,__LINE__,ha.y,0,0,0) = _stencil_val(__FILE__,__LINE__,hf.y,0,0,0)*ax;
+
+      H += hff;
+    } end_foreach_block_inner(); }
+  } }  }}  end_foreach_face_stencil()
+#line 89
+ }
+strongif (is_constant(fm.x) && !is_constant(cm)) {
+const struct { double x, y; } _const_fm = {_constant[fm.x.i -_NVARMAX], _constant[fm.y.i - _NVARMAX]};
+NOT_UNUSED(_const_fm);
+#undef val_fm_x
+#define val_fm_x(a,i,j,k) _const_fm.x
+#undef fine_fm_x
+#define fine_fm_x(a,i,j,k) _const_fm.x
+#undef coarse_fm_x
+#define coarse_fm_x(a,i,j,k) _const_fm.x
+#undef val_fm_y
+#define val_fm_y(a,i,j,k) _const_fm.y
+#undef fine_fm_y
+#define fine_fm_y(a,i,j,k) _const_fm.y
+#undef coarse_fm_y
+#define coarse_fm_y(a,i,j,k) _const_fm.y
+#undef val_cm
+#define val_cm(a,i,j,k) _stencil_val(__FILE__,__LINE__,a,i,j,k)
+#undef fine_cm
+#define fine_cm(a,i,j,k) _stencil_fine(__FILE__,__LINE__,a,i,j,k)
+#undef coarse_cm
+#define coarse_cm(a,i,j,k) _stencil_coarse(__FILE__,__LINE__,a,i,j,k)
+#line 54
+foreach_face_stencil() { int ig = -1; VARIABLES;  strongif (is_stencil_face_x()) {
+#line 54
+{
+
+#line 54 "vorticity.c"
+ {
+    double ax = (G*(2.*val_fm_x(fm.x,0,0,0)/(val_cm(cm,0,0,0) + val_cm(cm,0 -1,0,0)))*(_stencil_val(__FILE__,__LINE__,eta,0 -1,0,0) - _stencil_val(__FILE__,__LINE__,eta,0,0,0))/Delta);
+    double H = 0.;
+     { foreach_block_inner() {
+
+
+
+
+
+      double hl = _stencil_val(__FILE__,__LINE__,h,-1,0,0) > dry ? _stencil_val(__FILE__,__LINE__,h,-1,0,0) : 0.;
+      double hr = _stencil_val(__FILE__,__LINE__,h,0,0,0) > dry ? _stencil_val(__FILE__,__LINE__,h,0,0,0) : 0.;
+      _stencil_val(__FILE__,__LINE__,hu.x,0,0,0) = hl > 0. || hr > 0. ? (hl*_stencil_val(__FILE__,__LINE__,u.x,-1,0,0) + hr*_stencil_val(__FILE__,__LINE__,u.x,0,0,0))/(hl + hr) : 0.;
+
+
+
+
+
+      double hff;
+      hff = _stencil_val(__FILE__,__LINE__,h,0,0,0);
+
+
+
+
+
+
+      _stencil_val(__FILE__,__LINE__,hf.x,0,0,0) = val_fm_x(fm.x,0,0,0)*hff;
+
+
+
+
+      _stencil_val(__FILE__,__LINE__,hu.x,0,0,0) *= _stencil_val(__FILE__,__LINE__,hf.x,0,0,0);
+      _stencil_val(__FILE__,__LINE__,ha.x,0,0,0) = _stencil_val(__FILE__,__LINE__,hf.x,0,0,0)*ax;
+
+      H += hff;
+    } end_foreach_block_inner(); }
+  } }  }}  { int jg = -1; VARIABLES;  strongif (is_stencil_face_y()) {
+#line 54
+{
+
+#line 54 "vorticity.c"
+ {
+    double ax = (G*(2.*val_fm_y(fm.y,0,0,0)/(val_cm(cm,0,0,0) + val_cm(cm,0,0 -1,0)))*(_stencil_val(__FILE__,__LINE__,eta,0,0 -1,0) - _stencil_val(__FILE__,__LINE__,eta,0,0,0))/Delta);
+    double H = 0.;
+     { foreach_block_inner() {
+
+
+
+
+
+      double hl = _stencil_val(__FILE__,__LINE__,h,0,-1,0) > dry ? _stencil_val(__FILE__,__LINE__,h,0,-1,0) : 0.;
+      double hr = _stencil_val(__FILE__,__LINE__,h,0,0,0) > dry ? _stencil_val(__FILE__,__LINE__,h,0,0,0) : 0.;
+      _stencil_val(__FILE__,__LINE__,hu.y,0,0,0) = hl > 0. || hr > 0. ? (hl*_stencil_val(__FILE__,__LINE__,u.y,0,-1,0) + hr*_stencil_val(__FILE__,__LINE__,u.y,0,0,0))/(hl + hr) : 0.;
+
+
+
+
+
+      double hff;
+      hff = _stencil_val(__FILE__,__LINE__,h,0,0,0);
+
+
+
+
+
+
+      _stencil_val(__FILE__,__LINE__,hf.y,0,0,0) = val_fm_y(fm.y,0,0,0)*hff;
+
+
+
+
+      _stencil_val(__FILE__,__LINE__,hu.y,0,0,0) *= _stencil_val(__FILE__,__LINE__,hf.y,0,0,0);
+      _stencil_val(__FILE__,__LINE__,ha.y,0,0,0) = _stencil_val(__FILE__,__LINE__,hf.y,0,0,0)*ax;
+
+      H += hff;
+    } end_foreach_block_inner(); }
+  } }  }}  end_foreach_face_stencil()
+#line 89
+ }
+strongif (!is_constant(fm.x) && is_constant(cm)) {
+#undef val_fm_x
+#define val_fm_x(a,i,j,k) _stencil_val(__FILE__,__LINE__,a,i,j,k)
+#undef fine_fm_x
+#define fine_fm_x(a,i,j,k) _stencil_fine(__FILE__,__LINE__,a,i,j,k)
+#undef coarse_fm_x
+#define coarse_fm_x(a,i,j,k) _stencil_coarse(__FILE__,__LINE__,a,i,j,k)
+#undef val_fm_y
+#define val_fm_y(a,i,j,k) _stencil_val(__FILE__,__LINE__,a,i,j,k)
+#undef fine_fm_y
+#define fine_fm_y(a,i,j,k) _stencil_fine(__FILE__,__LINE__,a,i,j,k)
+#undef coarse_fm_y
+#define coarse_fm_y(a,i,j,k) _stencil_coarse(__FILE__,__LINE__,a,i,j,k)
+const double _const_cm = _constant[cm.i -_NVARMAX];
+NOT_UNUSED(_const_cm);
+#undef val_cm
+#define val_cm(a,i,j,k) _const_cm
+#undef fine_cm
+#define fine_cm(a,i,j,k) _const_cm
+#undef coarse_cm
+#define coarse_cm(a,i,j,k) _const_cm
+#line 54
+foreach_face_stencil() { int ig = -1; VARIABLES;  strongif (is_stencil_face_x()) {
+#line 54
+{
+
+#line 54 "vorticity.c"
+ {
+    double ax = (G*(2.*val_fm_x(fm.x,0,0,0)/(val_cm(cm,0,0,0) + val_cm(cm,0 -1,0,0)))*(_stencil_val(__FILE__,__LINE__,eta,0 -1,0,0) - _stencil_val(__FILE__,__LINE__,eta,0,0,0))/Delta);
+    double H = 0.;
+     { foreach_block_inner() {
+
+
+
+
+
+      double hl = _stencil_val(__FILE__,__LINE__,h,-1,0,0) > dry ? _stencil_val(__FILE__,__LINE__,h,-1,0,0) : 0.;
+      double hr = _stencil_val(__FILE__,__LINE__,h,0,0,0) > dry ? _stencil_val(__FILE__,__LINE__,h,0,0,0) : 0.;
+      _stencil_val(__FILE__,__LINE__,hu.x,0,0,0) = hl > 0. || hr > 0. ? (hl*_stencil_val(__FILE__,__LINE__,u.x,-1,0,0) + hr*_stencil_val(__FILE__,__LINE__,u.x,0,0,0))/(hl + hr) : 0.;
+
+
+
+
+
+      double hff;
+      hff = _stencil_val(__FILE__,__LINE__,h,0,0,0);
+
+
+
+
+
+
+      _stencil_val(__FILE__,__LINE__,hf.x,0,0,0) = val_fm_x(fm.x,0,0,0)*hff;
+
+
+
+
+      _stencil_val(__FILE__,__LINE__,hu.x,0,0,0) *= _stencil_val(__FILE__,__LINE__,hf.x,0,0,0);
+      _stencil_val(__FILE__,__LINE__,ha.x,0,0,0) = _stencil_val(__FILE__,__LINE__,hf.x,0,0,0)*ax;
+
+      H += hff;
+    } end_foreach_block_inner(); }
+  } }  }}  { int jg = -1; VARIABLES;  strongif (is_stencil_face_y()) {
+#line 54
+{
+
+#line 54 "vorticity.c"
+ {
+    double ax = (G*(2.*val_fm_y(fm.y,0,0,0)/(val_cm(cm,0,0,0) + val_cm(cm,0,0 -1,0)))*(_stencil_val(__FILE__,__LINE__,eta,0,0 -1,0) - _stencil_val(__FILE__,__LINE__,eta,0,0,0))/Delta);
+    double H = 0.;
+     { foreach_block_inner() {
+
+
+
+
+
+      double hl = _stencil_val(__FILE__,__LINE__,h,0,-1,0) > dry ? _stencil_val(__FILE__,__LINE__,h,0,-1,0) : 0.;
+      double hr = _stencil_val(__FILE__,__LINE__,h,0,0,0) > dry ? _stencil_val(__FILE__,__LINE__,h,0,0,0) : 0.;
+      _stencil_val(__FILE__,__LINE__,hu.y,0,0,0) = hl > 0. || hr > 0. ? (hl*_stencil_val(__FILE__,__LINE__,u.y,0,-1,0) + hr*_stencil_val(__FILE__,__LINE__,u.y,0,0,0))/(hl + hr) : 0.;
+
+
+
+
+
+      double hff;
+      hff = _stencil_val(__FILE__,__LINE__,h,0,0,0);
+
+
+
+
+
+
+      _stencil_val(__FILE__,__LINE__,hf.y,0,0,0) = val_fm_y(fm.y,0,0,0)*hff;
+
+
+
+
+      _stencil_val(__FILE__,__LINE__,hu.y,0,0,0) *= _stencil_val(__FILE__,__LINE__,hf.y,0,0,0);
+      _stencil_val(__FILE__,__LINE__,ha.y,0,0,0) = _stencil_val(__FILE__,__LINE__,hf.y,0,0,0)*ax;
+
+      H += hff;
+    } end_foreach_block_inner(); }
+  } }  }}  end_foreach_face_stencil()
+#line 89
+ }
+strongif (is_constant(fm.x) && is_constant(cm)) {
+const struct { double x, y; } _const_fm = {_constant[fm.x.i -_NVARMAX], _constant[fm.y.i - _NVARMAX]};
+NOT_UNUSED(_const_fm);
+#undef val_fm_x
+#define val_fm_x(a,i,j,k) _const_fm.x
+#undef fine_fm_x
+#define fine_fm_x(a,i,j,k) _const_fm.x
+#undef coarse_fm_x
+#define coarse_fm_x(a,i,j,k) _const_fm.x
+#undef val_fm_y
+#define val_fm_y(a,i,j,k) _const_fm.y
+#undef fine_fm_y
+#define fine_fm_y(a,i,j,k) _const_fm.y
+#undef coarse_fm_y
+#define coarse_fm_y(a,i,j,k) _const_fm.y
+const double _const_cm = _constant[cm.i -_NVARMAX];
+NOT_UNUSED(_const_cm);
+#undef val_cm
+#define val_cm(a,i,j,k) _const_cm
+#undef fine_cm
+#define fine_cm(a,i,j,k) _const_cm
+#undef coarse_cm
+#define coarse_cm(a,i,j,k) _const_cm
+#line 54
+foreach_face_stencil() { int ig = -1; VARIABLES;  strongif (is_stencil_face_x()) {
+#line 54
+{
+
+#line 54 "vorticity.c"
+ {
+    double ax = (G*(2.*val_fm_x(fm.x,0,0,0)/(val_cm(cm,0,0,0) + val_cm(cm,0 -1,0,0)))*(_stencil_val(__FILE__,__LINE__,eta,0 -1,0,0) - _stencil_val(__FILE__,__LINE__,eta,0,0,0))/Delta);
+    double H = 0.;
+     { foreach_block_inner() {
+
+
+
+
+
+      double hl = _stencil_val(__FILE__,__LINE__,h,-1,0,0) > dry ? _stencil_val(__FILE__,__LINE__,h,-1,0,0) : 0.;
+      double hr = _stencil_val(__FILE__,__LINE__,h,0,0,0) > dry ? _stencil_val(__FILE__,__LINE__,h,0,0,0) : 0.;
+      _stencil_val(__FILE__,__LINE__,hu.x,0,0,0) = hl > 0. || hr > 0. ? (hl*_stencil_val(__FILE__,__LINE__,u.x,-1,0,0) + hr*_stencil_val(__FILE__,__LINE__,u.x,0,0,0))/(hl + hr) : 0.;
+
+
+
+
+
+      double hff;
+      hff = _stencil_val(__FILE__,__LINE__,h,0,0,0);
+
+
+
+
+
+
+      _stencil_val(__FILE__,__LINE__,hf.x,0,0,0) = val_fm_x(fm.x,0,0,0)*hff;
+
+
+
+
+      _stencil_val(__FILE__,__LINE__,hu.x,0,0,0) *= _stencil_val(__FILE__,__LINE__,hf.x,0,0,0);
+      _stencil_val(__FILE__,__LINE__,ha.x,0,0,0) = _stencil_val(__FILE__,__LINE__,hf.x,0,0,0)*ax;
+
+      H += hff;
+    } end_foreach_block_inner(); }
+  } }  }}  { int jg = -1; VARIABLES;  strongif (is_stencil_face_y()) {
+#line 54
+{
+
+#line 54 "vorticity.c"
+ {
+    double ax = (G*(2.*val_fm_y(fm.y,0,0,0)/(val_cm(cm,0,0,0) + val_cm(cm,0,0 -1,0)))*(_stencil_val(__FILE__,__LINE__,eta,0,0 -1,0) - _stencil_val(__FILE__,__LINE__,eta,0,0,0))/Delta);
+    double H = 0.;
+     { foreach_block_inner() {
+
+
+
+
+
+      double hl = _stencil_val(__FILE__,__LINE__,h,0,-1,0) > dry ? _stencil_val(__FILE__,__LINE__,h,0,-1,0) : 0.;
+      double hr = _stencil_val(__FILE__,__LINE__,h,0,0,0) > dry ? _stencil_val(__FILE__,__LINE__,h,0,0,0) : 0.;
+      _stencil_val(__FILE__,__LINE__,hu.y,0,0,0) = hl > 0. || hr > 0. ? (hl*_stencil_val(__FILE__,__LINE__,u.y,0,-1,0) + hr*_stencil_val(__FILE__,__LINE__,u.y,0,0,0))/(hl + hr) : 0.;
+
+
+
+
+
+      double hff;
+      hff = _stencil_val(__FILE__,__LINE__,h,0,0,0);
+
+
+
+
+
+
+      _stencil_val(__FILE__,__LINE__,hf.y,0,0,0) = val_fm_y(fm.y,0,0,0)*hff;
+
+
+
+
+      _stencil_val(__FILE__,__LINE__,hu.y,0,0,0) *= _stencil_val(__FILE__,__LINE__,hf.y,0,0,0);
+      _stencil_val(__FILE__,__LINE__,ha.y,0,0,0) = _stencil_val(__FILE__,__LINE__,hf.y,0,0,0)*ax;
+
+      H += hff;
+    } end_foreach_block_inner(); }
+  } }  }}  end_foreach_face_stencil()
+#line 89
+ } if (_first_call) {
+ if (G != _G)
+   reduction_warning ("vorticity.c", 54, "G");
+ }
+ if (_first_call) {
+ if (dry != _dry)
+   reduction_warning ("vorticity.c", 54, "dry");
+ }
+  _first_call = false;
+}}
+enable_fpe (FE_DIVBYZERO|FE_INVALID);
+#line 89
+
+#undef OMP_PARALLEL
+#define OMP_PARALLEL()
+OMP(omp parallel reduction (min:dtmax)) {
+
+#line 54
+
+strongif (!is_constant(fm.x) && !is_constant(cm)) {
+#undef val_fm_x
+#define val_fm_x(a,i,j,k) val(a,i,j,k)
+#undef fine_fm_x
+#define fine_fm_x(a,i,j,k) fine(a,i,j,k)
+#undef coarse_fm_x
+#define coarse_fm_x(a,i,j,k) coarse(a,i,j,k)
+#undef val_fm_y
+#define val_fm_y(a,i,j,k) val(a,i,j,k)
+#undef fine_fm_y
+#define fine_fm_y(a,i,j,k) fine(a,i,j,k)
+#undef coarse_fm_y
+#define coarse_fm_y(a,i,j,k) coarse(a,i,j,k)
+#undef val_cm
+#define val_cm(a,i,j,k) val(a,i,j,k)
+#undef fine_cm
+#define fine_cm(a,i,j,k) fine(a,i,j,k)
+#undef coarse_cm
+#define coarse_cm(a,i,j,k) coarse(a,i,j,k)
+#line 54
+foreach_face_generic() { int ig = -1; VARIABLES;  strongif (is_face_x()) {
+#line 54
+{
+
+#line 54 "vorticity.c"
+ {
+    double ax = (G*(2.*val_fm_x(fm.x,0,0,0)/(val_cm(cm,0,0,0) + val_cm(cm,0 -1,0,0)))*(val(eta,0 -1,0,0) - val(eta,0,0,0))/Delta);
+    double H = 0.;
+     { foreach_block_inner() {
+
+
+
+
+
+      double hl = val(h,-1,0,0) > dry ? val(h,-1,0,0) : 0.;
+      double hr = val(h,0,0,0) > dry ? val(h,0,0,0) : 0.;
+      val(hu.x,0,0,0) = hl > 0. || hr > 0. ? (hl*val(u.x,-1,0,0) + hr*val(u.x,0,0,0))/(hl + hr) : 0.;
+
+
+
+
+
+      double hff;
+      hff = val(h,0,0,0);
+
+
+
+
+
+
+      val(hf.x,0,0,0) = val_fm_x(fm.x,0,0,0)*hff;
+
+
+
+
+      val(hu.x,0,0,0) *= val(hf.x,0,0,0);
+      val(ha.x,0,0,0) = val(hf.x,0,0,0)*ax;
+
+      H += hff;
+    } end_foreach_block_inner(); }
+  } }  }}  { int jg = -1; VARIABLES;  strongif (is_face_y()) {
+#line 54
+{
+
+#line 54 "vorticity.c"
+ {
+    double ax = (G*(2.*val_fm_y(fm.y,0,0,0)/(val_cm(cm,0,0,0) + val_cm(cm,0,0 -1,0)))*(val(eta,0,0 -1,0) - val(eta,0,0,0))/Delta);
+    double H = 0.;
+     { foreach_block_inner() {
+
+
+
+
+
+      double hl = val(h,0,-1,0) > dry ? val(h,0,-1,0) : 0.;
+      double hr = val(h,0,0,0) > dry ? val(h,0,0,0) : 0.;
+      val(hu.y,0,0,0) = hl > 0. || hr > 0. ? (hl*val(u.y,0,-1,0) + hr*val(u.y,0,0,0))/(hl + hr) : 0.;
+
+
+
+
+
+      double hff;
+      hff = val(h,0,0,0);
+
+
+
+
+
+
+      val(hf.y,0,0,0) = val_fm_y(fm.y,0,0,0)*hff;
+
+
+
+
+      val(hu.y,0,0,0) *= val(hf.y,0,0,0);
+      val(ha.y,0,0,0) = val(hf.y,0,0,0)*ax;
+
+      H += hff;
+    } end_foreach_block_inner(); }
+  } }  }}  end_foreach_face_generic()
+#line 89
+ end_foreach_face(); }
+strongif (is_constant(fm.x) && !is_constant(cm)) {
+const struct { double x, y; } _const_fm = {_constant[fm.x.i -_NVARMAX], _constant[fm.y.i - _NVARMAX]};
+NOT_UNUSED(_const_fm);
+#undef val_fm_x
+#define val_fm_x(a,i,j,k) _const_fm.x
+#undef fine_fm_x
+#define fine_fm_x(a,i,j,k) _const_fm.x
+#undef coarse_fm_x
+#define coarse_fm_x(a,i,j,k) _const_fm.x
+#undef val_fm_y
+#define val_fm_y(a,i,j,k) _const_fm.y
+#undef fine_fm_y
+#define fine_fm_y(a,i,j,k) _const_fm.y
+#undef coarse_fm_y
+#define coarse_fm_y(a,i,j,k) _const_fm.y
+#undef val_cm
+#define val_cm(a,i,j,k) val(a,i,j,k)
+#undef fine_cm
+#define fine_cm(a,i,j,k) fine(a,i,j,k)
+#undef coarse_cm
+#define coarse_cm(a,i,j,k) coarse(a,i,j,k)
+#line 54
+foreach_face_generic() { int ig = -1; VARIABLES;  strongif (is_face_x()) {
+#line 54
+{
+
+#line 54 "vorticity.c"
+ {
+    double ax = (G*(2.*val_fm_x(fm.x,0,0,0)/(val_cm(cm,0,0,0) + val_cm(cm,0 -1,0,0)))*(val(eta,0 -1,0,0) - val(eta,0,0,0))/Delta);
+    double H = 0.;
+     { foreach_block_inner() {
+
+
+
+
+
+      double hl = val(h,-1,0,0) > dry ? val(h,-1,0,0) : 0.;
+      double hr = val(h,0,0,0) > dry ? val(h,0,0,0) : 0.;
+      val(hu.x,0,0,0) = hl > 0. || hr > 0. ? (hl*val(u.x,-1,0,0) + hr*val(u.x,0,0,0))/(hl + hr) : 0.;
+
+
+
+
+
+      double hff;
+      hff = val(h,0,0,0);
+
+
+
+
+
+
+      val(hf.x,0,0,0) = val_fm_x(fm.x,0,0,0)*hff;
+
+
+
+
+      val(hu.x,0,0,0) *= val(hf.x,0,0,0);
+      val(ha.x,0,0,0) = val(hf.x,0,0,0)*ax;
+
+      H += hff;
+    } end_foreach_block_inner(); }
+  } }  }}  { int jg = -1; VARIABLES;  strongif (is_face_y()) {
+#line 54
+{
+
+#line 54 "vorticity.c"
+ {
+    double ax = (G*(2.*val_fm_y(fm.y,0,0,0)/(val_cm(cm,0,0,0) + val_cm(cm,0,0 -1,0)))*(val(eta,0,0 -1,0) - val(eta,0,0,0))/Delta);
+    double H = 0.;
+     { foreach_block_inner() {
+
+
+
+
+
+      double hl = val(h,0,-1,0) > dry ? val(h,0,-1,0) : 0.;
+      double hr = val(h,0,0,0) > dry ? val(h,0,0,0) : 0.;
+      val(hu.y,0,0,0) = hl > 0. || hr > 0. ? (hl*val(u.y,0,-1,0) + hr*val(u.y,0,0,0))/(hl + hr) : 0.;
+
+
+
+
+
+      double hff;
+      hff = val(h,0,0,0);
+
+
+
+
+
+
+      val(hf.y,0,0,0) = val_fm_y(fm.y,0,0,0)*hff;
+
+
+
+
+      val(hu.y,0,0,0) *= val(hf.y,0,0,0);
+      val(ha.y,0,0,0) = val(hf.y,0,0,0)*ax;
+
+      H += hff;
+    } end_foreach_block_inner(); }
+  } }  }}  end_foreach_face_generic()
+#line 89
+ end_foreach_face(); }
+strongif (!is_constant(fm.x) && is_constant(cm)) {
+#undef val_fm_x
+#define val_fm_x(a,i,j,k) val(a,i,j,k)
+#undef fine_fm_x
+#define fine_fm_x(a,i,j,k) fine(a,i,j,k)
+#undef coarse_fm_x
+#define coarse_fm_x(a,i,j,k) coarse(a,i,j,k)
+#undef val_fm_y
+#define val_fm_y(a,i,j,k) val(a,i,j,k)
+#undef fine_fm_y
+#define fine_fm_y(a,i,j,k) fine(a,i,j,k)
+#undef coarse_fm_y
+#define coarse_fm_y(a,i,j,k) coarse(a,i,j,k)
+const double _const_cm = _constant[cm.i -_NVARMAX];
+NOT_UNUSED(_const_cm);
+#undef val_cm
+#define val_cm(a,i,j,k) _const_cm
+#undef fine_cm
+#define fine_cm(a,i,j,k) _const_cm
+#undef coarse_cm
+#define coarse_cm(a,i,j,k) _const_cm
+#line 54
+foreach_face_generic() { int ig = -1; VARIABLES;  strongif (is_face_x()) {
+#line 54
+{
+
+#line 54 "vorticity.c"
+ {
+    double ax = (G*(2.*val_fm_x(fm.x,0,0,0)/(val_cm(cm,0,0,0) + val_cm(cm,0 -1,0,0)))*(val(eta,0 -1,0,0) - val(eta,0,0,0))/Delta);
+    double H = 0.;
+     { foreach_block_inner() {
+
+
+
+
+
+      double hl = val(h,-1,0,0) > dry ? val(h,-1,0,0) : 0.;
+      double hr = val(h,0,0,0) > dry ? val(h,0,0,0) : 0.;
+      val(hu.x,0,0,0) = hl > 0. || hr > 0. ? (hl*val(u.x,-1,0,0) + hr*val(u.x,0,0,0))/(hl + hr) : 0.;
+
+
+
+
+
+      double hff;
+      hff = val(h,0,0,0);
+
+
+
+
+
+
+      val(hf.x,0,0,0) = val_fm_x(fm.x,0,0,0)*hff;
+
+
+
+
+      val(hu.x,0,0,0) *= val(hf.x,0,0,0);
+      val(ha.x,0,0,0) = val(hf.x,0,0,0)*ax;
+
+      H += hff;
+    } end_foreach_block_inner(); }
+  } }  }}  { int jg = -1; VARIABLES;  strongif (is_face_y()) {
+#line 54
+{
+
+#line 54 "vorticity.c"
+ {
+    double ax = (G*(2.*val_fm_y(fm.y,0,0,0)/(val_cm(cm,0,0,0) + val_cm(cm,0,0 -1,0)))*(val(eta,0,0 -1,0) - val(eta,0,0,0))/Delta);
+    double H = 0.;
+     { foreach_block_inner() {
+
+
+
+
+
+      double hl = val(h,0,-1,0) > dry ? val(h,0,-1,0) : 0.;
+      double hr = val(h,0,0,0) > dry ? val(h,0,0,0) : 0.;
+      val(hu.y,0,0,0) = hl > 0. || hr > 0. ? (hl*val(u.y,0,-1,0) + hr*val(u.y,0,0,0))/(hl + hr) : 0.;
+
+
+
+
+
+      double hff;
+      hff = val(h,0,0,0);
+
+
+
+
+
+
+      val(hf.y,0,0,0) = val_fm_y(fm.y,0,0,0)*hff;
+
+
+
+
+      val(hu.y,0,0,0) *= val(hf.y,0,0,0);
+      val(ha.y,0,0,0) = val(hf.y,0,0,0)*ax;
+
+      H += hff;
+    } end_foreach_block_inner(); }
+  } }  }}  end_foreach_face_generic()
+#line 89
+ end_foreach_face(); }
+strongif (is_constant(fm.x) && is_constant(cm)) {
+const struct { double x, y; } _const_fm = {_constant[fm.x.i -_NVARMAX], _constant[fm.y.i - _NVARMAX]};
+NOT_UNUSED(_const_fm);
+#undef val_fm_x
+#define val_fm_x(a,i,j,k) _const_fm.x
+#undef fine_fm_x
+#define fine_fm_x(a,i,j,k) _const_fm.x
+#undef coarse_fm_x
+#define coarse_fm_x(a,i,j,k) _const_fm.x
+#undef val_fm_y
+#define val_fm_y(a,i,j,k) _const_fm.y
+#undef fine_fm_y
+#define fine_fm_y(a,i,j,k) _const_fm.y
+#undef coarse_fm_y
+#define coarse_fm_y(a,i,j,k) _const_fm.y
+const double _const_cm = _constant[cm.i -_NVARMAX];
+NOT_UNUSED(_const_cm);
+#undef val_cm
+#define val_cm(a,i,j,k) _const_cm
+#undef fine_cm
+#define fine_cm(a,i,j,k) _const_cm
+#undef coarse_cm
+#define coarse_cm(a,i,j,k) _const_cm
+#line 54
+foreach_face_generic() { int ig = -1; VARIABLES;  strongif (is_face_x()) {
+#line 54
+{
+
+#line 54 "vorticity.c"
+ {
+    double ax = (G*(2.*val_fm_x(fm.x,0,0,0)/(val_cm(cm,0,0,0) + val_cm(cm,0 -1,0,0)))*(val(eta,0 -1,0,0) - val(eta,0,0,0))/Delta);
+    double H = 0.;
+     { foreach_block_inner() {
+
+
+
+
+
+      double hl = val(h,-1,0,0) > dry ? val(h,-1,0,0) : 0.;
+      double hr = val(h,0,0,0) > dry ? val(h,0,0,0) : 0.;
+      val(hu.x,0,0,0) = hl > 0. || hr > 0. ? (hl*val(u.x,-1,0,0) + hr*val(u.x,0,0,0))/(hl + hr) : 0.;
+
+
+
+
+
+      double hff;
+      hff = val(h,0,0,0);
+
+
+
+
+
+
+      val(hf.x,0,0,0) = val_fm_x(fm.x,0,0,0)*hff;
+
+
+
+
+      val(hu.x,0,0,0) *= val(hf.x,0,0,0);
+      val(ha.x,0,0,0) = val(hf.x,0,0,0)*ax;
+
+      H += hff;
+    } end_foreach_block_inner(); }
+  } }  }}  { int jg = -1; VARIABLES;  strongif (is_face_y()) {
+#line 54
+{
+
+#line 54 "vorticity.c"
+ {
+    double ax = (G*(2.*val_fm_y(fm.y,0,0,0)/(val_cm(cm,0,0,0) + val_cm(cm,0,0 -1,0)))*(val(eta,0,0 -1,0) - val(eta,0,0,0))/Delta);
+    double H = 0.;
+     { foreach_block_inner() {
+
+
+
+
+
+      double hl = val(h,0,-1,0) > dry ? val(h,0,-1,0) : 0.;
+      double hr = val(h,0,0,0) > dry ? val(h,0,0,0) : 0.;
+      val(hu.y,0,0,0) = hl > 0. || hr > 0. ? (hl*val(u.y,0,-1,0) + hr*val(u.y,0,0,0))/(hl + hr) : 0.;
+
+
+
+
+
+      double hff;
+      hff = val(h,0,0,0);
+
+
+
+
+
+
+      val(hf.y,0,0,0) = val_fm_y(fm.y,0,0,0)*hff;
+
+
+
+
+      val(hu.y,0,0,0) *= val(hf.y,0,0,0);
+      val(ha.y,0,0,0) = val(hf.y,0,0,0)*ax;
+
+      H += hff;
+    } end_foreach_block_inner(); }
+  } }  }}  end_foreach_face_generic()
+#line 89
+ end_foreach_face(); }mpi_all_reduce_array (&dtmax, double, MPI_MIN, 1);
+
+#undef OMP_PARALLEL
+#define OMP_PARALLEL() OMP(omp parallel)
 }
+#line 89
+ }
 
+  omega = new_block_vector("omega", nl);
+  reset (((vector []){{omega.x,omega.y},{{-1},{-1}}}), 0.);
+  omegaz = new_block_scalar("omegaz", "", nl);
+  reset (((scalar []){omegaz,{-1}}), 0);
+   { 
+disable_fpe (FE_DIVBYZERO|FE_INVALID);
+{ {  static bool _first_call = true;
+  ForeachData _foreach_data = {
+    .fname = "vorticity.c", .line = 95,
+    .each = "foreach", .first = _first_call
+  };
 
+strongif (!is_constant(fm.x)) {
+#undef val_fm_x
+#define val_fm_x(a,i,j,k) _stencil_val(__FILE__,__LINE__,a,i,j,k)
+#undef fine_fm_x
+#define fine_fm_x(a,i,j,k) _stencil_fine(__FILE__,__LINE__,a,i,j,k)
+#undef coarse_fm_x
+#define coarse_fm_x(a,i,j,k) _stencil_coarse(__FILE__,__LINE__,a,i,j,k)
+#undef val_fm_y
+#define val_fm_y(a,i,j,k) _stencil_val(__FILE__,__LINE__,a,i,j,k)
+#undef fine_fm_y
+#define fine_fm_y(a,i,j,k) _stencil_fine(__FILE__,__LINE__,a,i,j,k)
+#undef coarse_fm_y
+#define coarse_fm_y(a,i,j,k) _stencil_coarse(__FILE__,__LINE__,a,i,j,k)
+#line 95
+foreach_stencil(){
 
-
-
-void power_input () {
-#line 33 "././spectrum.h"
-  int length1D, length2D;
-  char message[20];
-  int i, rank, size;
-  MPI_Status status;
-  int root = 0;
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-
-  if (rank == root) {
-
-    length2D = 32*(32 +1);
-    float * a = (float*) pmalloc (sizeof(float)*length2D,__func__,__FILE__,__LINE__);
-    char filename[100];
-    sprintf (filename, "F_kxky");
-    FILE * fp = fopen (filename, "rb");
-    fread (a, sizeof(float), length2D, fp);
-    for (int i=0;i<length2D;i++) {
-      F_kxky_[i] = (double)a[i];
-    }
-    fclose (fp);
-
-
-    length1D = 32;
-    float * b1 = (float*) pmalloc (sizeof(float)*length1D,__func__,__FILE__,__LINE__);
-    sprintf (filename, "kx");
-    FILE *fp1 = fopen (filename, "rb");
-    fread (b1, sizeof(float), length1D, fp1);
-    for (int i=0;i<length1D;i++) {
-      kx_[i] = (double)b1[i];
-    }
-    fclose (fp1);
-
-
-    float * b2 = (float*) pmalloc (sizeof(float)*(length1D+1),__func__,__FILE__,__LINE__);
-    sprintf (filename, "ky");
-    FILE *fp2 = fopen (filename, "rb");
-    fread (b2, sizeof(float), length1D+1, fp2);
-    for (int i=0;i<length1D+1;i++) {
-      ky_[i] = (double)b2[i];
-    }
-    fclose (fp2);
-
-
-    double kmod = 0;
-    int index = 0;
-    srand(RANDOM);
-    for (int i=0; i<32; i++) {
-      for (int j=0; j<32 +1; j++) {
- index = j*32 + i;
- kmod = sqrt(sq(kx_[i]) + sq(ky_[j]));
- omega[index] = sqrt(9.8*kmod);
- phase[index] = randInRange (0, 2.*pi);
+#line 95 "vorticity.c"
+ {
+     { foreach_block_inner() {
+      _stencil_val(__FILE__,__LINE__,omegaz,0,0,0) = (0.5*(_stencil_val(__FILE__,__LINE__,u.y,0,0,0) + _stencil_val(__FILE__,__LINE__,u.y,1,0,0))*val_fm_x(fm.x,1,0,0) - 0.5*(_stencil_val(__FILE__,__LINE__,u.y,0,0,0) + _stencil_val(__FILE__,__LINE__,u.y,-1,0,0))*val_fm_x(fm.x,0,0,0)
+    + 0.5*(_stencil_val(__FILE__,__LINE__,u.x,0,0,0) + _stencil_val(__FILE__,__LINE__,u.x,0,-1,0))*val_fm_y(fm.y,0,0,0) - 0.5*(_stencil_val(__FILE__,__LINE__,u.x,0,0,0) + _stencil_val(__FILE__,__LINE__,u.x,0,1,0))*val_fm_y(fm.y,0,1,0))/Delta;
+      {
+#line 99
+ {
+ IF (point.l > 0) {
+   double area, circ;
+   area = Delta*(_stencil_val(__FILE__,__LINE__,hf.y,0,0,0) + _stencil_val(__FILE__,__LINE__,hf.y,0,0,-1) + _stencil_val(__FILE__,__LINE__,hf.y,0,1,0) + _stencil_val(__FILE__,__LINE__,hf.y,0,1,-1))/4.;
+   circ = (-_stencil_val(__FILE__,__LINE__,u.y,0,0,0) + _stencil_val(__FILE__,__LINE__,u.y,0,0,-1))*Delta - 0.5*(_stencil_val(__FILE__,__LINE__,w,0,0,-1) + _stencil_val(__FILE__,__LINE__,w,0,-1,-1))*0.5*(_stencil_val(__FILE__,__LINE__,hf.y,0,0,0) + _stencil_val(__FILE__,__LINE__,hf.y,0,0,-1)) +
+     0.5*(_stencil_val(__FILE__,__LINE__,w,0,0,-1) + _stencil_val(__FILE__,__LINE__,w,0,1,-1))*0.5*(_stencil_val(__FILE__,__LINE__,hf.y,0,1,0) + _stencil_val(__FILE__,__LINE__,hf.y,0,1,-1));
+   _stencil_val(__FILE__,__LINE__,omega.x,0,0,0) = circ/area;
+ }
+  {
+   _stencil_val(__FILE__,__LINE__,omega.x,0,0,0) = 0.;
+ }
       }
-    }
-  }
+#line 99
+ {
+ IF (point.l > 0) {
+   double area, circ;
+   area = Delta*(_stencil_val(__FILE__,__LINE__,hf.x,0,0,0) + _stencil_val(__FILE__,__LINE__,hf.x,0,0,-1) + _stencil_val(__FILE__,__LINE__,hf.x,1,0,0) + _stencil_val(__FILE__,__LINE__,hf.x,1,0,-1))/4.;
+   circ = (-_stencil_val(__FILE__,__LINE__,u.x,0,0,0) + _stencil_val(__FILE__,__LINE__,u.x,0,0,-1))*Delta - 0.5*(_stencil_val(__FILE__,__LINE__,w,0,0,-1) + _stencil_val(__FILE__,__LINE__,w,-1,0,-1))*0.5*(_stencil_val(__FILE__,__LINE__,hf.x,0,0,0) + _stencil_val(__FILE__,__LINE__,hf.x,0,0,-1)) +
+     0.5*(_stencil_val(__FILE__,__LINE__,w,0,0,-1) + _stencil_val(__FILE__,__LINE__,w,1,0,-1))*0.5*(_stencil_val(__FILE__,__LINE__,hf.x,1,0,0) + _stencil_val(__FILE__,__LINE__,hf.x,1,0,-1));
+   _stencil_val(__FILE__,__LINE__,omega.y,0,0,0) = circ/area;
+ }
+  {
+   _stencil_val(__FILE__,__LINE__,omega.y,0,0,0) = 0.;
+ }
+      }}
+    } end_foreach_block_inner(); }
+  } } end_foreach_stencil(); }
+strongif (is_constant(fm.x)) {
+const struct { double x, y; } _const_fm = {_constant[fm.x.i -_NVARMAX], _constant[fm.y.i - _NVARMAX]};
+NOT_UNUSED(_const_fm);
+#undef val_fm_x
+#define val_fm_x(a,i,j,k) _const_fm.x
+#undef fine_fm_x
+#define fine_fm_x(a,i,j,k) _const_fm.x
+#undef coarse_fm_x
+#define coarse_fm_x(a,i,j,k) _const_fm.x
+#undef val_fm_y
+#define val_fm_y(a,i,j,k) _const_fm.y
+#undef fine_fm_y
+#define fine_fm_y(a,i,j,k) _const_fm.y
+#undef coarse_fm_y
+#define coarse_fm_y(a,i,j,k) _const_fm.y
+#line 95
+foreach_stencil(){
 
-  MPI_Bcast(&kx_, length1D, MPI_DOUBLE, root, MPI_COMM_WORLD);
-  MPI_Bcast(&ky_, length1D+1, MPI_DOUBLE, root, MPI_COMM_WORLD);
-  MPI_Bcast(&F_kxky_, length2D, MPI_DOUBLE, root, MPI_COMM_WORLD);
-  MPI_Bcast(&omega, length2D, MPI_DOUBLE, root, MPI_COMM_WORLD);
-  MPI_Bcast(&phase, length2D, MPI_DOUBLE, root, MPI_COMM_WORLD);
+#line 95 "vorticity.c"
+ {
+     { foreach_block_inner() {
+      _stencil_val(__FILE__,__LINE__,omegaz,0,0,0) = (0.5*(_stencil_val(__FILE__,__LINE__,u.y,0,0,0) + _stencil_val(__FILE__,__LINE__,u.y,1,0,0))*val_fm_x(fm.x,1,0,0) - 0.5*(_stencil_val(__FILE__,__LINE__,u.y,0,0,0) + _stencil_val(__FILE__,__LINE__,u.y,-1,0,0))*val_fm_x(fm.x,0,0,0)
+    + 0.5*(_stencil_val(__FILE__,__LINE__,u.x,0,0,0) + _stencil_val(__FILE__,__LINE__,u.x,0,-1,0))*val_fm_y(fm.y,0,0,0) - 0.5*(_stencil_val(__FILE__,__LINE__,u.x,0,0,0) + _stencil_val(__FILE__,__LINE__,u.x,0,1,0))*val_fm_y(fm.y,0,1,0))/Delta;
+      {
+#line 99
+ {
+ IF (point.l > 0) {
+   double area, circ;
+   area = Delta*(_stencil_val(__FILE__,__LINE__,hf.y,0,0,0) + _stencil_val(__FILE__,__LINE__,hf.y,0,0,-1) + _stencil_val(__FILE__,__LINE__,hf.y,0,1,0) + _stencil_val(__FILE__,__LINE__,hf.y,0,1,-1))/4.;
+   circ = (-_stencil_val(__FILE__,__LINE__,u.y,0,0,0) + _stencil_val(__FILE__,__LINE__,u.y,0,0,-1))*Delta - 0.5*(_stencil_val(__FILE__,__LINE__,w,0,0,-1) + _stencil_val(__FILE__,__LINE__,w,0,-1,-1))*0.5*(_stencil_val(__FILE__,__LINE__,hf.y,0,0,0) + _stencil_val(__FILE__,__LINE__,hf.y,0,0,-1)) +
+     0.5*(_stencil_val(__FILE__,__LINE__,w,0,0,-1) + _stencil_val(__FILE__,__LINE__,w,0,1,-1))*0.5*(_stencil_val(__FILE__,__LINE__,hf.y,0,1,0) + _stencil_val(__FILE__,__LINE__,hf.y,0,1,-1));
+   _stencil_val(__FILE__,__LINE__,omega.x,0,0,0) = circ/area;
+ }
+  {
+   _stencil_val(__FILE__,__LINE__,omega.x,0,0,0) = 0.;
+ }
+      }
+#line 99
+ {
+ IF (point.l > 0) {
+   double area, circ;
+   area = Delta*(_stencil_val(__FILE__,__LINE__,hf.x,0,0,0) + _stencil_val(__FILE__,__LINE__,hf.x,0,0,-1) + _stencil_val(__FILE__,__LINE__,hf.x,1,0,0) + _stencil_val(__FILE__,__LINE__,hf.x,1,0,-1))/4.;
+   circ = (-_stencil_val(__FILE__,__LINE__,u.x,0,0,0) + _stencil_val(__FILE__,__LINE__,u.x,0,0,-1))*Delta - 0.5*(_stencil_val(__FILE__,__LINE__,w,0,0,-1) + _stencil_val(__FILE__,__LINE__,w,-1,0,-1))*0.5*(_stencil_val(__FILE__,__LINE__,hf.x,0,0,0) + _stencil_val(__FILE__,__LINE__,hf.x,0,0,-1)) +
+     0.5*(_stencil_val(__FILE__,__LINE__,w,0,0,-1) + _stencil_val(__FILE__,__LINE__,w,1,0,-1))*0.5*(_stencil_val(__FILE__,__LINE__,hf.x,1,0,0) + _stencil_val(__FILE__,__LINE__,hf.x,1,0,-1));
+   _stencil_val(__FILE__,__LINE__,omega.y,0,0,0) = circ/area;
+ }
+  {
+   _stencil_val(__FILE__,__LINE__,omega.y,0,0,0) = 0.;
+ }
+      }}
+    } end_foreach_block_inner(); }
+  } } end_foreach_stencil(); }  _first_call = false;
+}}
+enable_fpe (FE_DIVBYZERO|FE_INVALID);
+#line 112
 
-  char checkout[100];
-  sprintf (checkout, "F-%d", pid());
-  FILE * fout = fopen (checkout, "w");
-  for (int i=0; i<length2D; i++)
-    fprintf (fout, "%g ", F_kxky_[i]);
-  fclose (fout);
-  sprintf (checkout, "ky-%d", pid());
-  fout = fopen (checkout, "w");
-  for (int i=0; i<length1D+1; i++)
-    fprintf (fout, "%g ", ky_[i]);
-  fclose (fout);
-#line 156 "././spectrum.h"
+strongif (!is_constant(fm.x)) {
+#undef val_fm_x
+#define val_fm_x(a,i,j,k) val(a,i,j,k)
+#undef fine_fm_x
+#define fine_fm_x(a,i,j,k) fine(a,i,j,k)
+#undef coarse_fm_x
+#define coarse_fm_x(a,i,j,k) coarse(a,i,j,k)
+#undef val_fm_y
+#define val_fm_y(a,i,j,k) val(a,i,j,k)
+#undef fine_fm_y
+#define fine_fm_y(a,i,j,k) fine(a,i,j,k)
+#undef coarse_fm_y
+#define coarse_fm_y(a,i,j,k) coarse(a,i,j,k)
+#line 95
+foreach (){
+
+#line 95 "vorticity.c"
+ {
+     { foreach_block_inner() {
+      val(omegaz,0,0,0) = (0.5*(val(u.y,0,0,0) + val(u.y,1,0,0))*val_fm_x(fm.x,1,0,0) - 0.5*(val(u.y,0,0,0) + val(u.y,-1,0,0))*val_fm_x(fm.x,0,0,0)
+    + 0.5*(val(u.x,0,0,0) + val(u.x,0,-1,0))*val_fm_y(fm.y,0,0,0) - 0.5*(val(u.x,0,0,0) + val(u.x,0,1,0))*val_fm_y(fm.y,0,1,0))/Delta;
+      {
+#line 99
+ {
+ if (point.l > 0) {
+   double area, circ;
+   area = Delta*(val(hf.y,0,0,0) + val(hf.y,0,0,-1) + val(hf.y,0,1,0) + val(hf.y,0,1,-1))/4.;
+   circ = (-val(u.y,0,0,0) + val(u.y,0,0,-1))*Delta - 0.5*(val(w,0,0,-1) + val(w,0,-1,-1))*0.5*(val(hf.y,0,0,0) + val(hf.y,0,0,-1)) +
+     0.5*(val(w,0,0,-1) + val(w,0,1,-1))*0.5*(val(hf.y,0,1,0) + val(hf.y,0,1,-1));
+   val(omega.x,0,0,0) = circ/area;
+ }
+ else {
+   val(omega.x,0,0,0) = 0.;
+ }
+      }
+#line 99
+ {
+ if (point.l > 0) {
+   double area, circ;
+   area = Delta*(val(hf.x,0,0,0) + val(hf.x,0,0,-1) + val(hf.x,1,0,0) + val(hf.x,1,0,-1))/4.;
+   circ = (-val(u.x,0,0,0) + val(u.x,0,0,-1))*Delta - 0.5*(val(w,0,0,-1) + val(w,-1,0,-1))*0.5*(val(hf.x,0,0,0) + val(hf.x,0,0,-1)) +
+     0.5*(val(w,0,0,-1) + val(w,1,0,-1))*0.5*(val(hf.x,1,0,0) + val(hf.x,1,0,-1));
+   val(omega.y,0,0,0) = circ/area;
+ }
+ else {
+   val(omega.y,0,0,0) = 0.;
+ }
+      }}
+    } end_foreach_block_inner(); }
+  } } end_foreach(); }
+strongif (is_constant(fm.x)) {
+const struct { double x, y; } _const_fm = {_constant[fm.x.i -_NVARMAX], _constant[fm.y.i - _NVARMAX]};
+NOT_UNUSED(_const_fm);
+#undef val_fm_x
+#define val_fm_x(a,i,j,k) _const_fm.x
+#undef fine_fm_x
+#define fine_fm_x(a,i,j,k) _const_fm.x
+#undef coarse_fm_x
+#define coarse_fm_x(a,i,j,k) _const_fm.x
+#undef val_fm_y
+#define val_fm_y(a,i,j,k) _const_fm.y
+#undef fine_fm_y
+#define fine_fm_y(a,i,j,k) _const_fm.y
+#undef coarse_fm_y
+#define coarse_fm_y(a,i,j,k) _const_fm.y
+#line 95
+foreach (){
+
+#line 95 "vorticity.c"
+ {
+     { foreach_block_inner() {
+      val(omegaz,0,0,0) = (0.5*(val(u.y,0,0,0) + val(u.y,1,0,0))*val_fm_x(fm.x,1,0,0) - 0.5*(val(u.y,0,0,0) + val(u.y,-1,0,0))*val_fm_x(fm.x,0,0,0)
+    + 0.5*(val(u.x,0,0,0) + val(u.x,0,-1,0))*val_fm_y(fm.y,0,0,0) - 0.5*(val(u.x,0,0,0) + val(u.x,0,1,0))*val_fm_y(fm.y,0,1,0))/Delta;
+      {
+#line 99
+ {
+ if (point.l > 0) {
+   double area, circ;
+   area = Delta*(val(hf.y,0,0,0) + val(hf.y,0,0,-1) + val(hf.y,0,1,0) + val(hf.y,0,1,-1))/4.;
+   circ = (-val(u.y,0,0,0) + val(u.y,0,0,-1))*Delta - 0.5*(val(w,0,0,-1) + val(w,0,-1,-1))*0.5*(val(hf.y,0,0,0) + val(hf.y,0,0,-1)) +
+     0.5*(val(w,0,0,-1) + val(w,0,1,-1))*0.5*(val(hf.y,0,1,0) + val(hf.y,0,1,-1));
+   val(omega.x,0,0,0) = circ/area;
+ }
+ else {
+   val(omega.x,0,0,0) = 0.;
+ }
+      }
+#line 99
+ {
+ if (point.l > 0) {
+   double area, circ;
+   area = Delta*(val(hf.x,0,0,0) + val(hf.x,0,0,-1) + val(hf.x,1,0,0) + val(hf.x,1,0,-1))/4.;
+   circ = (-val(u.x,0,0,0) + val(u.x,0,0,-1))*Delta - 0.5*(val(w,0,0,-1) + val(w,-1,0,-1))*0.5*(val(hf.x,0,0,0) + val(hf.x,0,0,-1)) +
+     0.5*(val(w,0,0,-1) + val(w,1,0,-1))*0.5*(val(hf.x,1,0,0) + val(hf.x,1,0,-1));
+   val(omega.y,0,0,0) = circ/area;
+ }
+ else {
+   val(omega.y,0,0,0) = 0.;
+ }
+      }}
+    } end_foreach_block_inner(); }
+  } } end_foreach(); } }
 }
-
-
-
-double wave (double x, double y)
-{
-  double eta = 0;
-  double ampl = 0, a = 0;
-  int index = 0;
-  for (int i=0; i<32; i++) {
-    for (int j=0; j<32 +1; j++) {
-      index = j*32 + i;
-      ampl = sqrt(2.*F_kxky_[index]*dkx_*dky_);
-      a = (kx_[i]*x + ky_[j]*y + phase[index]);
-      eta += ampl*cos(a);
-    }
-  }
-  return eta;
-}
-double u_x (double x, double y, double z) {
-  int index = 0;
-  double u_x = 0;
-  double ampl = 0, a = 0;
-  double z_actual = 0, kmod = 0, theta = 0;
-  for (int i=0; i<32; i++) {
-    for (int j=0; j<32 +1; j++) {
-      index = j*32 + i;
-      ampl = sqrt(2.*F_kxky_[index]*dkx_*dky_);
-      z_actual = (z < ampl ? (z) : ampl);
-
-      kmod = sqrt(sq(kx_[i]) + sq(ky_[j]));
-      theta = atan(ky_[j]/kx_[i]);
-      a = (kx_[i]*x + ky_[j]*y + phase[index]);
-      u_x += sqrt(9.8*kmod)*ampl*exp(kmod*z_actual)*cos(a)*cos(theta);
-    }
-  }
-  return u_x;
-}
-
-double u_y (double x, double y, double z) {
-  int index = 0;
-  double u_y = 0;
-  double ampl = 0, a = 0;
-  double z_actual = 0, kmod = 0, theta = 0;
-  for (int i=0; i<32; i++) {
-    for (int j=0; j<32 +1; j++) {
-      index = j*32 + i;
-      ampl = sqrt(2.*F_kxky_[index]*dkx_*dky_);
-      z_actual = (z < ampl ? (z) : ampl);
-      kmod = sqrt(sq(kx_[i]) + sq(ky_[j]));
-      theta = atan(ky_[j]/kx_[i]);
-      a = (kx_[i]*x + ky_[j]*y + phase[index]);
-      u_y += sqrt(9.8*kmod)*ampl*exp(kmod*z_actual)*cos(a)*sin(theta);
-    }
-  }
-  return u_y;
-}
-
-double u_z (double x, double y, double z) {
-  int index = 0;
-  double u_z = 0;
-  double ampl = 0, a = 0;
-  double z_actual = 0, kmod = 0;
-  for (int i=0; i<32; i++) {
-    for (int j=0; j<32 +1; j++) {
-      index = j*32 + i;
-      ampl = sqrt(2.*F_kxky_[index]*dkx_*dky_);
-      z_actual = (z < ampl ? (z) : ampl);
-      kmod = sqrt(sq(kx_[i]) + sq(ky_[j]));
-      a = (kx_[i]*x + ky_[j]*y + phase[index]);
-      u_z += sqrt(9.8*kmod)*ampl*exp(kmod*z_actual)*sin(a);
-    }
-  }
-  return u_z;
-}
-#line 32 "field_PM.c"
-
-
 
 
 
@@ -24750,14 +25705,17 @@ double u_z (double x, double y, double z) {
 
 int writefields (double t, const char *suffix) {
   char s[80];
-  char filename1[50], filename2[50], filename3[50], filename4[50];
-  vector u_temp;
-  scalar w_temp, h_temp;
+  char filename1[50], filename2[50], filename3[50], filename4[50], filename5[50], filename6[50], filename7[50];
+  vector u_temp, omega_temp;
+  scalar w_temp, h_temp, omegaz_temp;
   for (int j=0; j<nl; ++j) {
     sprintf (filename1, "field/ux_%s_t%g_l%d", suffix, t, j);
     sprintf (filename2, "field/uy_%s_t%g_l%d", suffix, t, j);
     sprintf (filename3, "field/uz_%s_t%g_l%d", suffix, t, j);
     sprintf (filename4, "field/h_%s_t%g_l%d", suffix, t, j);
+    sprintf (filename5, "field/omegax_%s_t%g_l%d", suffix, t, j);
+    sprintf (filename6, "field/omegay_%s_t%g_l%d", suffix, t, j);
+    sprintf (filename7, "field/omegaz_%s_t%g_l%d", suffix, t, j);
     if (j==0) {
 
       sprintf (s, "u");
@@ -24766,6 +25724,10 @@ int writefields (double t, const char *suffix) {
       w_temp = lookup_field (s);
       sprintf (s, "h");
       h_temp = lookup_field (s);
+      sprintf (s, "omega");
+      omega_temp = lookup_vector (s);
+      sprintf (s, "omegaz");
+      omegaz_temp = lookup_field (s);
     }
     else {
       sprintf (s, "u%d", j);
@@ -24774,6 +25736,10 @@ int writefields (double t, const char *suffix) {
       w_temp = lookup_field (s);
       sprintf (s, "h%d", j);
       h_temp = lookup_field (s);
+      sprintf (s, "omega%d", j);
+      omega_temp = lookup_vector (s);
+      sprintf (s, "omegaz%d", j);
+      omegaz_temp = lookup_field (s);
     }
     FILE * fux = fopen (filename1, "w");
     output_matrix_mpi ((struct OutputMatrix){u_temp.x, fux, N, .linear = true});
@@ -24787,364 +25753,44 @@ int writefields (double t, const char *suffix) {
     FILE * fh = fopen (filename4, "w");
     output_matrix_mpi ((struct OutputMatrix){h_temp, fh, N, .linear = true});
     fclose (fh);
+    FILE * fomegax = fopen (filename5, "w");
+    output_matrix_mpi ((struct OutputMatrix){omega_temp.x, fomegax, N, .linear = true});
+    fclose (fomegax);
+    FILE * fomegay = fopen (filename6, "w");
+    output_matrix_mpi ((struct OutputMatrix){omega_temp.y, fomegay, N, .linear = true});
+    fclose (fomegay);
+    FILE * fomegaz = fopen (filename7, "w");
+    output_matrix_mpi ((struct OutputMatrix){omegaz_temp, fomegaz, N, .linear = true});
+    fclose (fomegaz);
   }
   return 0;
 }
 
-int main (int argc, char * argv[])
-{ _init_solver();
-  if (argc > 1)
-    NLAYER = atoi(argv[1]);
-  if (argc > 2)
-    LEVEL_data = atoi(argv[2]);
-  if (argc > 3)
-    TEND = atof(argv[3]);
-  if (argc > 4)
-    nu = atof(argv[4]);
-  else
-    nu = 0.;
-  if (argc > 5)
-    RANDOM = atoi(argv[5]);
-  if (argc > 6)
-    L0 = atof(argv[6]);
-  else
-    L0 = 50.;
-  if (argc > 7)
-    kp_ = 2.*pi/atof(argv[7]);
-  else
-    kp_ = 2.*pi/(L0/5.);
-  if (argc > 8)
-    theta_H = atof(argv[8]);
-  else
-    theta_H = 0.5;
-  origin ((struct _origin){-L0/2., -L0/2.});
-  periodic (right);
-  periodic (top);
-  N = 1 << LEVEL_data;
-  nl = NLAYER;
-  G = 9.8;
-  h_ = 2.*pi/kp_;
-
-  gpe_base = -0.5*sq(h_)*sq(L0)*9.8;
 
 
-
-  CFL_H = 1;
-
-  fprintf (ferr, "Read in parameters!\n");
-  run();
- free_solver(); }
-#line 141 "field_PM.c"
-static int init_0_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (i = 0);   *ip = i; *tp = t;   return ret; } static int init_0 (const int i, const double t, Event * _ev) { trace ("init_0", "field_PM.c", 141); 
+static int init_0_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (i = 0);   *ip = i; *tp = t;   return ret; } static int init_0 (const int i, const double t, Event * _ev) { trace ("init_0", "vorticity.c", 184); 
 {
-  if (!restore ((struct Dump){"restart"})) {
-    power_input();
-    dkx_ = kx_[1] - kx_[0];
-    dky_ = ky_[1] - ky_[0];
-    fprintf (ferr, "dkx = %g, dky = %g\n", dkx_, dky_);
-    geometric_beta (1./3., true);
-     { 
-disable_fpe (FE_DIVBYZERO|FE_INVALID);
-{  double _h_ = h_;
- int _nl = nl;
-{ double h_ = _h_; NOT_UNUSED(h_);
- int nl = _nl; NOT_UNUSED(nl);
-  static bool _first_call = true;
-  ForeachData _foreach_data = {
-    .fname = "field_PM.c", .line = 149,
-    .each = "foreach", .first = _first_call
-  };
-foreach_stencil(){
-
-#line 149 "field_PM.c"
- {
-      _stencil_val(__FILE__,__LINE__,zb,0,0,0) = -h_;
-      _stencil_val(__FILE__,__LINE__,eta,0,0,0) = wave(x, y);
-      double H = wave(x, y) - _stencil_val(__FILE__,__LINE__,zb,0,0,0);
-       { foreach_block_inner() {
-       _stencil_val(__FILE__,__LINE__,h,0,0,0) = H/nl;
-      } end_foreach_block_inner(); }
-    } } end_foreach_stencil(); if (_first_call) {
- if (h_ != _h_)
-   reduction_warning ("field_PM.c", 149, "h_");
- }
- if (_first_call) {
- if (nl != _nl)
-   reduction_warning ("field_PM.c", 149, "nl");
- }
-  _first_call = false;
-}}
-enable_fpe (FE_DIVBYZERO|FE_INVALID);
-#line 156
-foreach(){
-
-#line 149 "field_PM.c"
- {
-      val(zb,0,0,0) = -h_;
-      val(eta,0,0,0) = wave(x, y);
-      double H = wave(x, y) - val(zb,0,0,0);
-       { foreach_block_inner() {
-       val(h,0,0,0) = H/nl;
-      } end_foreach_block_inner(); }
-    } } end_foreach(); }
-
-    vertical_remapping (h, tracers);
-     { 
-disable_fpe (FE_DIVBYZERO|FE_INVALID);
-{ {  static bool _first_call = true;
-  ForeachData _foreach_data = {
-    .fname = "field_PM.c", .line = 159,
-    .each = "foreach", .first = _first_call
-  };
-foreach_stencil(){
-
-#line 159 "field_PM.c"
- {
-      double z = _stencil_val(__FILE__,__LINE__,zb,0,0,0);
-       { foreach_block_inner() {
-        z += _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.;
-        _stencil_val(__FILE__,__LINE__,u.x,0,0,0) = u_x(x, y, z);
-        _stencil_val(__FILE__,__LINE__,u.y,0,0,0) = u_y(x, y, z);
-        _stencil_val(__FILE__,__LINE__,w,0,0,0) = u_z(x, y, z);
-        z += _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.;
-      } end_foreach_block_inner(); }
-    } } end_foreach_stencil();  _first_call = false;
-}}
-enable_fpe (FE_DIVBYZERO|FE_INVALID);
-#line 168
-foreach(){
-
-#line 159 "field_PM.c"
- {
-      double z = val(zb,0,0,0);
-       { foreach_block_inner() {
-        z += val(h,0,0,0)/2.;
-        val(u.x,0,0,0) = u_x(x, y, z);
-        val(u.y,0,0,0) = u_y(x, y, z);
-        val(w,0,0,0) = u_z(x, y, z);
-        z += val(h,0,0,0)/2.;
-      } end_foreach_block_inner(); }
-    } } end_foreach(); }
-    fprintf (ferr,"Done initialization!\n");
-    dump((struct Dump){"initial"});
+  char dumpname[100];
+  sprintf (dumpname, "dump_t%g", TRESTORE);
+  if (!restore ((struct Dump){dumpname})) {
+    fprintf (ferr, "%s not found!\n", dumpname);
   }
   else {
 
-    dtmax = 0.01;
-    dt = dtnext (dtmax);
+    geometric_beta (1./3., true);
+
+
+
+
+    vort ();
     char *suffix = "matrix";
-    writefields (t, suffix);
+    writefields (TRESTORE, suffix);
   }
- end_trace("init_0", "field_PM.c", 179); } return 0; } 
+ end_trace("init_0", "vorticity.c", 202); } return 0; } 
 
-
-
-
-
-
-static int energy_before_remap_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (i+=10);   *ip = i; *tp = t;   return ret; } static int energy_before_remap (const int i, const double t, Event * _ev) { trace ("energy_before_remap", "field_PM.c", 186); 
-{
-  if (i==10) {
-    fprintf(ferr, "energy output before remap!\n");
-    fflush(ferr);
-  }
-  double ke = 0., gpe = 0.;
-   { 
-disable_fpe (FE_DIVBYZERO|FE_INVALID);
-{  double _ke = ke;
- double _gpe = gpe;
-{ double ke = _ke; NOT_UNUSED(ke);
- double gpe = _gpe; NOT_UNUSED(gpe);
-  static bool _first_call = true;
-  ForeachData _foreach_data = {
-    .fname = "field_PM.c", .line = 193,
-    .each = "foreach", .first = _first_call
-  };
-
-strongif (!is_constant(cm)) {
-#undef val_cm
-#define val_cm(a,i,j,k) _stencil_val(__FILE__,__LINE__,a,i,j,k)
-#undef fine_cm
-#define fine_cm(a,i,j,k) _stencil_fine(__FILE__,__LINE__,a,i,j,k)
-#undef coarse_cm
-#define coarse_cm(a,i,j,k) _stencil_coarse(__FILE__,__LINE__,a,i,j,k)
-#line 193
-foreach_stencil(){
-
-#line 193 "field_PM.c"
- {
-    double zc = _stencil_val(__FILE__,__LINE__,zb,0,0,0);
-     { foreach_block_inner() {
-      double norm2 = sq(_stencil_val(__FILE__,__LINE__,w,0,0,0));
-      {
-#line 197
-
-        norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
-#line 197
-
-        norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
-        ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        gpe += (zc + _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.)*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        zc += _stencil_val(__FILE__,__LINE__,h,0,0,0);
-    } end_foreach_block_inner(); }
-  } } end_foreach_stencil(); }
-strongif (is_constant(cm)) {
-const double _const_cm = _constant[cm.i -_NVARMAX];
-NOT_UNUSED(_const_cm);
-#undef val_cm
-#define val_cm(a,i,j,k) _const_cm
-#undef fine_cm
-#define fine_cm(a,i,j,k) _const_cm
-#undef coarse_cm
-#define coarse_cm(a,i,j,k) _const_cm
-#line 193
-foreach_stencil(){
-
-#line 193 "field_PM.c"
- {
-    double zc = _stencil_val(__FILE__,__LINE__,zb,0,0,0);
-     { foreach_block_inner() {
-      double norm2 = sq(_stencil_val(__FILE__,__LINE__,w,0,0,0));
-      {
-#line 197
-
-        norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
-#line 197
-
-        norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
-        ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        gpe += (zc + _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.)*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        zc += _stencil_val(__FILE__,__LINE__,h,0,0,0);
-    } end_foreach_block_inner(); }
-  } } end_foreach_stencil(); }  _first_call = false;
-}}
-enable_fpe (FE_DIVBYZERO|FE_INVALID);
-#line 203
-
-#undef OMP_PARALLEL
-#define OMP_PARALLEL()
-OMP(omp parallel reduction(+:ke)  reduction(+:gpe)) {
-
-#line 193
-
-strongif (!is_constant(cm)) {
-#undef val_cm
-#define val_cm(a,i,j,k) val(a,i,j,k)
-#undef fine_cm
-#define fine_cm(a,i,j,k) fine(a,i,j,k)
-#undef coarse_cm
-#define coarse_cm(a,i,j,k) coarse(a,i,j,k)
-#line 193
-foreach (){
-
-#line 193 "field_PM.c"
- {
-    double zc = val(zb,0,0,0);
-     { foreach_block_inner() {
-      double norm2 = sq(val(w,0,0,0));
-      {
-#line 197
-
-        norm2 += sq(val(u.x,0,0,0));
-#line 197
-
-        norm2 += sq(val(u.y,0,0,0));}
-        ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        gpe += (zc + val(h,0,0,0)/2.)*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        zc += val(h,0,0,0);
-    } end_foreach_block_inner(); }
-  } } end_foreach(); }
-strongif (is_constant(cm)) {
-const double _const_cm = _constant[cm.i -_NVARMAX];
-NOT_UNUSED(_const_cm);
-#undef val_cm
-#define val_cm(a,i,j,k) _const_cm
-#undef fine_cm
-#define fine_cm(a,i,j,k) _const_cm
-#undef coarse_cm
-#define coarse_cm(a,i,j,k) _const_cm
-#line 193
-foreach (){
-
-#line 193 "field_PM.c"
- {
-    double zc = val(zb,0,0,0);
-     { foreach_block_inner() {
-      double norm2 = sq(val(w,0,0,0));
-      {
-#line 197
-
-        norm2 += sq(val(u.x,0,0,0));
-#line 197
-
-        norm2 += sq(val(u.y,0,0,0));}
-        ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        gpe += (zc + val(h,0,0,0)/2.)*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        zc += val(h,0,0,0);
-    } end_foreach_block_inner(); }
-  } } end_foreach(); }mpi_all_reduce_array (&ke, double, MPI_SUM, 1);
-mpi_all_reduce_array (&gpe, double, MPI_SUM, 1);
-
-#undef OMP_PARALLEL
-#define OMP_PARALLEL() OMP(omp parallel)
-}
-#line 203
- }
-  static FILE * fp =NULL; strongif (!fp || i == 0) fp = pid() > 0 ? fopen("/dev/null", "w") :  fopen("energy_before_remap.dat","w");
-  fprintf (fp, "%g %g %g\n", t, ke/2., 9.8*gpe - gpe_base);
-  fflush (fp);
- end_trace("energy_before_remap", "field_PM.c", 207); } return 0; } 
-#line 236 "field_PM.c"
-static int movie_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t += 1);   *ip = i; *tp = t;   return ret; } static int movie_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t <= TEND);   *ip = i; *tp = t;   return ret; } static int movie (const int i, const double t, Event * _ev) { trace ("movie", "field_PM.c", 236); 
-{
-  char s[80];
-  view ((struct _view_set){.fov = 20, .quat = {0.475152,0.161235,0.235565,0.832313}, .width = 800, .height = 600});
-  sprintf (s, "t = %.2f", t);
-  draw_string ((struct _draw_string){s, .size = 30});
-  sprintf (s, "u%d.x", nl-1);
-  squares ((struct _squares){s, .linear = true, .z = "eta", .min = -2./7.*sqrt(L0), .max = 2./7.*sqrt(L0)});
-  {
-  static FILE * fp =NULL; strongif (!fp || i == 0) fp = pid() > 0 ? fopen("/dev/null", "w") :  fopen ("ux" ".ppm", "a");
-  save ((struct _save){.fp = fp});
-  }
-#line 260 "field_PM.c"
-  char filename1[50], filename2[50], filename3[50];
-  sprintf (filename1, "surface/eta_matrix_%g", t);
-  sprintf (filename2, "surface/ux_matrix_%g", t);
-  sprintf (filename3, "surface/uy_matrix_%g", t);
-  FILE * feta = fopen (filename1, "w");
-
-  output_matrix_mpi ((struct OutputMatrix){eta, feta, N, .linear = true});
-  fclose (feta);
-  sprintf (s, "u%d", nl-1);
-  vector u_temp = lookup_vector (s);
-  FILE * fux = fopen (filename2, "w");
-  output_matrix_mpi ((struct OutputMatrix){u_temp.x, fux, N, .linear = true});
-  fclose (fux);
-  FILE * fuy = fopen (filename3, "w");
-  output_matrix_mpi ((struct OutputMatrix){u_temp.y, fuy, N, .linear = true});
-  fclose (fuy);
- end_trace("movie", "field_PM.c", 276); } return 0; } 
-
-
-
-
-
-
-static int field_log_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t=0);   *ip = i; *tp = t;   return ret; } static int field_log_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t+=10);   *ip = i; *tp = t;   return ret; } static int field_log_expr2 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t<=TEND);   *ip = i; *tp = t;   return ret; } static int field_log (const int i, const double t, Event * _ev) { trace ("field_log", "field_PM.c", 283);  {
-  char *suffix = "matrix";
-  writefields (t, suffix);
- end_trace("field_log", "field_PM.c", 286); } return 0; } 
-#line 306 "field_PM.c"
-static int regulardump_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t = 0);   *ip = i; *tp = t;   return ret; } static int regulardump_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t += 20);   *ip = i; *tp = t;   return ret; } static int regulardump_expr2 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t < TEND);   *ip = i; *tp = t;   return ret; } static int regulardump (const int i, const double t, Event * _ev) { trace ("regulardump", "field_PM.c", 306);  {
-  char dname[100];
-  sprintf (dname, "dump_t%g", t);
-  dump ((struct Dump){dname});
- end_trace("regulardump", "field_PM.c", 310); } return 0; } 
-
-static int endrun_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t = TEND);   *ip = i; *tp = t;   return ret; } static int endrun (const int i, const double t, Event * _ev) { trace ("endrun", "field_PM.c", 312);  {
-  dump ((struct Dump){0});
- end_trace("endrun", "field_PM.c", 314); } return 0; } 
+static int deletefield_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t=1234567890);   *ip = i; *tp = t;   return ret; } static int deletefield (const int i, const double t, Event * _ev) { trace ("deletefield", "vorticity.c", 204);  {
+  delete ((scalar *)((vector []){{hu.x,hu.y},{ha.x,ha.y},{hf.x,hf.y},{omega.x,omega.y},{{-1},{-1}}}));
+ end_trace("deletefield", "vorticity.c", 206); } return 0; } 
 size_t datasize = 1*sizeof (double);
 static int defaults0 (const int i, const double t, Event * _ev);
 static int defaults0_expr0 (int * ip, double * tp, Event * _ev);
@@ -25202,21 +25848,8 @@ static int perf_plot (const int i, const double t, Event * _ev);
 static int perf_plot_expr0 (int * ip, double * tp, Event * _ev);
 static int init_0 (const int i, const double t, Event * _ev);
 static int init_0_expr0 (int * ip, double * tp, Event * _ev);
-static int energy_before_remap (const int i, const double t, Event * _ev);
-static int energy_before_remap_expr0 (int * ip, double * tp, Event * _ev);
-static int movie (const int i, const double t, Event * _ev);
-static int movie_expr0 (int * ip, double * tp, Event * _ev);
-static int movie_expr1 (int * ip, double * tp, Event * _ev);
-static int field_log (const int i, const double t, Event * _ev);
-static int field_log_expr0 (int * ip, double * tp, Event * _ev);
-static int field_log_expr1 (int * ip, double * tp, Event * _ev);
-static int field_log_expr2 (int * ip, double * tp, Event * _ev);
-static int regulardump (const int i, const double t, Event * _ev);
-static int regulardump_expr0 (int * ip, double * tp, Event * _ev);
-static int regulardump_expr1 (int * ip, double * tp, Event * _ev);
-static int regulardump_expr2 (int * ip, double * tp, Event * _ev);
-static int endrun (const int i, const double t, Event * _ev);
-static int endrun_expr0 (int * ip, double * tp, Event * _ev);
+static int deletefield (const int i, const double t, Event * _ev);
+static int deletefield_expr0 (int * ip, double * tp, Event * _ev);
 void _init_solver (void) {
   void init_solver();
   init_solver();
@@ -25237,19 +25870,11 @@ void _init_solver (void) {
   event_register ((Event){ 0, 1, init, {init_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/layered/hydro.h", 159, "init"});
   event_register ((Event){ 0, 1, init_0, {init_0_expr0}, ((int *)0), ((double *)0),
-    "field_PM.c", 141, "init"});
+    "vorticity.c", 184, "init"});
   event_register ((Event){ 0, 1, perfs, {perfs_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/layered/perfs.h", 7, "perfs"});
   event_register ((Event){ 0, 1, perf_plot, {perf_plot_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/layered/perfs.h", 30, "perf_plot"});
-  event_register ((Event){ 0, 2, movie, {movie_expr0, movie_expr1}, ((int *)0), ((double *)0),
-    "field_PM.c", 236, "movie"});
-  event_register ((Event){ 0, 3, field_log, {field_log_expr0, field_log_expr1, field_log_expr2}, ((int *)0), ((double *)0),
-    "field_PM.c", 283, "field_log"});
-  event_register ((Event){ 0, 3, regulardump, {regulardump_expr0, regulardump_expr1, regulardump_expr2}, ((int *)0), ((double *)0),
-    "field_PM.c", 306, "regulardump"});
-  event_register ((Event){ 0, 1, endrun, {endrun_expr0}, ((int *)0), ((double *)0),
-    "field_PM.c", 312, "endrun"});
   event_register ((Event){ 0, 1, cleanup, {cleanup_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/run.h", 50, "cleanup"});
   event_register ((Event){ 0, 1, cleanup_0, {cleanup_0_expr0}, ((int *)0), ((double *)0),
@@ -25286,8 +25911,8 @@ void _init_solver (void) {
     "/home/jiarongw/basilisk/src/layered/hydro.h", 454, "remap"});
   event_register ((Event){ 0, 1, remap_0, {remap_0_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/layered/remap.h", 111, "remap"});
-  event_register ((Event){ 0, 1, energy_before_remap, {energy_before_remap_expr0}, ((int *)0), ((double *)0),
-    "field_PM.c", 186, "energy_before_remap"});
+  event_register ((Event){ 0, 1, deletefield, {deletefield_expr0}, ((int *)0), ((double *)0),
+    "vorticity.c", 204, "deletefield"});
   void allocate_globals (int);
   allocate_globals (1);
   set_fpe();

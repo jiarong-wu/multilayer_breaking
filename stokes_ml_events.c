@@ -249,7 +249,7 @@ event snapshot (t += 0.1*T0) {
   dump (dname);
 }
 
-event end (t = 6.*T0) {
+event end (i = 4) {
   fprintf (fout, "i = %d t = %g\n", i, t);
   dump ("end");
 }

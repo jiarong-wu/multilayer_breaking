@@ -1,9 +1,9 @@
-#line 1 "field_PM-cpp.c"
+#line 1 "stokes_ml-cpp.c"
 #line 1 "<built-in>"
 #line 1 "<command-line>"
 #line 1 "/usr/include/stdc-predef.h"
 #line 1 "<command-line>"
-#line 1 "field_PM-cpp.c"
+#line 1 "stokes_ml-cpp.c"
 #if _XOPEN_SOURCE < 700
 #undef _XOPEN_SOURCE
 #define _XOPEN_SOURCE 700
@@ -1696,12 +1696,9 @@ int _layer = 0;
 #undef val
 #define val(a,k,p,m) data(k,p,m)[_index(a,m)]
 #line 1495 "/home/jiarongw/basilisk/src/common.h"
-#line 15 "field_PM-cpp.c"
-#line 1 "field_PM.c"
-
-
-
-
+#line 15 "stokes_ml-cpp.c"
+#line 1 "stokes_ml.c"
+#line 21 "stokes_ml.c"
 #line 1 "grid/multigrid.h"
 #line 1 "/home/jiarongw/basilisk/src/grid/multigrid.h"
 #line 16 "/home/jiarongw/basilisk/src/grid/multigrid.h"
@@ -5822,7 +5819,7 @@ double z_indexing (scalar index, bool leaves)
   { double _ret =  pid() == 0 ? i*npe() - 1 : -1; end_trace("z_indexing", "/home/jiarongw/basilisk/src/grid/multigrid-mpi.h", 147);  return _ret; }
  end_trace("z_indexing", "/home/jiarongw/basilisk/src/grid/multigrid-mpi.h", 148); }
 #line 900 "/home/jiarongw/basilisk/src/grid/multigrid.h"
-#line 6 "field_PM.c"
+#line 22 "stokes_ml.c"
 #line 1 "view.h"
 #line 1 "/home/jiarongw/basilisk/src/view.h"
 #line 67 "/home/jiarongw/basilisk/src/view.h"
@@ -12989,7 +12986,7 @@ bool load (struct _load p) {
   }
   return true;
 }
-#line 7 "field_PM.c"
+#line 23 "stokes_ml.c"
 #line 1 "layered/hydro.h"
 #line 1 "/home/jiarongw/basilisk/src/layered/hydro.h"
 #line 46 "/home/jiarongw/basilisk/src/layered/hydro.h"
@@ -17489,8 +17486,7 @@ void output_fluxes (Flux * fluxes, scalar h, vector u)
     }
   }
 }
-#line 8 "field_PM.c"
-
+#line 24 "stokes_ml.c"
 #line 1 "layered/nh.h"
 #line 1 "/home/jiarongw/basilisk/src/layered/nh.h"
 #line 44 "/home/jiarongw/basilisk/src/layered/nh.h"
@@ -24166,7 +24162,8 @@ foreach(){
 static int cleanup_1_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (i = 1234567890);   *ip = i; *tp = t;   return ret; } static int cleanup_1 (const int i, const double t, Event * _ev) { trace ("cleanup_1", "/home/jiarongw/basilisk/src/layered/nh.h", 458);  {
   delete (((scalar []){w,phi,{-1}}));
  end_trace("cleanup_1", "/home/jiarongw/basilisk/src/layered/nh.h", 460); } return 0; } 
-#line 10 "field_PM.c"
+#line 25 "stokes_ml.c"
+
 #line 1 "layered/remap.h"
 #line 1 "/home/jiarongw/basilisk/src/layered/remap.h"
 #line 11 "/home/jiarongw/basilisk/src/layered/remap.h"
@@ -24378,8 +24375,7 @@ static int cleanup_2_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; 
 {
   pfree (beta,__func__,__FILE__,__LINE__), beta = NULL;
  end_trace("cleanup_2", "/home/jiarongw/basilisk/src/layered/remap.h", 122); } return 0; } 
-#line 11 "field_PM.c"
-
+#line 27 "stokes_ml.c"
 #line 1 "layered/perfs.h"
 #line 1 "/home/jiarongw/basilisk/src/layered/perfs.h"
 
@@ -24417,8 +24413,7 @@ static int perf_plot_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; 
     "$BASILISK/layered/perfs.plot 2> /dev/null "
     "& read dummy; kill $!", "w");
  end_trace("perf_plot", "/home/jiarongw/basilisk/src/layered/perfs.h", 35); } return 0; } 
-#line 13 "field_PM.c"
-
+#line 28 "stokes_ml.c"
 #line 1 "output_mpi.h"
 #line 1 "./output_mpi.h"
 
@@ -24547,200 +24542,16 @@ void output_matrix_part_mpi (struct OutputMatrix_part p)
 
   matrix_free (field);
 }
-#line 15 "field_PM.c"
+#line 29 "stokes_ml.c"
 
 
 
 
 
-double kp_ = 2.*pi/10.;
 
-double h_ = 10;
+double ak = 0.1;
+double RE = 40000.;
 double gpe_base = 0;
-
-
-
-double TEND = 50.;
-int NLAYER = 10;
-int LEVEL_data = 7;
-
-#line 1 "./spectrum.h"
-#line 1 "././spectrum.h"
-
-
-
-
-
-
-double F_kxky_[32*(32 +1)], omega[32*(32 +1)], phase[32*(32 +1)];
-double kx_[32], ky_[32 +1];
-double dkx_, dky_;
-int RANDOM;
-
-
-
-double randInRange (int min, int max)
-{
-  return min + (rand() / (double) (RAND_MAX) * (max - min + 1));
-}
-
-
-
-
-
-void power_input () {
-#line 33 "././spectrum.h"
-  int length1D, length2D;
-  char message[20];
-  int i, rank, size;
-  MPI_Status status;
-  int root = 0;
-  MPI_Comm_size(MPI_COMM_WORLD, &size);
-  MPI_Comm_rank(MPI_COMM_WORLD, &rank);
-
-
-  if (rank == root) {
-
-    length2D = 32*(32 +1);
-    float * a = (float*) pmalloc (sizeof(float)*length2D,__func__,__FILE__,__LINE__);
-    char filename[100];
-    sprintf (filename, "F_kxky");
-    FILE * fp = fopen (filename, "rb");
-    fread (a, sizeof(float), length2D, fp);
-    for (int i=0;i<length2D;i++) {
-      F_kxky_[i] = (double)a[i];
-    }
-    fclose (fp);
-
-
-    length1D = 32;
-    float * b1 = (float*) pmalloc (sizeof(float)*length1D,__func__,__FILE__,__LINE__);
-    sprintf (filename, "kx");
-    FILE *fp1 = fopen (filename, "rb");
-    fread (b1, sizeof(float), length1D, fp1);
-    for (int i=0;i<length1D;i++) {
-      kx_[i] = (double)b1[i];
-    }
-    fclose (fp1);
-
-
-    float * b2 = (float*) pmalloc (sizeof(float)*(length1D+1),__func__,__FILE__,__LINE__);
-    sprintf (filename, "ky");
-    FILE *fp2 = fopen (filename, "rb");
-    fread (b2, sizeof(float), length1D+1, fp2);
-    for (int i=0;i<length1D+1;i++) {
-      ky_[i] = (double)b2[i];
-    }
-    fclose (fp2);
-
-
-    double kmod = 0;
-    int index = 0;
-    srand(RANDOM);
-    for (int i=0; i<32; i++) {
-      for (int j=0; j<32 +1; j++) {
- index = j*32 + i;
- kmod = sqrt(sq(kx_[i]) + sq(ky_[j]));
- omega[index] = sqrt(9.8*kmod);
- phase[index] = randInRange (0, 2.*pi);
-      }
-    }
-  }
-
-  MPI_Bcast(&kx_, length1D, MPI_DOUBLE, root, MPI_COMM_WORLD);
-  MPI_Bcast(&ky_, length1D+1, MPI_DOUBLE, root, MPI_COMM_WORLD);
-  MPI_Bcast(&F_kxky_, length2D, MPI_DOUBLE, root, MPI_COMM_WORLD);
-  MPI_Bcast(&omega, length2D, MPI_DOUBLE, root, MPI_COMM_WORLD);
-  MPI_Bcast(&phase, length2D, MPI_DOUBLE, root, MPI_COMM_WORLD);
-
-  char checkout[100];
-  sprintf (checkout, "F-%d", pid());
-  FILE * fout = fopen (checkout, "w");
-  for (int i=0; i<length2D; i++)
-    fprintf (fout, "%g ", F_kxky_[i]);
-  fclose (fout);
-  sprintf (checkout, "ky-%d", pid());
-  fout = fopen (checkout, "w");
-  for (int i=0; i<length1D+1; i++)
-    fprintf (fout, "%g ", ky_[i]);
-  fclose (fout);
-#line 156 "././spectrum.h"
-}
-
-
-
-double wave (double x, double y)
-{
-  double eta = 0;
-  double ampl = 0, a = 0;
-  int index = 0;
-  for (int i=0; i<32; i++) {
-    for (int j=0; j<32 +1; j++) {
-      index = j*32 + i;
-      ampl = sqrt(2.*F_kxky_[index]*dkx_*dky_);
-      a = (kx_[i]*x + ky_[j]*y + phase[index]);
-      eta += ampl*cos(a);
-    }
-  }
-  return eta;
-}
-double u_x (double x, double y, double z) {
-  int index = 0;
-  double u_x = 0;
-  double ampl = 0, a = 0;
-  double z_actual = 0, kmod = 0, theta = 0;
-  for (int i=0; i<32; i++) {
-    for (int j=0; j<32 +1; j++) {
-      index = j*32 + i;
-      ampl = sqrt(2.*F_kxky_[index]*dkx_*dky_);
-      z_actual = (z < ampl ? (z) : ampl);
-
-      kmod = sqrt(sq(kx_[i]) + sq(ky_[j]));
-      theta = atan(ky_[j]/kx_[i]);
-      a = (kx_[i]*x + ky_[j]*y + phase[index]);
-      u_x += sqrt(9.8*kmod)*ampl*exp(kmod*z_actual)*cos(a)*cos(theta);
-    }
-  }
-  return u_x;
-}
-
-double u_y (double x, double y, double z) {
-  int index = 0;
-  double u_y = 0;
-  double ampl = 0, a = 0;
-  double z_actual = 0, kmod = 0, theta = 0;
-  for (int i=0; i<32; i++) {
-    for (int j=0; j<32 +1; j++) {
-      index = j*32 + i;
-      ampl = sqrt(2.*F_kxky_[index]*dkx_*dky_);
-      z_actual = (z < ampl ? (z) : ampl);
-      kmod = sqrt(sq(kx_[i]) + sq(ky_[j]));
-      theta = atan(ky_[j]/kx_[i]);
-      a = (kx_[i]*x + ky_[j]*y + phase[index]);
-      u_y += sqrt(9.8*kmod)*ampl*exp(kmod*z_actual)*cos(a)*sin(theta);
-    }
-  }
-  return u_y;
-}
-
-double u_z (double x, double y, double z) {
-  int index = 0;
-  double u_z = 0;
-  double ampl = 0, a = 0;
-  double z_actual = 0, kmod = 0;
-  for (int i=0; i<32; i++) {
-    for (int j=0; j<32 +1; j++) {
-      index = j*32 + i;
-      ampl = sqrt(2.*F_kxky_[index]*dkx_*dky_);
-      z_actual = (z < ampl ? (z) : ampl);
-      kmod = sqrt(sq(kx_[i]) + sq(ky_[j]));
-      a = (kx_[i]*x + ky_[j]*y + phase[index]);
-      u_z += sqrt(9.8*kmod)*ampl*exp(kmod*z_actual)*sin(a);
-    }
-  }
-  return u_z;
-}
-#line 32 "field_PM.c"
 
 
 
@@ -24750,14 +24561,15 @@ double u_z (double x, double y, double z) {
 
 int writefields (double t, const char *suffix) {
   char s[80];
-  char filename1[50], filename2[50], filename3[50], filename4[50];
+  char filename1[50], filename2[50], filename3[50], filename4[50], filename5[50];
   vector u_temp;
-  scalar w_temp, h_temp;
+  scalar w_temp, h_temp, phi_temp;
   for (int j=0; j<nl; ++j) {
-    sprintf (filename1, "field/ux_%s_t%g_l%d", suffix, t, j);
-    sprintf (filename2, "field/uy_%s_t%g_l%d", suffix, t, j);
-    sprintf (filename3, "field/uz_%s_t%g_l%d", suffix, t, j);
-    sprintf (filename4, "field/h_%s_t%g_l%d", suffix, t, j);
+    sprintf (filename1, "field/ux_%s_t%g_l%d", suffix, t/((2.*pi)/sqrt(1*(2.*pi))), j);
+    sprintf (filename2, "field/uy_%s_t%g_l%d", suffix, t/((2.*pi)/sqrt(1*(2.*pi))), j);
+    sprintf (filename3, "field/uz_%s_t%g_l%d", suffix, t/((2.*pi)/sqrt(1*(2.*pi))), j);
+    sprintf (filename4, "field/h_%s_t%g_l%d", suffix, t/((2.*pi)/sqrt(1*(2.*pi))), j);
+    sprintf (filename5, "field/phi_%s_t%g_l%d", suffix, t/((2.*pi)/sqrt(1*(2.*pi))), j);
     if (j==0) {
 
       sprintf (s, "u");
@@ -24766,6 +24578,8 @@ int writefields (double t, const char *suffix) {
       w_temp = lookup_field (s);
       sprintf (s, "h");
       h_temp = lookup_field (s);
+      sprintf (s, "phi");
+      phi_temp = lookup_field (s);
     }
     else {
       sprintf (s, "u%d", j);
@@ -24774,180 +24588,210 @@ int writefields (double t, const char *suffix) {
       w_temp = lookup_field (s);
       sprintf (s, "h%d", j);
       h_temp = lookup_field (s);
+      sprintf (s, "phi%d", j);
+      phi_temp = lookup_field (s);
     }
     FILE * fux = fopen (filename1, "w");
-    output_matrix_mpi ((struct OutputMatrix){u_temp.x, fux, N, .linear = true});
+    output_matrix_mpi ((struct OutputMatrix){u_temp.x, fux, N, .linear=true});
     fclose (fux);
     FILE * fuy = fopen (filename2, "w");
-    output_matrix_mpi ((struct OutputMatrix){u_temp.y, fuy, N, .linear = true});
+    output_matrix_mpi ((struct OutputMatrix){u_temp.y, fuy, N, .linear=true});
     fclose (fuy);
     FILE * fuz = fopen (filename3, "w");
-    output_matrix_mpi ((struct OutputMatrix){w_temp, fuz, N, .linear = true});
+    output_matrix_mpi ((struct OutputMatrix){w_temp, fuz, N, .linear=true});
     fclose (fuz);
     FILE * fh = fopen (filename4, "w");
-    output_matrix_mpi ((struct OutputMatrix){h_temp, fh, N, .linear = true});
+    output_matrix_mpi ((struct OutputMatrix){h_temp, fh, N, .linear=true});
     fclose (fh);
+    FILE * fphi = fopen (filename5, "w");
+    output_matrix_mpi ((struct OutputMatrix){phi_temp, fphi, N, .linear=true});
+    fclose (fphi);
   }
   return 0;
 }
 
+
+
+
+
 int main (int argc, char * argv[])
 { _init_solver();
   if (argc > 1)
-    NLAYER = atoi(argv[1]);
+    RE = atof (argv[1]);
   if (argc > 2)
-    LEVEL_data = atoi(argv[2]);
+    nl = atoi (argv[2]);
   if (argc > 3)
-    TEND = atof(argv[3]);
+    N = atoi (argv[3]);
   if (argc > 4)
-    nu = atof(argv[4]);
-  else
-    nu = 0.;
+    ak = atof (argv[4]);
   if (argc > 5)
-    RANDOM = atoi(argv[5]);
-  if (argc > 6)
-    L0 = atof(argv[6]);
-  else
-    L0 = 50.;
-  if (argc > 7)
-    kp_ = 2.*pi/atof(argv[7]);
-  else
-    kp_ = 2.*pi/(L0/5.);
-  if (argc > 8)
-    theta_H = atof(argv[8]);
-  else
-    theta_H = 0.5;
+    theta_H = atof(argv[5]);
+
   origin ((struct _origin){-L0/2., -L0/2.});
   periodic (right);
-  periodic (top);
-  N = 1 << LEVEL_data;
-  nl = NLAYER;
-  G = 9.8;
-  h_ = 2.*pi/kp_;
-
-  gpe_base = -0.5*sq(h_)*sq(L0)*9.8;
-
-
-
-  CFL_H = 1;
-
-  fprintf (ferr, "Read in parameters!\n");
+  TOLERANCE = 1e-4;
+  G = 1;
+  gpe_base = -0.5*sq(0.5)*sq(L0)*1;
+  nu = 1./RE;
+  CFL = 0.1;
+  max_slope = 0.577;
   run();
  free_solver(); }
-#line 141 "field_PM.c"
-static int init_0_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (i = 0);   *ip = i; *tp = t;   return ret; } static int init_0 (const int i, const double t, Event * _ev) { trace ("init_0", "field_PM.c", 141); 
+
+
+
+
+
+#line 1 "test/stokes.h"
+#line 1 "/home/jiarongw/basilisk/src/test/stokes.h"
+
+
+
+
+
+
+double wave (double x, double y)
 {
-  if (!restore ((struct Dump){"restart"})) {
-    power_input();
-    dkx_ = kx_[1] - kx_[0];
-    dky_ = ky_[1] - ky_[0];
-    fprintf (ferr, "dkx = %g, dky = %g\n", dkx_, dky_);
+  double a_ = ak/(2.*pi);
+  double eta1 = a_*cos((2.*pi)*x);
+  double alpa = 1./tanh((2.*pi)*0.5);
+  double eta2 = 1./4.*alpa*(3.*sq(alpa) - 1.)*sq(a_)*(2.*pi)*cos(2.*(2.*pi)*x);
+  double eta3 = -3./8.*(cube(alpa)*alpa -
+   3.*sq(alpa) + 3.)*cube(a_)*sq((2.*pi))*cos((2.*pi)*x) +
+    3./64.*(8.*cube(alpa)*cube(alpa) +
+     (sq(alpa) - 1.)*(sq(alpa) - 1.))*cube(a_)*sq((2.*pi))*cos(3.*(2.*pi)*x);
+  return eta1 + ak*eta2 + sq(ak)*eta3 - y;
+}
+
+double u_x (double x, double y)
+{
+  double alpa = 1./tanh((2.*pi)*0.5);
+  double a_ = ak/(2.*pi);
+  double sgma = sqrt(1*(2.*pi)*tanh((2.*pi)*0.5)*
+       (1. + (2.*pi)*(2.*pi)*a_*a_*(9./8.*(sq(alpa) - 1.)*
+     (sq(alpa) - 1.) + sq(alpa))));
+  double A_ = a_*1/sgma;
+  return A_*cosh((2.*pi)*(y + 0.5))/cosh((2.*pi)*0.5)*(2.*pi)*cos((2.*pi)*x) +
+    ak*3.*ak*A_/(8.*alpa)*(sq(alpa) - 1.)*(sq(alpa) - 1.)*
+    cosh(2.0*(2.*pi)*(y + 0.5))*2.*(2.*pi)*cos(2.0*(2.*pi)*x)/cosh(2.0*(2.*pi)*0.5) +
+    ak*ak*1./64.*(sq(alpa) - 1.)*(sq(alpa) + 3.)*
+    (9.*sq(alpa) - 13.)*
+    cosh(3.*(2.*pi)*(y + 0.5))/cosh(3.*(2.*pi)*0.5)*a_*a_*(2.*pi)*(2.*pi)*A_*3.*(2.*pi)*cos(3.*(2.*pi)*x);
+}
+
+double u_y (double x, double y)
+{
+  double alpa = 1./tanh((2.*pi)*0.5);
+  double a_ = ak/(2.*pi);
+  double sgma = sqrt(1*(2.*pi)*tanh((2.*pi)*0.5)*
+       (1. + (2.*pi)*(2.*pi)*a_*a_*(9./8.*(sq(alpa) - 1.)*
+     (sq(alpa) - 1.) + sq(alpa))));
+  double A_ = a_*1/sgma;
+  return A_*(2.*pi)*sinh((2.*pi)*(y + 0.5))/cosh((2.*pi)*0.5)*sin((2.*pi)*x) +
+    ak*3.*ak*A_/(8.*alpa)*(sq(alpa) - 1.)*(sq(alpa) - 1.)*
+    2.*(2.*pi)*sinh(2.0*(2.*pi)*(y + 0.5))*sin(2.0*(2.*pi)*x)/cosh(2.0*(2.*pi)*0.5) +
+    ak*ak*1./64.*(sq(alpa) - 1.)*(sq(alpa) + 3.)*
+    (9.*sq(alpa) - 13.)*
+    3.*(2.*pi)*sinh(3.*(2.*pi)*(y + 0.5))/cosh(3.*(2.*pi)*0.5)*a_*a_*(2.*pi)*(2.*pi)*A_*sin(3.*(2.*pi)*x);
+}
+#line 129 "stokes_ml.c"
+
+static int init_0_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (i = 0);   *ip = i; *tp = t;   return ret; } static int init_0 (const int i, const double t, Event * _ev) { trace ("init_0", "stokes_ml.c", 130); 
+{
+  if (!restore((struct Dump){"restart"})) {
     geometric_beta (1./3., true);
      { 
 disable_fpe (FE_DIVBYZERO|FE_INVALID);
-{  double _h_ = h_;
- int _nl = nl;
-{ double h_ = _h_; NOT_UNUSED(h_);
- int nl = _nl; NOT_UNUSED(nl);
+{  int _nl = nl;
+{ int nl = _nl; NOT_UNUSED(nl);
   static bool _first_call = true;
   ForeachData _foreach_data = {
-    .fname = "field_PM.c", .line = 149,
+    .fname = "stokes_ml.c", .line = 134,
     .each = "foreach", .first = _first_call
   };
 foreach_stencil(){
 
-#line 149 "field_PM.c"
+#line 134 "stokes_ml.c"
  {
-      _stencil_val(__FILE__,__LINE__,zb,0,0,0) = -h_;
-      _stencil_val(__FILE__,__LINE__,eta,0,0,0) = wave(x, y);
-      double H = wave(x, y) - _stencil_val(__FILE__,__LINE__,zb,0,0,0);
+
+      _stencil_val(__FILE__,__LINE__,zb,0,0,0) = -0.5;
+      _stencil_val(__FILE__,__LINE__,eta,0,0,0) = wave(x,y);
+      double H = wave(x, 0) - _stencil_val(__FILE__,__LINE__,zb,0,0,0);
        { foreach_block_inner() {
-       _stencil_val(__FILE__,__LINE__,h,0,0,0) = H/nl;
+ _stencil_val(__FILE__,__LINE__,h,0,0,0) = H/nl;
       } end_foreach_block_inner(); }
     } } end_foreach_stencil(); if (_first_call) {
- if (h_ != _h_)
-   reduction_warning ("field_PM.c", 149, "h_");
- }
- if (_first_call) {
  if (nl != _nl)
-   reduction_warning ("field_PM.c", 149, "nl");
+   reduction_warning ("stokes_ml.c", 134, "nl");
  }
   _first_call = false;
 }}
 enable_fpe (FE_DIVBYZERO|FE_INVALID);
-#line 156
+#line 142
 foreach(){
 
-#line 149 "field_PM.c"
+#line 134 "stokes_ml.c"
  {
-      val(zb,0,0,0) = -h_;
-      val(eta,0,0,0) = wave(x, y);
-      double H = wave(x, y) - val(zb,0,0,0);
+
+      val(zb,0,0,0) = -0.5;
+      val(eta,0,0,0) = wave(x,y);
+      double H = wave(x, 0) - val(zb,0,0,0);
        { foreach_block_inner() {
-       val(h,0,0,0) = H/nl;
+ val(h,0,0,0) = H/nl;
       } end_foreach_block_inner(); }
     } } end_foreach(); }
-
-    vertical_remapping (h, tracers);
+    vertical_remapping (h,tracers);
      { 
 disable_fpe (FE_DIVBYZERO|FE_INVALID);
 { {  static bool _first_call = true;
   ForeachData _foreach_data = {
-    .fname = "field_PM.c", .line = 159,
+    .fname = "stokes_ml.c", .line = 144,
     .each = "foreach", .first = _first_call
   };
 foreach_stencil(){
 
-#line 159 "field_PM.c"
+#line 144 "stokes_ml.c"
  {
       double z = _stencil_val(__FILE__,__LINE__,zb,0,0,0);
        { foreach_block_inner() {
-        z += _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.;
-        _stencil_val(__FILE__,__LINE__,u.x,0,0,0) = u_x(x, y, z);
-        _stencil_val(__FILE__,__LINE__,u.y,0,0,0) = u_y(x, y, z);
-        _stencil_val(__FILE__,__LINE__,w,0,0,0) = u_z(x, y, z);
-        z += _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.;
+ z += _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.;
+ _stencil_val(__FILE__,__LINE__,u.x,0,0,0) = u_x(x, z);
+ _stencil_val(__FILE__,__LINE__,w,0,0,0) = u_y(x, z);
+ z += _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.;
       } end_foreach_block_inner(); }
     } } end_foreach_stencil();  _first_call = false;
 }}
 enable_fpe (FE_DIVBYZERO|FE_INVALID);
-#line 168
+#line 152
 foreach(){
 
-#line 159 "field_PM.c"
+#line 144 "stokes_ml.c"
  {
       double z = val(zb,0,0,0);
        { foreach_block_inner() {
-        z += val(h,0,0,0)/2.;
-        val(u.x,0,0,0) = u_x(x, y, z);
-        val(u.y,0,0,0) = u_y(x, y, z);
-        val(w,0,0,0) = u_z(x, y, z);
-        z += val(h,0,0,0)/2.;
+ z += val(h,0,0,0)/2.;
+ val(u.x,0,0,0) = u_x(x, z);
+ val(w,0,0,0) = u_y(x, z);
+ z += val(h,0,0,0)/2.;
       } end_foreach_block_inner(); }
     } } end_foreach(); }
-    fprintf (ferr,"Done initialization!\n");
-    dump((struct Dump){"initial"});
   }
   else {
-
+    geometric_beta (1./3., true);
     dtmax = 0.01;
     dt = dtnext (dtmax);
     char *suffix = "matrix";
     writefields (t, suffix);
   }
- end_trace("init_0", "field_PM.c", 179); } return 0; } 
+ end_trace("init_0", "stokes_ml.c", 161); } return 0; } 
 
-
-
-
-
-
-static int energy_before_remap_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (i+=10);   *ip = i; *tp = t;   return ret; } static int energy_before_remap (const int i, const double t, Event * _ev) { trace ("energy_before_remap", "field_PM.c", 186); 
+static int limiter_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (i = 0);   *ip = i; *tp = t;   return ret; } static int limiter (const int i, const double t, Event * _ev) { trace ("limiter", "stokes_ml.c", 163);  {
+  gradient = minmod2;
+  theta = 1;
+ end_trace("limiter", "stokes_ml.c", 166); } return 0; } 
+#line 178 "stokes_ml.c"
+static int logfile_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (i++);   *ip = i; *tp = t;   return ret; } static int logfile (const int i, const double t, Event * _ev) { trace ("logfile", "stokes_ml.c", 178); 
 {
-  if (i==10) {
-    fprintf(ferr, "energy output before remap!\n");
-    fflush(ferr);
-  }
   double ke = 0., gpe = 0.;
    { 
 disable_fpe (FE_DIVBYZERO|FE_INVALID);
@@ -24957,7 +24801,7 @@ disable_fpe (FE_DIVBYZERO|FE_INVALID);
  double gpe = _gpe; NOT_UNUSED(gpe);
   static bool _first_call = true;
   ForeachData _foreach_data = {
-    .fname = "field_PM.c", .line = 193,
+    .fname = "stokes_ml.c", .line = 181,
     .each = "foreach", .first = _first_call
   };
 
@@ -24968,24 +24812,24 @@ strongif (!is_constant(cm)) {
 #define fine_cm(a,i,j,k) _stencil_fine(__FILE__,__LINE__,a,i,j,k)
 #undef coarse_cm
 #define coarse_cm(a,i,j,k) _stencil_coarse(__FILE__,__LINE__,a,i,j,k)
-#line 193
+#line 181
 foreach_stencil(){
 
-#line 193 "field_PM.c"
+#line 181 "stokes_ml.c"
  {
     double zc = _stencil_val(__FILE__,__LINE__,zb,0,0,0);
      { foreach_block_inner() {
       double norm2 = sq(_stencil_val(__FILE__,__LINE__,w,0,0,0));
       {
-#line 197
+#line 185
 
-        norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
-#line 197
+ norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
+#line 185
 
-        norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
-        ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        gpe += (zc + _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.)*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        zc += _stencil_val(__FILE__,__LINE__,h,0,0,0);
+ norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
+      ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+      gpe += (zc + _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.)*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+      zc += _stencil_val(__FILE__,__LINE__,h,0,0,0);
     } end_foreach_block_inner(); }
   } } end_foreach_stencil(); }
 strongif (is_constant(cm)) {
@@ -24997,35 +24841,35 @@ NOT_UNUSED(_const_cm);
 #define fine_cm(a,i,j,k) _const_cm
 #undef coarse_cm
 #define coarse_cm(a,i,j,k) _const_cm
-#line 193
+#line 181
 foreach_stencil(){
 
-#line 193 "field_PM.c"
+#line 181 "stokes_ml.c"
  {
     double zc = _stencil_val(__FILE__,__LINE__,zb,0,0,0);
      { foreach_block_inner() {
       double norm2 = sq(_stencil_val(__FILE__,__LINE__,w,0,0,0));
       {
-#line 197
+#line 185
 
-        norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
-#line 197
+ norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
+#line 185
 
-        norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
-        ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        gpe += (zc + _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.)*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        zc += _stencil_val(__FILE__,__LINE__,h,0,0,0);
+ norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
+      ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+      gpe += (zc + _stencil_val(__FILE__,__LINE__,h,0,0,0)/2.)*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+      zc += _stencil_val(__FILE__,__LINE__,h,0,0,0);
     } end_foreach_block_inner(); }
   } } end_foreach_stencil(); }  _first_call = false;
 }}
 enable_fpe (FE_DIVBYZERO|FE_INVALID);
-#line 203
+#line 191
 
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(+:ke)  reduction(+:gpe)) {
 
-#line 193
+#line 181
 
 strongif (!is_constant(cm)) {
 #undef val_cm
@@ -25034,24 +24878,24 @@ strongif (!is_constant(cm)) {
 #define fine_cm(a,i,j,k) fine(a,i,j,k)
 #undef coarse_cm
 #define coarse_cm(a,i,j,k) coarse(a,i,j,k)
-#line 193
+#line 181
 foreach (){
 
-#line 193 "field_PM.c"
+#line 181 "stokes_ml.c"
  {
     double zc = val(zb,0,0,0);
      { foreach_block_inner() {
       double norm2 = sq(val(w,0,0,0));
       {
-#line 197
+#line 185
 
-        norm2 += sq(val(u.x,0,0,0));
-#line 197
+ norm2 += sq(val(u.x,0,0,0));
+#line 185
 
-        norm2 += sq(val(u.y,0,0,0));}
-        ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        gpe += (zc + val(h,0,0,0)/2.)*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        zc += val(h,0,0,0);
+ norm2 += sq(val(u.y,0,0,0));}
+      ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+      gpe += (zc + val(h,0,0,0)/2.)*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+      zc += val(h,0,0,0);
     } end_foreach_block_inner(); }
   } } end_foreach(); }
 strongif (is_constant(cm)) {
@@ -25063,24 +24907,24 @@ NOT_UNUSED(_const_cm);
 #define fine_cm(a,i,j,k) _const_cm
 #undef coarse_cm
 #define coarse_cm(a,i,j,k) _const_cm
-#line 193
+#line 181
 foreach (){
 
-#line 193 "field_PM.c"
+#line 181 "stokes_ml.c"
  {
     double zc = val(zb,0,0,0);
      { foreach_block_inner() {
       double norm2 = sq(val(w,0,0,0));
       {
-#line 197
+#line 185
 
-        norm2 += sq(val(u.x,0,0,0));
-#line 197
+ norm2 += sq(val(u.x,0,0,0));
+#line 185
 
-        norm2 += sq(val(u.y,0,0,0));}
-        ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        gpe += (zc + val(h,0,0,0)/2.)*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
-        zc += val(h,0,0,0);
+ norm2 += sq(val(u.y,0,0,0));}
+      ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+      gpe += (zc + val(h,0,0,0)/2.)*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
+      zc += val(h,0,0,0);
     } end_foreach_block_inner(); }
   } } end_foreach(); }mpi_all_reduce_array (&ke, double, MPI_SUM, 1);
 mpi_all_reduce_array (&gpe, double, MPI_SUM, 1);
@@ -25088,30 +24932,37 @@ mpi_all_reduce_array (&gpe, double, MPI_SUM, 1);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 203
+#line 191
  }
-  static FILE * fp =NULL; strongif (!fp || i == 0) fp = pid() > 0 ? fopen("/dev/null", "w") :  fopen("energy_before_remap.dat","w");
-  fprintf (fp, "%g %g %g\n", t, ke/2., 9.8*gpe - gpe_base);
+  static FILE * fp =NULL; strongif (!fp || i == 0) fp = pid() > 0 ? fopen("/dev/null", "w") :  fopen ("budget.dat", "w");
+  fprintf (fp, "%g %g %g\n", t/((2.*pi)/sqrt(1*(2.*pi))), ke/2., 1*gpe - gpe_base);
   fflush (fp);
- end_trace("energy_before_remap", "field_PM.c", 207); } return 0; } 
-#line 236 "field_PM.c"
-static int movie_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t += 1);   *ip = i; *tp = t;   return ret; } static int movie_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t <= TEND);   *ip = i; *tp = t;   return ret; } static int movie (const int i, const double t, Event * _ev) { trace ("movie", "field_PM.c", 236); 
+ end_trace("logfile", "stokes_ml.c", 195); } return 0; } 
+
+
+
+
+static int movie_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t += 0.01*((2.*pi)/sqrt(1*(2.*pi))));   *ip = i; *tp = t;   return ret; } static int movie (const int i, const double t, Event * _ev) { trace ("movie", "stokes_ml.c", 200); 
 {
+
+
+  view ((struct _view_set){ .fov = 20, .quat = {0.521116,0.126971,0.264401,0.801503}, .width = 800, .height = 600});
   char s[80];
-  view ((struct _view_set){.fov = 20, .quat = {0.475152,0.161235,0.235565,0.832313}, .width = 800, .height = 600});
-  sprintf (s, "t = %.2f", t);
-  draw_string ((struct _draw_string){s, .size = 30});
+  sprintf (s, "t = %.2f T0", t/((2.*pi)/sqrt(1*(2.*pi))));
+  draw_string ((struct _draw_string){s, .size = 100});
   sprintf (s, "u%d.x", nl-1);
-  squares ((struct _squares){s, .linear = true, .z = "eta", .min = -2./7.*sqrt(L0), .max = 2./7.*sqrt(L0)});
+  for (double x = -1; x <= 1; x++)
+    { begin_translate ((struct _translate){x});
+      squares ((struct _squares){s, .linear = true, .z = "eta", .min = -0.15, .max = 0.6});; end_translate(); }
   {
-  static FILE * fp =NULL; strongif (!fp || i == 0) fp = pid() > 0 ? fopen("/dev/null", "w") :  fopen ("ux" ".ppm", "a");
-  save ((struct _save){.fp = fp});
+    static FILE * fp =NULL; strongif (!fp || i == 0) fp = pid() > 0 ? fopen("/dev/null", "w") :  fopen ("movie.ppm", "w");
+    save ((struct _save){.fp = fp});
   }
-#line 260 "field_PM.c"
-  char filename1[50], filename2[50], filename3[50];
-  sprintf (filename1, "surface/eta_matrix_%g", t);
-  sprintf (filename2, "surface/ux_matrix_%g", t);
-  sprintf (filename3, "surface/uy_matrix_%g", t);
+  char filename1[50], filename2[50], filename3[50], filename4[50];
+  sprintf (filename1, "surface/eta_matrix_%g", t/((2.*pi)/sqrt(1*(2.*pi))));
+  sprintf (filename2, "surface/ux_matrix_%g", t/((2.*pi)/sqrt(1*(2.*pi))));
+  sprintf (filename3, "surface/uy_matrix_%g", t/((2.*pi)/sqrt(1*(2.*pi))));
+  sprintf (filename4, "surface/uz_matrix_%g", t/((2.*pi)/sqrt(1*(2.*pi))));
   FILE * feta = fopen (filename1, "w");
 
   output_matrix_mpi ((struct OutputMatrix){eta, feta, N, .linear = true});
@@ -25124,27 +24975,29 @@ static int movie_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; doub
   FILE * fuy = fopen (filename3, "w");
   output_matrix_mpi ((struct OutputMatrix){u_temp.y, fuy, N, .linear = true});
   fclose (fuy);
- end_trace("movie", "field_PM.c", 276); } return 0; } 
+  sprintf (s, "w%d", nl-1);
+  scalar w_temp = lookup_field (s);
+  FILE *fuz = fopen (filename4, "w");
+  output_matrix_mpi ((struct OutputMatrix){w_temp, fuz, N, .linear = true});
+  fclose (fuz);
+ end_trace("movie", "stokes_ml.c", 238); } return 0; } 
 
 
-
-
-
-
-static int field_log_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t=0);   *ip = i; *tp = t;   return ret; } static int field_log_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t+=10);   *ip = i; *tp = t;   return ret; } static int field_log_expr2 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t<=TEND);   *ip = i; *tp = t;   return ret; } static int field_log (const int i, const double t, Event * _ev) { trace ("field_log", "field_PM.c", 283);  {
+static int field_log_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t += 0.1*((2.*pi)/sqrt(1*(2.*pi))));   *ip = i; *tp = t;   return ret; } static int field_log (const int i, const double t, Event * _ev) { trace ("field_log", "stokes_ml.c", 241);  {
   char *suffix = "matrix";
   writefields (t, suffix);
- end_trace("field_log", "field_PM.c", 286); } return 0; } 
-#line 306 "field_PM.c"
-static int regulardump_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t = 0);   *ip = i; *tp = t;   return ret; } static int regulardump_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t += 20);   *ip = i; *tp = t;   return ret; } static int regulardump_expr2 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t < TEND);   *ip = i; *tp = t;   return ret; } static int regulardump (const int i, const double t, Event * _ev) { trace ("regulardump", "field_PM.c", 306);  {
-  char dname[100];
-  sprintf (dname, "dump_t%g", t);
-  dump ((struct Dump){dname});
- end_trace("regulardump", "field_PM.c", 310); } return 0; } 
+ end_trace("field_log", "stokes_ml.c", 244); } return 0; } 
 
-static int endrun_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t = TEND);   *ip = i; *tp = t;   return ret; } static int endrun (const int i, const double t, Event * _ev) { trace ("endrun", "field_PM.c", 312);  {
-  dump ((struct Dump){0});
- end_trace("endrun", "field_PM.c", 314); } return 0; } 
+static int snapshot_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t += 0.1*((2.*pi)/sqrt(1*(2.*pi))));   *ip = i; *tp = t;   return ret; } static int snapshot (const int i, const double t, Event * _ev) { trace ("snapshot", "stokes_ml.c", 246);  {
+  char dname[100];
+  sprintf (dname, "dump%g", t/((2.*pi)/sqrt(1*(2.*pi))));
+  dump ((struct Dump){dname});
+ end_trace("snapshot", "stokes_ml.c", 250); } return 0; } 
+
+static int end_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t = 6.*((2.*pi)/sqrt(1*(2.*pi))));   *ip = i; *tp = t;   return ret; } static int end (const int i, const double t, Event * _ev) { trace ("end", "stokes_ml.c", 252);  {
+  fprintf (fout, "i = %d t = %g\n", i, t);
+  dump ((struct Dump){"end"});
+ end_trace("end", "stokes_ml.c", 255); } return 0; } 
 size_t datasize = 1*sizeof (double);
 static int defaults0 (const int i, const double t, Event * _ev);
 static int defaults0_expr0 (int * ip, double * tp, Event * _ev);
@@ -25202,21 +25055,18 @@ static int perf_plot (const int i, const double t, Event * _ev);
 static int perf_plot_expr0 (int * ip, double * tp, Event * _ev);
 static int init_0 (const int i, const double t, Event * _ev);
 static int init_0_expr0 (int * ip, double * tp, Event * _ev);
-static int energy_before_remap (const int i, const double t, Event * _ev);
-static int energy_before_remap_expr0 (int * ip, double * tp, Event * _ev);
+static int limiter (const int i, const double t, Event * _ev);
+static int limiter_expr0 (int * ip, double * tp, Event * _ev);
+static int logfile (const int i, const double t, Event * _ev);
+static int logfile_expr0 (int * ip, double * tp, Event * _ev);
 static int movie (const int i, const double t, Event * _ev);
 static int movie_expr0 (int * ip, double * tp, Event * _ev);
-static int movie_expr1 (int * ip, double * tp, Event * _ev);
 static int field_log (const int i, const double t, Event * _ev);
 static int field_log_expr0 (int * ip, double * tp, Event * _ev);
-static int field_log_expr1 (int * ip, double * tp, Event * _ev);
-static int field_log_expr2 (int * ip, double * tp, Event * _ev);
-static int regulardump (const int i, const double t, Event * _ev);
-static int regulardump_expr0 (int * ip, double * tp, Event * _ev);
-static int regulardump_expr1 (int * ip, double * tp, Event * _ev);
-static int regulardump_expr2 (int * ip, double * tp, Event * _ev);
-static int endrun (const int i, const double t, Event * _ev);
-static int endrun_expr0 (int * ip, double * tp, Event * _ev);
+static int snapshot (const int i, const double t, Event * _ev);
+static int snapshot_expr0 (int * ip, double * tp, Event * _ev);
+static int end (const int i, const double t, Event * _ev);
+static int end_expr0 (int * ip, double * tp, Event * _ev);
 void _init_solver (void) {
   void init_solver();
   init_solver();
@@ -25237,19 +25087,23 @@ void _init_solver (void) {
   event_register ((Event){ 0, 1, init, {init_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/layered/hydro.h", 159, "init"});
   event_register ((Event){ 0, 1, init_0, {init_0_expr0}, ((int *)0), ((double *)0),
-    "field_PM.c", 141, "init"});
+    "stokes_ml.c", 130, "init"});
   event_register ((Event){ 0, 1, perfs, {perfs_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/layered/perfs.h", 7, "perfs"});
   event_register ((Event){ 0, 1, perf_plot, {perf_plot_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/layered/perfs.h", 30, "perf_plot"});
-  event_register ((Event){ 0, 2, movie, {movie_expr0, movie_expr1}, ((int *)0), ((double *)0),
-    "field_PM.c", 236, "movie"});
-  event_register ((Event){ 0, 3, field_log, {field_log_expr0, field_log_expr1, field_log_expr2}, ((int *)0), ((double *)0),
-    "field_PM.c", 283, "field_log"});
-  event_register ((Event){ 0, 3, regulardump, {regulardump_expr0, regulardump_expr1, regulardump_expr2}, ((int *)0), ((double *)0),
-    "field_PM.c", 306, "regulardump"});
-  event_register ((Event){ 0, 1, endrun, {endrun_expr0}, ((int *)0), ((double *)0),
-    "field_PM.c", 312, "endrun"});
+  event_register ((Event){ 0, 1, limiter, {limiter_expr0}, ((int *)0), ((double *)0),
+    "stokes_ml.c", 163, "limiter"});
+  event_register ((Event){ 0, 1, logfile, {logfile_expr0}, ((int *)0), ((double *)0),
+    "stokes_ml.c", 178, "logfile"});
+  event_register ((Event){ 0, 1, movie, {movie_expr0}, ((int *)0), ((double *)0),
+    "stokes_ml.c", 200, "movie"});
+  event_register ((Event){ 0, 1, field_log, {field_log_expr0}, ((int *)0), ((double *)0),
+    "stokes_ml.c", 241, "field_log"});
+  event_register ((Event){ 0, 1, snapshot, {snapshot_expr0}, ((int *)0), ((double *)0),
+    "stokes_ml.c", 246, "snapshot"});
+  event_register ((Event){ 0, 1, end, {end_expr0}, ((int *)0), ((double *)0),
+    "stokes_ml.c", 252, "end"});
   event_register ((Event){ 0, 1, cleanup, {cleanup_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/run.h", 50, "cleanup"});
   event_register ((Event){ 0, 1, cleanup_0, {cleanup_0_expr0}, ((int *)0), ((double *)0),
@@ -25286,8 +25140,6 @@ void _init_solver (void) {
     "/home/jiarongw/basilisk/src/layered/hydro.h", 454, "remap"});
   event_register ((Event){ 0, 1, remap_0, {remap_0_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/layered/remap.h", 111, "remap"});
-  event_register ((Event){ 0, 1, energy_before_remap, {energy_before_remap_expr0}, ((int *)0), ((double *)0),
-    "field_PM.c", 186, "energy_before_remap"});
   void allocate_globals (int);
   allocate_globals (1);
   set_fpe();
