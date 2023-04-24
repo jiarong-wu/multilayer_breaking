@@ -162,6 +162,8 @@ event init (i = 0)
     }
     fprintf (stderr,"Done initialization!\n");
     dump("initial");
+    char *suffix = "matrix";
+    writefields (0, suffix);
   }
   else {
     // We limit the first time step after the restart

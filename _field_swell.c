@@ -24664,18 +24664,32 @@ void power_input () {
   MPI_Bcast(&omega, length2D, MPI_DOUBLE, root, MPI_COMM_WORLD);
   MPI_Bcast(&phase, length2D, MPI_DOUBLE, root, MPI_COMM_WORLD);
 
+
   char checkout[100];
   sprintf (checkout, "F-%d", pid());
   FILE * fout = fopen (checkout, "w");
   for (int i=0; i<length2D; i++)
     fprintf (fout, "%g ", F_kxky_[i]);
   fclose (fout);
+
+  sprintf (checkout, "omega-%d", pid());
+  fout = fopen (checkout, "w");
+  for (int i=0; i<length2D; i++)
+    fprintf (fout, "%g ", omega[i]);
+  fclose (fout);
+
+  sprintf (checkout, "kx-%d", pid());
+  fout = fopen (checkout, "w");
+  for (int i=0; i<length1D; i++)
+    fprintf (fout, "%g ", kx_[i]);
+  fclose (fout);
+
   sprintf (checkout, "ky-%d", pid());
   fout = fopen (checkout, "w");
   for (int i=0; i<length1D; i++)
     fprintf (fout, "%g ", ky_[i]);
   fclose (fout);
-#line 150 "././spectrum_swell.h"
+#line 164 "././spectrum_swell.h"
 }
 
 
@@ -24707,7 +24721,7 @@ double u_x (double x, double y, double z) {
       z_actual = (z < ampl ? (z) : ampl);
 
       kmod = sqrt(sq(kx_[i]) + sq(ky_[j]));
-      theta = atan(ky_[j]/kx_[i]);
+      theta = atan(ky_[j]/(kx_[i]+0.00000001));
       a = (kx_[i]*x + ky_[j]*y + phase[index]);
       u_x += sqrt(9.8*kmod)*ampl*exp(kmod*z_actual)*cos(a)*cos(theta);
     }
@@ -24726,7 +24740,7 @@ double u_y (double x, double y, double z) {
       ampl = sqrt(2.*F_kxky_[index]*dkx_*dky_);
       z_actual = (z < ampl ? (z) : ampl);
       kmod = sqrt(sq(kx_[i]) + sq(ky_[j]));
-      theta = atan(ky_[j]/kx_[i]);
+      theta = atan(ky_[j]/(kx_[i]+0.00000001));
       a = (kx_[i]*x + ky_[j]*y + phase[index]);
       u_y += sqrt(9.8*kmod)*ampl*exp(kmod*z_actual)*cos(a)*sin(theta);
     }
@@ -24934,6 +24948,8 @@ foreach(){
     } } end_foreach(); }
     fprintf (ferr,"Done initialization!\n");
     dump((struct Dump){"initial"});
+    char *suffix = "matrix";
+    writefields (0, suffix);
   }
   else {
 
@@ -24943,14 +24959,14 @@ foreach(){
     char *suffix = "matrix";
     writefields (t, suffix);
   }
- end_trace("init_0", "field_swell.c", 174); } return 0; } 
+ end_trace("init_0", "field_swell.c", 176); } return 0; } 
 
 
 
 
 
 
-static int energy_before_remap_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (i+=10);   *ip = i; *tp = t;   return ret; } static int energy_before_remap (const int i, const double t, Event * _ev) { trace ("energy_before_remap", "field_swell.c", 181); 
+static int energy_before_remap_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (i+=10);   *ip = i; *tp = t;   return ret; } static int energy_before_remap (const int i, const double t, Event * _ev) { trace ("energy_before_remap", "field_swell.c", 183); 
 {
   if (i==10) {
     fprintf(ferr, "energy output before remap!\n");
@@ -24965,7 +24981,7 @@ disable_fpe (FE_DIVBYZERO|FE_INVALID);
  double gpe = _gpe; NOT_UNUSED(gpe);
   static bool _first_call = true;
   ForeachData _foreach_data = {
-    .fname = "field_swell.c", .line = 188,
+    .fname = "field_swell.c", .line = 190,
     .each = "foreach", .first = _first_call
   };
 
@@ -24976,19 +24992,19 @@ strongif (!is_constant(cm)) {
 #define fine_cm(a,i,j,k) _stencil_fine(__FILE__,__LINE__,a,i,j,k)
 #undef coarse_cm
 #define coarse_cm(a,i,j,k) _stencil_coarse(__FILE__,__LINE__,a,i,j,k)
-#line 188
+#line 190
 foreach_stencil(){
 
-#line 188 "field_swell.c"
+#line 190 "field_swell.c"
  {
     double zc = _stencil_val(__FILE__,__LINE__,zb,0,0,0);
      { foreach_block_inner() {
       double norm2 = sq(_stencil_val(__FILE__,__LINE__,w,0,0,0));
       {
-#line 192
+#line 194
 
         norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
-#line 192
+#line 194
 
         norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
         ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
@@ -25005,19 +25021,19 @@ NOT_UNUSED(_const_cm);
 #define fine_cm(a,i,j,k) _const_cm
 #undef coarse_cm
 #define coarse_cm(a,i,j,k) _const_cm
-#line 188
+#line 190
 foreach_stencil(){
 
-#line 188 "field_swell.c"
+#line 190 "field_swell.c"
  {
     double zc = _stencil_val(__FILE__,__LINE__,zb,0,0,0);
      { foreach_block_inner() {
       double norm2 = sq(_stencil_val(__FILE__,__LINE__,w,0,0,0));
       {
-#line 192
+#line 194
 
         norm2 += sq(_stencil_val(__FILE__,__LINE__,u.x,0,0,0));
-#line 192
+#line 194
 
         norm2 += sq(_stencil_val(__FILE__,__LINE__,u.y,0,0,0));}
         ke += norm2*_stencil_val(__FILE__,__LINE__,h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
@@ -25027,13 +25043,13 @@ foreach_stencil(){
   } } end_foreach_stencil(); }  _first_call = false;
 }}
 enable_fpe (FE_DIVBYZERO|FE_INVALID);
-#line 198
+#line 200
 
 #undef OMP_PARALLEL
 #define OMP_PARALLEL()
 OMP(omp parallel reduction(+:ke)  reduction(+:gpe)) {
 
-#line 188
+#line 190
 
 strongif (!is_constant(cm)) {
 #undef val_cm
@@ -25042,19 +25058,19 @@ strongif (!is_constant(cm)) {
 #define fine_cm(a,i,j,k) fine(a,i,j,k)
 #undef coarse_cm
 #define coarse_cm(a,i,j,k) coarse(a,i,j,k)
-#line 188
+#line 190
 foreach (){
 
-#line 188 "field_swell.c"
+#line 190 "field_swell.c"
  {
     double zc = val(zb,0,0,0);
      { foreach_block_inner() {
       double norm2 = sq(val(w,0,0,0));
       {
-#line 192
+#line 194
 
         norm2 += sq(val(u.x,0,0,0));
-#line 192
+#line 194
 
         norm2 += sq(val(u.y,0,0,0));}
         ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
@@ -25071,19 +25087,19 @@ NOT_UNUSED(_const_cm);
 #define fine_cm(a,i,j,k) _const_cm
 #undef coarse_cm
 #define coarse_cm(a,i,j,k) _const_cm
-#line 188
+#line 190
 foreach (){
 
-#line 188 "field_swell.c"
+#line 190 "field_swell.c"
  {
     double zc = val(zb,0,0,0);
      { foreach_block_inner() {
       double norm2 = sq(val(w,0,0,0));
       {
-#line 192
+#line 194
 
         norm2 += sq(val(u.x,0,0,0));
-#line 192
+#line 194
 
         norm2 += sq(val(u.y,0,0,0));}
         ke += norm2*val(h,0,0,0)*(sq(Delta)*val_cm(cm,0,0,0));
@@ -25096,14 +25112,14 @@ mpi_all_reduce_array (&gpe, double, MPI_SUM, 1);
 #undef OMP_PARALLEL
 #define OMP_PARALLEL() OMP(omp parallel)
 }
-#line 198
+#line 200
  }
   static FILE * fp =NULL; strongif (!fp || i == 0) fp = pid() > 0 ? fopen("/dev/null", "w") :  fopen("energy_before_remap.dat","w");
   fprintf (fp, "%g %g %g\n", t, ke/2., 9.8*gpe - gpe_base);
   fflush (fp);
- end_trace("energy_before_remap", "field_swell.c", 202); } return 0; } 
-#line 231 "field_swell.c"
-static int movie_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t += 1);   *ip = i; *tp = t;   return ret; } static int movie_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t <= TEND);   *ip = i; *tp = t;   return ret; } static int movie (const int i, const double t, Event * _ev) { trace ("movie", "field_swell.c", 231); 
+ end_trace("energy_before_remap", "field_swell.c", 204); } return 0; } 
+#line 233 "field_swell.c"
+static int movie_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t += 1);   *ip = i; *tp = t;   return ret; } static int movie_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t <= TEND);   *ip = i; *tp = t;   return ret; } static int movie (const int i, const double t, Event * _ev) { trace ("movie", "field_swell.c", 233); 
 {
   char s[80];
   view ((struct _view_set){.fov = 20, .quat = {0.475152,0.161235,0.235565,0.832313}, .width = 800, .height = 600});
@@ -25115,7 +25131,7 @@ static int movie_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; doub
   static FILE * fp =NULL; strongif (!fp || i == 0) fp = pid() > 0 ? fopen("/dev/null", "w") :  fopen ("ux" ".ppm", "a");
   save ((struct _save){.fp = fp});
   }
-#line 255 "field_swell.c"
+#line 257 "field_swell.c"
   char filename1[50], filename2[50], filename3[50];
   sprintf (filename1, "surface/eta_matrix_%g", t);
   sprintf (filename2, "surface/ux_matrix_%g", t);
@@ -25132,27 +25148,27 @@ static int movie_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; doub
   FILE * fuy = fopen (filename3, "w");
   output_matrix_mpi ((struct OutputMatrix){u_temp.y, fuy, N, .linear = true});
   fclose (fuy);
- end_trace("movie", "field_swell.c", 271); } return 0; } 
+ end_trace("movie", "field_swell.c", 273); } return 0; } 
 
 
 
 
 
 
-static int field_log_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t=0);   *ip = i; *tp = t;   return ret; } static int field_log_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t+=10);   *ip = i; *tp = t;   return ret; } static int field_log_expr2 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t<=TEND);   *ip = i; *tp = t;   return ret; } static int field_log (const int i, const double t, Event * _ev) { trace ("field_log", "field_swell.c", 278);  {
+static int field_log_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t=0);   *ip = i; *tp = t;   return ret; } static int field_log_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t+=10);   *ip = i; *tp = t;   return ret; } static int field_log_expr2 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t<=TEND);   *ip = i; *tp = t;   return ret; } static int field_log (const int i, const double t, Event * _ev) { trace ("field_log", "field_swell.c", 280);  {
   char *suffix = "matrix";
   writefields (t, suffix);
- end_trace("field_log", "field_swell.c", 281); } return 0; } 
-#line 301 "field_swell.c"
-static int regulardump_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t = 0);   *ip = i; *tp = t;   return ret; } static int regulardump_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t += 20);   *ip = i; *tp = t;   return ret; } static int regulardump_expr2 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t < TEND);   *ip = i; *tp = t;   return ret; } static int regulardump (const int i, const double t, Event * _ev) { trace ("regulardump", "field_swell.c", 301);  {
+ end_trace("field_log", "field_swell.c", 283); } return 0; } 
+#line 303 "field_swell.c"
+static int regulardump_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t = 0);   *ip = i; *tp = t;   return ret; } static int regulardump_expr1 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t += 20);   *ip = i; *tp = t;   return ret; } static int regulardump_expr2 (int * ip, double * tp, Event * _ev) {   int i = *ip; double t = *tp;   int ret = ( t < TEND);   *ip = i; *tp = t;   return ret; } static int regulardump (const int i, const double t, Event * _ev) { trace ("regulardump", "field_swell.c", 303);  {
   char dname[100];
   sprintf (dname, "dump_t%g", t);
   dump ((struct Dump){dname});
- end_trace("regulardump", "field_swell.c", 305); } return 0; } 
+ end_trace("regulardump", "field_swell.c", 307); } return 0; } 
 
-static int endrun_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t = TEND);   *ip = i; *tp = t;   return ret; } static int endrun (const int i, const double t, Event * _ev) { trace ("endrun", "field_swell.c", 307);  {
+static int endrun_expr0 (int * ip, double * tp, Event * _ev) {  int i = *ip; double t = *tp;  int ret = (t = TEND);   *ip = i; *tp = t;   return ret; } static int endrun (const int i, const double t, Event * _ev) { trace ("endrun", "field_swell.c", 309);  {
   dump ((struct Dump){0});
- end_trace("endrun", "field_swell.c", 309); } return 0; } 
+ end_trace("endrun", "field_swell.c", 311); } return 0; } 
 size_t datasize = 1*sizeof (double);
 static int defaults0 (const int i, const double t, Event * _ev);
 static int defaults0_expr0 (int * ip, double * tp, Event * _ev);
@@ -25251,13 +25267,13 @@ void _init_solver (void) {
   event_register ((Event){ 0, 1, perf_plot, {perf_plot_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/layered/perfs.h", 30, "perf_plot"});
   event_register ((Event){ 0, 2, movie, {movie_expr0, movie_expr1}, ((int *)0), ((double *)0),
-    "field_swell.c", 231, "movie"});
+    "field_swell.c", 233, "movie"});
   event_register ((Event){ 0, 3, field_log, {field_log_expr0, field_log_expr1, field_log_expr2}, ((int *)0), ((double *)0),
-    "field_swell.c", 278, "field_log"});
+    "field_swell.c", 280, "field_log"});
   event_register ((Event){ 0, 3, regulardump, {regulardump_expr0, regulardump_expr1, regulardump_expr2}, ((int *)0), ((double *)0),
-    "field_swell.c", 301, "regulardump"});
+    "field_swell.c", 303, "regulardump"});
   event_register ((Event){ 0, 1, endrun, {endrun_expr0}, ((int *)0), ((double *)0),
-    "field_swell.c", 307, "endrun"});
+    "field_swell.c", 309, "endrun"});
   event_register ((Event){ 0, 1, cleanup, {cleanup_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/run.h", 50, "cleanup"});
   event_register ((Event){ 0, 1, cleanup_0, {cleanup_0_expr0}, ((int *)0), ((double *)0),
@@ -25295,7 +25311,7 @@ void _init_solver (void) {
   event_register ((Event){ 0, 1, remap_0, {remap_0_expr0}, ((int *)0), ((double *)0),
     "/home/jiarongw/basilisk/src/layered/remap.h", 111, "remap"});
   event_register ((Event){ 0, 1, energy_before_remap, {energy_before_remap_expr0}, ((int *)0), ((double *)0),
-    "field_swell.c", 181, "energy_before_remap"});
+    "field_swell.c", 183, "energy_before_remap"});
   void allocate_globals (int);
   allocate_globals (1);
   set_fpe();

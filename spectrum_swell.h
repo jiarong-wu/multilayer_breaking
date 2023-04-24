@@ -86,6 +86,7 @@ void power_input() {
   MPI_Bcast(&F_kxky_, length2D, MPI_DOUBLE, root, MPI_COMM_WORLD);
   MPI_Bcast(&omega, length2D, MPI_DOUBLE, root, MPI_COMM_WORLD);
   MPI_Bcast(&phase, length2D, MPI_DOUBLE, root, MPI_COMM_WORLD);
+
   // Make sure that the inputs are correct by printing them out
   char checkout[100];
   sprintf (checkout, "F-%d", pid());
@@ -93,6 +94,19 @@ void power_input() {
   for (int i=0; i<length2D; i++)
     fprintf (fout, "%g ", F_kxky_[i]);
   fclose (fout);
+
+  sprintf (checkout, "omega-%d", pid());
+  fout = fopen (checkout, "w");
+  for (int i=0; i<length2D; i++)
+    fprintf (fout, "%g ", omega[i]);
+  fclose (fout);
+
+  sprintf (checkout, "kx-%d", pid());
+  fout = fopen (checkout, "w");
+  for (int i=0; i<length1D; i++)
+    fprintf (fout, "%g ", kx_[i]);
+  fclose (fout);
+
   sprintf (checkout, "ky-%d", pid());
   fout = fopen (checkout, "w");
   for (int i=0; i<length1D; i++)
@@ -178,7 +192,7 @@ double u_x (double x, double y, double z) {
       z_actual = (z < ampl ? (z) : ampl);
       // fprintf(stderr, "z = %g, ampl = %g, z_actual = %g\n", z, ampl, z_actual);
       kmod = sqrt(sq(kx_[i]) + sq(ky_[j]));
-      theta = atan(ky_[j]/kx_[i]);
+      theta = atan(ky_[j]/(kx_[i]+0.00000001)); // Avoid divide by zero
       a = (kx_[i]*x + ky_[j]*y + phase[index]);
       u_x += sqrt(g_*kmod)*ampl*exp(kmod*z_actual)*cos(a)*cos(theta);
     }
@@ -197,7 +211,7 @@ double u_y (double x, double y, double z) {
       ampl = sqrt(2.*F_kxky_[index]*dkx_*dky_);
       z_actual = (z < ampl ? (z) : ampl);
       kmod = sqrt(sq(kx_[i]) + sq(ky_[j]));
-      theta = atan(ky_[j]/kx_[i]);
+      theta = atan(ky_[j]/(kx_[i]+0.00000001));
       a = (kx_[i]*x + ky_[j]*y + phase[index]);
       u_y += sqrt(g_*kmod)*ampl*exp(kmod*z_actual)*cos(a)*sin(theta);
     }
