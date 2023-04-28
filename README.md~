@@ -1,4 +1,0 @@
-The source code and minimal working environment for the multilayer breaking wave project.
-
-To compile, run 
-```make -f Makefile.parallel OUTPUT=field_PM```
