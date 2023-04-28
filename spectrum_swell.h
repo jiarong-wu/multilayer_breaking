@@ -88,30 +88,30 @@ void power_input() {
   MPI_Bcast(&phase, length2D, MPI_DOUBLE, root, MPI_COMM_WORLD);
 
   // Make sure that the inputs are correct by printing them out
-  char checkout[100];
-  sprintf (checkout, "F-%d", pid());
-  FILE * fout = fopen (checkout, "w");
-  for (int i=0; i<length2D; i++)
-    fprintf (fout, "%g ", F_kxky_[i]);
-  fclose (fout);
+  /* char checkout[100]; */
+  /* sprintf (checkout, "F-%d", pid()); */
+  /* FILE * fout = fopen (checkout, "w"); */
+  /* for (int i=0; i<length2D; i++) */
+  /*   fprintf (fout, "%g ", F_kxky_[i]); */
+  /* fclose (fout); */
 
-  sprintf (checkout, "omega-%d", pid());
-  fout = fopen (checkout, "w");
-  for (int i=0; i<length2D; i++)
-    fprintf (fout, "%g ", omega[i]);
-  fclose (fout);
+  /* sprintf (checkout, "omega-%d", pid()); */
+  /* fout = fopen (checkout, "w"); */
+  /* for (int i=0; i<length2D; i++) */
+  /*   fprintf (fout, "%g ", omega[i]); */
+  /* fclose (fout); */
 
-  sprintf (checkout, "kx-%d", pid());
-  fout = fopen (checkout, "w");
-  for (int i=0; i<length1D; i++)
-    fprintf (fout, "%g ", kx_[i]);
-  fclose (fout);
+  /* sprintf (checkout, "kx-%d", pid()); */
+  /* fout = fopen (checkout, "w"); */
+  /* for (int i=0; i<length1D; i++) */
+  /*   fprintf (fout, "%g ", kx_[i]); */
+  /* fclose (fout); */
 
-  sprintf (checkout, "ky-%d", pid());
-  fout = fopen (checkout, "w");
-  for (int i=0; i<length1D; i++)
-    fprintf (fout, "%g ", ky_[i]);
-  fclose (fout);
+  /* sprintf (checkout, "ky-%d", pid()); */
+  /* fout = fopen (checkout, "w"); */
+  /* for (int i=0; i<length1D; i++) */
+  /*   fprintf (fout, "%g ", ky_[i]); */
+  /* fclose (fout); */
 
 /**
    If not using MPI. */ 
