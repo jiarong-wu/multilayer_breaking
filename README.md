@@ -12,8 +12,8 @@ which will generate an executable under the current fold.
 
 ## Header file 
 output_mpi.h is necessary for outputting 2D slices.
-spectrum.h enables the spectrum read-in process. Currently it is fixed number of wavenumbers (32*33) with linear spacing. MPI compatible. The spectrum is in binary and generated with separate python code.
-spectrum_swell.h temporarily expands the spectrum to 65*65 shape with still linear spacing. 
+`spectrum.h` enables the spectrum read-in process. Currently it is fixed number of wavenumbers (32\*33) with linear spacing. MPI compatible. The spectrum is in binary and generated with separate python code.
+`spectrum_swell.h` temporarily expands the spectrum to 65\*65 shape with still linear spacing. 
 
 ## Field scale cases
 field_PM.c is the code used for the JFM paper, which uses synthesized wind-sea spectrum. field_swell.c temporarily expands this to spectrum with swells (by including spectrum_swell.h). Need to better factorize the code later.
