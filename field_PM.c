@@ -118,7 +118,7 @@ int main(int argc, char * argv[])
   gpe_base = -0.5*sq(h_)*L0*g_;
 #endif
   CFL_H = 1; // Smaller time step
-  // max_slope = 0.8; // Change the slope limiter threshold
+  // max_slope = 0.4; // Change the slope limiter threshold
   fprintf (stderr, "Read in parameters!\n");
   run();
 }

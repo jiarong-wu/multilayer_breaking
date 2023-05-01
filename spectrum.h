@@ -4,7 +4,8 @@
 The initial condition is a random broad-banded wave field based on externally imported power spectrum. Some spectrum related variables: */
 
 #define N_mode_ 32 // Corresponds to input of 32 modes in kx and 33 modes in ky. This number has to match the files being read in
-double F_kxky_[N_mode_*(N_mode_+1)], omega[N_mode_*(N_mode_+1)], phase[N_mode_*(N_mode_+1)];
+double F_kxky_[N_mode_*(N_mode_+1)], omega[N_mode_*(N_mode_+1)], \
+  phase[N_mode_*(N_mode_+1)];
 double kx_[N_mode_], ky_[N_mode_+1];
 double dkx_, dky_;
 int RANDOM; // integer to seed random number generator
