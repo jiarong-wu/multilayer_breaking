@@ -45,6 +45,7 @@ The following function computes vorticity vector omega. */
 face vector hu, hf, ha;
 vector omega;
 scalar omegaz;
+vector dzdx;
 
 void vort ()
 {
@@ -91,7 +92,7 @@ void vort ()
   omega = new vector[nl];
   reset ({omega}, 0.);
   omegaz = new scalar[nl];
-  reset ({omegaz}, 0);
+  reset ({omegaz}, 0.);
   foreach () { 
     foreach_layer () {
       omegaz[] = (0.5*(u.y[] + u.y[1])*fm.x[1] - 0.5*(u.y[] + u.y[-1])*fm.x[] \
@@ -102,24 +103,55 @@ void vort ()
 	  area = Delta*(hf.y[] + hf.y[0,0,-1] + hf.y[0,1,0] + hf.y[0,1,-1])/4.; // Add fm later
 	  circ = (-u.y[] + u.y[0,0,-1])*Delta - 0.5*(w[0,0,-1] + w[0,-1,-1])*0.5*(hf.y[] + hf.y[0,0,-1]) + \
 	    0.5*(w[0,0,-1] + w[0,1,-1])*0.5*(hf.y[0,1,0] + hf.y[0,1,-1]);
-	  omega.x[] = circ/area;
+	  omega.x[] = circ/area;      
 	}
-	else {
+	else
 	  omega.x[] = 0.; // not well defined for the bottom layer
-	}
+      }
+    }
+  }
+  
+  // Analyze the slope
+  dzdx = new vector[nl];
+  reset ({dzdx}, 0.);
+  foreach () {
+    coord dz;
+    foreach_dimension ()
+      dz.x = (fm.x[1]*(zb[1] + zb[]) - fm.x[]*(zb[-1] + zb[]))/2.;
+    foreach_layer () {
+      foreach_dimension () {
+	dzdx.x[] = dz.x + hf.x[1] - hf.x[];
+	dz.x += hf.x[1] - hf.x[];
       }
     }
   }
 }
 
+vector dzdxc;
+void slope () {
+  // Analyze the slope, test if it's different when taking a centered value
+  dzdxc = new vector[nl];
+  reset ({dzdxc}, 0.);
+  foreach () {
+    coord dz;
+    foreach_dimension ()
+      dz.x = (fm.x[1]*(zb[1] + zb[]) - fm.x[]*(zb[-1] + zb[]))/2.;
+    foreach_layer () {
+      foreach_dimension () {
+	dzdxc.x[] = dz.x + h[1] - h[];
+	dz.x += h[1] - h[];
+      }
+    }
+  }
+}
 /**
 ## Write to files
 A new writefields function with omega added. */
 
 int writefields (double t, const char *suffix) {
   char s[80];
-  char filename1[50], filename2[50], filename3[50], filename4[50], filename5[50], filename6[50], filename7[50];
-  vector u_temp, omega_temp;
+  char filename1[50], filename2[50], filename3[50], filename4[50], filename5[50], filename6[50], filename7[50], filename8[50], filename9[50], filename10[50], filename11[50];
+  vector u_temp, omega_temp, dzdx_temp, dzdxc_temp;
   scalar w_temp, h_temp, omegaz_temp;
   for (int j=0; j<nl; ++j) {
     sprintf (filename1, "field/ux_%s_t%g_l%d", suffix, t, j);
@@ -129,6 +161,10 @@ int writefields (double t, const char *suffix) {
     sprintf (filename5, "field/omegax_%s_t%g_l%d", suffix, t, j);
     sprintf (filename6, "field/omegay_%s_t%g_l%d", suffix, t, j);
     sprintf (filename7, "field/omegaz_%s_t%g_l%d", suffix, t, j);
+    sprintf (filename8, "field/dzdx_%s_t%g_l%d", suffix, t, j);
+    sprintf (filename9, "field/dzdy_%s_t%g_l%d", suffix, t, j);
+    sprintf (filename10, "field/dzdxc_%s_t%g_l%d", suffix, t, j);
+    sprintf (filename11, "field/dzdyc_%s_t%g_l%d", suffix, t, j);
     if (j==0) {
       // The first layer is named u instead of u0
       sprintf (s, "u");
@@ -141,6 +177,10 @@ int writefields (double t, const char *suffix) {
       omega_temp = lookup_vector (s);
       sprintf (s, "omegaz");
       omegaz_temp = lookup_field (s);
+      sprintf (s, "dzdx");
+      dzdx_temp = lookup_vector (s);
+      sprintf (s, "dzdxc");
+      dzdxc_temp = lookup_vector (s);
     }
     else {
       sprintf (s, "u%d", j);
@@ -153,6 +193,10 @@ int writefields (double t, const char *suffix) {
       omega_temp = lookup_vector (s);
       sprintf (s, "omegaz%d", j);
       omegaz_temp = lookup_field (s);
+      sprintf (s, "dzdx%d", j);
+      dzdx_temp = lookup_vector (s);
+      sprintf (s, "dzdxc%d", j);
+      dzdxc_temp = lookup_vector (s);
     }
     FILE * fux = fopen (filename1, "w");
     output_matrix_mpi (u_temp.x, fux, N, linear = true);
@@ -175,6 +219,18 @@ int writefields (double t, const char *suffix) {
     FILE * fomegaz = fopen (filename7, "w");
     output_matrix_mpi (omegaz_temp, fomegaz, N, linear = true);
     fclose (fomegaz);
+    FILE * fdzdx = fopen (filename8, "w");
+    output_matrix_mpi (dzdx_temp.x, fdzdx, N, linear = true);
+    fclose (fdzdx);
+    FILE * fdzdy = fopen (filename9, "w");
+    output_matrix_mpi (dzdx_temp.y, fdzdy, N, linear = true);
+    fclose (fdzdy);
+    FILE * fdzdxc = fopen (filename10, "w");
+    output_matrix_mpi (dzdxc_temp.x, fdzdxc, N, linear = true);
+    fclose (fdzdxc);
+    FILE * fdzdyc = fopen (filename11, "w");
+    output_matrix_mpi (dzdxc_temp.y, fdzdyc, N, linear = true);
+    fclose (fdzdyc);
   }
   return 0;
 }
@@ -196,6 +252,7 @@ event init (i = 0)
     /* char *suffix = "matrix"; */
     /* writefields (t, suffix); */
     vort ();
+    slope ();
     char *suffix = "matrix";
     writefields (TRESTORE, suffix); // if I put t instead of TRESTORE here it doesn't work?? t=0. When does t get updated?
   }
