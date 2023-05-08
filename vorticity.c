@@ -13,7 +13,7 @@
 
 /**
 Definition of some controlling parameters. */
-
+#define g_ 9.8
 double TRESTORE = 50.; // t to restore
 int NLAYER = 10; // number of layers
 int LEVEL_data = 7; // horizontal resolution
@@ -35,6 +35,9 @@ int main (int argc, char * argv[])
   periodic (top);
   N = 1 << LEVEL_data; 
   nl = NLAYER;
+  run();
+  G = g_;
+  CFL_H = 1; // Smaller time step
   run();
 }
 
@@ -120,11 +123,12 @@ void vort ()
       dz.x = (fm.x[1]*(zb[1] + zb[]) - fm.x[]*(zb[-1] + zb[]))/2.;
     foreach_layer () {
       foreach_dimension () {
-	dzdx.x[] = dz.x + hf.x[1] - hf.x[];
+	dzdx.x[] = dz.x + hf.x[1] - hf.x[]; // It's the same if we had used h[] here
 	dz.x += hf.x[1] - hf.x[];
       }
     }
-  }
+  }  
+  delete ((scalar *){hu,ha,hf});
 }
 
 vector dzdxc;
@@ -138,12 +142,13 @@ void slope () {
       dz.x = (fm.x[1]*(zb[1] + zb[]) - fm.x[]*(zb[-1] + zb[]))/2.;
     foreach_layer () {
       foreach_dimension () {
-	dzdxc.x[] = dz.x + h[1] - h[];
-	dz.x += h[1] - h[];
+	dzdxc.x[] = dz.x + hf.x[1] - hf.x[];
+	dz.x += hf.x[1] - hf.x[];
       }
     }
   }
 }
+
 /**
 ## Write to files
 A new writefields function with omega added. */
@@ -235,6 +240,10 @@ int writefields (double t, const char *suffix) {
   return 0;
 }
 
+
+int phony = 1;
+int j = 0;
+
 /**
 Read the dump file and compute vorticity and output. */
 event init (i = 0)
@@ -247,17 +256,42 @@ event init (i = 0)
   else {
     // We limit the first time step after the restart
     geometric_beta (1./3., true); // when restarting, remember to specify the grid mapping method, and this needs to match the original grid
-    /* dtmax = 0.01; */
-    /* dt = dtnext (dtmax); */
+    dtmax = 0.01; 
+    dt = dtnext (dtmax); 
     /* char *suffix = "matrix"; */
     /* writefields (t, suffix); */
     vort ();
+    phony = 0;
+  }
+}
+
+// Run for one step
+
+
+event update_eta (i++) {
+  if (phony == 0) {
+    j = i;
+    phony = 1;
+    fprintf (stderr, "New indexing set to j = %d!\n", j);
+  }
+  // Output at the next time step, before hf is deleted in the original update_eta and before remap
+  if (i == j+1) {
+    fprintf (stderr, "Output at i = j+1 = %d!\n", i);
     slope ();
     char *suffix = "matrix";
     writefields (TRESTORE, suffix); // if I put t instead of TRESTORE here it doesn't work?? t=0. When does t get updated?
   }
 }
 
-event deletefield (t=end, last) {
-  delete ((scalar *){hu,ha,hf,omega});
+event exit_i (i++) {
+  if (i == j+2) {
+    fprintf (stderr, "Exit at i=j+2!\n");
+    delete ((scalar *){omega,omegaz,dzdx,dzdxc});
+    return 1;
+  }
 }
+
+event endrun (t = 1000.) {
+  fprintf (stderr, "This should not happen!\n");
+}
+

@@ -210,29 +210,29 @@ event init (i = 0)
 {
   char dumpname[100];
   sprintf (dumpname, "dump_t%g", TRESTORE);
-  if (!restore (dumpname)) {
+  if (!restore ("restart")) {
     fprintf (stderr, "%s not found!\n", dumpname);
   }
   else {
     fprintf (stderr, "Computing vorticity! \n");
-    vorticity3D (u, omega);
-    fprintf (stderr, "Computing dissipation! \n");
-    dissipation_rate (rateWater);
-    char filename[100];
-    int Nslice = 256;
-    double zslice = -L0/2+L0/2./Nslice;
-    for (int i=0; i<Nslice; i++) {
-      zslice += L0/Nslice;
-      sprintf (filename, "./field/omegax_t%g_slice%d", TRESTORE, i);
-      sliceXY (filename,omega.x,zslice,9);
-      sprintf (filename, "./field/omegay_t%g_slice%d", TRESTORE, i);
-      sliceXY (filename,omega.y,zslice,9);
-      sprintf (filename, "./field/omegaz_t%g_slice%d", TRESTORE, i);
-      sliceXY (filename,omega.z,zslice,9);
-      sprintf (filename, "./field/epsilon_t%g_slice%d", TRESTORE, i);
-      sliceXY (filename,rateWater,zslice,9);
-    }
-  }
+    /* vorticity3D (u, omega); */
+    /* fprintf (stderr, "Computing dissipation! \n"); */
+    /* dissipation_rate (rateWater); */
+    /* char filename[100]; */
+    /* int Nslice = 256; */
+    /* double zslice = -L0/2+L0/2./Nslice; */
+    /* for (int i=0; i<Nslice; i++) { */
+    /*   zslice += L0/Nslice; */
+    /*   sprintf (filename, "./field/omegax_t%g_slice%d", TRESTORE, i); */
+    /*   sliceXY (filename,omega.x,zslice,9); */
+    /*   sprintf (filename, "./field/omegay_t%g_slice%d", TRESTORE, i); */
+    /*   sliceXY (filename,omega.y,zslice,9); */
+    /*   sprintf (filename, "./field/omegaz_t%g_slice%d", TRESTORE, i); */
+    /*   sliceXY (filename,omega.z,zslice,9); */
+    /*   sprintf (filename, "./field/epsilon_t%g_slice%d", TRESTORE, i); */
+    /*   sliceXY (filename,rateWater,zslice,9); */
+   /* } */
+ }
 }
 
 
