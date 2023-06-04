@@ -4,9 +4,10 @@
 
 #include "grid/multigrid.h"
 #include "view.h"
-#include "layered/hydro.h"
-//#include "layered/hydro_test.h"
-#include "layered/nh.h"
+//#include "layered/hydro.h"
+#include "layered/hydro_test.h"
+//#include "layered/nh.h"
+#include "layered/nh_test.h"
 #include "layered/remap.h"
 //#include "remap_test.h"
 #include "layered/perfs.h"
@@ -178,11 +179,6 @@ event init (i = 0)
     writefields (t, suffix);
   }
 }
-
-/** Test adding horizontal diffusion. */
-
-event viscous_term (i++)
-  horizontal_diffusion ((scalar *){u}, nu, dt);
 
 /**
 ## Outputs

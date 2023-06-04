@@ -4,9 +4,10 @@
 
 #include "grid/multigrid.h"
 #include "view.h"
-#include "layered/hydro.h"
-//#include "layered/hydro_test.h"
-#include "layered/nh.h"
+//#include "layered/hydro.h"
+#include "layered/hydro_test.h"
+//#include "layered/nh.h"
+#include "layered/nh_test.h"
 #include "layered/remap.h"
 //#include "remap_test.h"
 #include "layered/perfs.h"
@@ -118,7 +119,7 @@ int main(int argc, char * argv[])
   gpe_base = -0.5*sq(h_)*L0*g_;
 #endif
   CFL_H = 1; // Smaller time step
-  // max_slope = 0.4; // Change the slope limiter threshold
+  max_slope = 1; // Change the slope limiter threshold
   fprintf (stderr, "Read in parameters!\n");
   run();
 }
@@ -178,11 +179,6 @@ event init (i = 0)
     writefields (t, suffix);
   }
 }
-
-/** Test adding horizontal diffusion. */
-
-event viscous_term (i++)
-  horizontal_diffusion ((scalar *){u}, nu, dt);
 
 /**
 ## Outputs

@@ -179,11 +179,6 @@ event init (i = 0)
   }
 }
 
-/** Test adding horizontal diffusion. */
-
-event viscous_term (i++)
-  horizontal_diffusion ((scalar *){u}, nu, dt);
-
 /**
 ## Outputs
 This is not necessary. It seems that the remapping does not change the energy.

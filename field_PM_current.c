@@ -165,6 +165,10 @@ event init (i = 0)
         w[] = u_z(x, y, z);
         z += h[]/2.;
       }
+      // Add the current??
+      foreach_layer() {
+	u.x[] += 0.1*sqrt(g_/kp_)*exp(-kp_/5.*z); // 0.1 cp with slow decay
+      }
     }
     fprintf (stderr,"Done initialization!\n");
     dump("initial");
@@ -178,11 +182,6 @@ event init (i = 0)
     writefields (t, suffix);
   }
 }
-
-/** Test adding horizontal diffusion. */
-
-event viscous_term (i++)
-  horizontal_diffusion ((scalar *){u}, nu, dt);
 
 /**
 ## Outputs
