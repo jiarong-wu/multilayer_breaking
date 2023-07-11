@@ -1,5 +1,5 @@
 /**
-# Read-in the dump file and output vorticity. (multilayer solver)
+# Header file for vorticity computation.
 */
 
 #include "grid/multigrid.h"
@@ -12,43 +12,13 @@
 #include "output_mpi.h" // Antoon's function for MPI compatible matrix output
 
 /**
-Definition of some controlling parameters. */
-#define g_ 9.8
-double TRESTORE = 50.; // t to restore
-int NLAYER = 10; // number of layers
-int LEVEL_data = 7; // horizontal resolution
-
-int main (int argc, char * argv[])
-{
-  if (argc > 1)
-    NLAYER = atoi(argv[1]); // # of layers
-  if (argc > 2)
-    LEVEL_data = atoi(argv[2]); // Horizontal resolution
-  if (argc > 3)
-    TRESTORE = atof(argv[3]); // Restoring time for analysis
-  if (argc > 4)
-    L0 = atof(argv[4]); // Box size 
-  else
-    L0 = 50.;
-  origin (-L0/2., -L0/2.);
-  periodic (right);
-  periodic (top);
-  N = 1 << LEVEL_data; 
-  nl = NLAYER;
-  run();
-  G = g_;
-  CFL_H = 1; // Smaller time step
-  run();
-}
-
-/**
 ## Computation of vorticity 
 The following function computes vorticity vector omega. */
 
 face vector hu, hf, ha;
 vector omega;
 scalar omegaz;
-vector dzdx;
+vector dzdx; // dzdx from face field. declared and then assigned space in the function
 
 void vort ()
 {
@@ -131,7 +101,7 @@ void vort ()
   delete ((scalar *){hu,ha,hf});
 }
 
-vector dzdxc;
+vector dzdxc; // centered dzdx
 void slope () {
   // Analyze the slope, test if it's different when taking a centered value
   dzdxc = new vector[nl];
@@ -239,59 +209,3 @@ int writefields (double t, const char *suffix) {
   }
   return 0;
 }
-
-
-int phony = 1;
-int j = 0;
-
-/**
-Read the dump file and compute vorticity and output. */
-event init (i = 0)
-{
-  char dumpname[100];
-  sprintf (dumpname, "dump_t%g", TRESTORE);
-  if (!restore (dumpname)) {
-    fprintf (stderr, "%s not found!\n", dumpname);
-  }
-  else {
-    // We limit the first time step after the restart
-    geometric_beta (1./3., true); // when restarting, remember to specify the grid mapping method, and this needs to match the original grid
-    dtmax = 0.01; 
-    dt = dtnext (dtmax); 
-    /* char *suffix = "matrix"; */
-    /* writefields (t, suffix); */
-    vort ();
-    phony = 0;
-  }
-}
-
-// Run for one step
-
-
-event update_eta (i++) {
-  if (phony == 0) {
-    j = i;
-    phony = 1;
-    fprintf (stderr, "New indexing set to j = %d!\n", j);
-  }
-  // Output at the next time step, before hf is deleted in the original update_eta and before remap
-  if (i == j+1) {
-    fprintf (stderr, "Output at i = j+1 = %d!\n", i);
-    slope ();
-    char *suffix = "matrix";
-    writefields (TRESTORE, suffix); // if I put t instead of TRESTORE here it doesn't work?? t=0. When does t get updated?
-  }
-}
-
-event exit_i (i++) {
-  if (i == j+2) {
-    fprintf (stderr, "Exit at i=j+2!\n");
-    delete ((scalar *){omega,omegaz,dzdx,dzdxc});
-    return 1;
-  }
-}
-
-event endrun (t = 1000.) {
-  fprintf (stderr, "This should not happen!\n");
-}
-

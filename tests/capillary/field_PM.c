@@ -3,6 +3,7 @@
 */
 
 #include "grid/multigrid.h"
+#include "hydro-tension.h"
 #include "view.h"
 #include "layered/hydro.h"
 //#include "layered/hydro_test.h"
@@ -29,6 +30,10 @@ int NLAYER = 10; // number of layers
 int LEVEL_data = 7;
 
 #include "./spectrum.h" // Used for new input method (the spectrum info)
+
+/** 
+## Parameters
+*/
 
 /** Function for writing fields at time t.
 */
@@ -164,6 +169,8 @@ event init (i = 0)
     }
     fprintf (stderr,"Done initialization!\n");
     dump("initial");
+    foreach() 
+      sigma[] = 0.0728;
   }
   else {
     // We limit the first time step after the restart
@@ -172,13 +179,15 @@ event init (i = 0)
     dt = dtnext (dtmax);
     char *suffix = "matrix";
     writefields (t, suffix);
+    foreach() 
+      sigma[] = 0.0728;
   }
 }
 
 /** Test adding horizontal diffusion. */
 
-event viscous_term (i++)
-  horizontal_diffusion ((scalar *){u}, nu, dt);
+/* event viscous_term (i++) */
+/*   horizontal_diffusion ((scalar *){u}, nu, dt); */
 
 /**
 ## Outputs

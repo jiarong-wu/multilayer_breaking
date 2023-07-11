@@ -29,51 +29,7 @@ int NLAYER = 10; // number of layers
 int LEVEL_data = 7;
 
 #include "./spectrum.h" // Used for new input method (the spectrum info)
-
-/** Function for writing fields at time t.
-*/
-int writefields (double t, const char *suffix) {
-  char s[80];
-  char filename1[50], filename2[50], filename3[50], filename4[50];
-  vector u_temp;
-  scalar w_temp, h_temp;
-  for (int j=0; j<nl; ++j) {
-    sprintf (filename1, "field/ux_%s_t%g_l%d", suffix, t, j);
-    sprintf (filename2, "field/uy_%s_t%g_l%d", suffix, t, j);  
-    sprintf (filename3, "field/uz_%s_t%g_l%d", suffix, t, j);  
-    sprintf (filename4, "field/h_%s_t%g_l%d", suffix, t, j);  
-    if (j==0) {
-      // The first layer is named u instead of u0
-      sprintf (s, "u");
-      u_temp = lookup_vector (s);
-      sprintf (s, "w");
-      w_temp = lookup_field (s);
-      sprintf (s, "h");
-      h_temp = lookup_field (s);
-    }
-    else {
-      sprintf (s, "u%d", j);
-      u_temp = lookup_vector (s);
-      sprintf (s, "w%d", j);
-      w_temp = lookup_field (s);
-      sprintf (s, "h%d", j);
-      h_temp = lookup_field (s);
-    }
-    FILE * fux = fopen (filename1, "w");
-    output_matrix_mpi (u_temp.x, fux, N, linear = true);
-    fclose (fux);
-    FILE * fuy = fopen (filename2, "w");
-    output_matrix_mpi (u_temp.y, fuy, N, linear = true);
-    fclose (fuy);
-    FILE * fuz = fopen (filename3, "w");
-    output_matrix_mpi (w_temp, fuz, N, linear = true);
-    fclose (fuz);
-    FILE * fh = fopen (filename4, "w");
-    output_matrix_mpi (h_temp, fh, N, linear = true);
-    fclose (fh);    
-  }
-  return 0;
-}
+#include "./vorticity.h" // Used to compute the vorticity and dzdx field including the extended write_fields function
 
 int main(int argc, char * argv[])
 {
@@ -115,7 +71,8 @@ int main(int argc, char * argv[])
 #endif
   CFL_H = 1; // Smaller time step
   // max_slope = 0.4; // Change the slope limiter threshold
-  fprintf (stderr, "Read in parameters!\n");
+  nu = 0.; // Overwrite the nu input and set vertical diffusion to 0
+  fprintf (stderr, "Read in parameters! nu set to zero! \n");
   run();
 }
 
