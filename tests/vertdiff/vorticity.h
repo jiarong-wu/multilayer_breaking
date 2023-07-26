@@ -124,6 +124,9 @@ void slope () {
 A new writefields function with Omega added. */
 
 int writefields (double t, const char *suffix) {
+  // Compute the vorticity field and slopes everytime the writefields function is called  
+  vort ();
+  slope ();
   char s[80];
   char filename1[50], filename2[50], filename3[50], filename4[50], filename5[50], filename6[50], filename7[50], filename8[50], filename9[50], filename10[50], filename11[50];
   vector u_temp, Omega_temp, dzdx_temp, dzdxc_temp;
@@ -133,9 +136,9 @@ int writefields (double t, const char *suffix) {
     sprintf (filename2, "field/uy_%s_t%g_l%d", suffix, t, j);  
     sprintf (filename3, "field/uz_%s_t%g_l%d", suffix, t, j);  
     sprintf (filename4, "field/h_%s_t%g_l%d", suffix, t, j);
-    sprintf (filename5, "field/Omegax_%s_t%g_l%d", suffix, t, j);
-    sprintf (filename6, "field/Omegay_%s_t%g_l%d", suffix, t, j);
-    sprintf (filename7, "field/Omegaz_%s_t%g_l%d", suffix, t, j);
+    sprintf (filename5, "field/omegax_%s_t%g_l%d", suffix, t, j);
+    sprintf (filename6, "field/omegay_%s_t%g_l%d", suffix, t, j);
+    sprintf (filename7, "field/omegaz_%s_t%g_l%d", suffix, t, j);
     sprintf (filename8, "field/dzdx_%s_t%g_l%d", suffix, t, j);
     sprintf (filename9, "field/dzdy_%s_t%g_l%d", suffix, t, j);
     sprintf (filename10, "field/dzdxc_%s_t%g_l%d", suffix, t, j);

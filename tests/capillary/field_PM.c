@@ -118,7 +118,7 @@ int main(int argc, char * argv[])
 #else
   gpe_base = -0.5*sq(h_)*L0*g_;
 #endif
-  CFL_H = 1; // Smaller time step
+  CFL_H = 4; // Use a relatively large time step for inplicit surface tension scheme to avoid too much slow-down
   // max_slope = 0.4; // Change the slope limiter threshold
   fprintf (stderr, "Read in parameters!\n");
   run();
@@ -170,7 +170,7 @@ event init (i = 0)
     fprintf (stderr,"Done initialization!\n");
     dump("initial");
     foreach() 
-      sigma[] = 0.0728;
+      sigma[] = 0.0000728; //surface tension coefficient divided by water density
   }
   else {
     // We limit the first time step after the restart
@@ -180,7 +180,7 @@ event init (i = 0)
     char *suffix = "matrix";
     writefields (t, suffix);
     foreach() 
-      sigma[] = 0.0728;
+      sigma[] = 0.0000728;
   }
 }
 
@@ -244,7 +244,7 @@ event energy_before_remap (i+=10, last)
    Note that the movie generation below is very expensive. */
 #  define POPEN(name, mode) fopen (name ".ppm", mode)
 #if 1
-event movie (t += 1; t <= TEND)
+event movie (t += 0.01; t <= TEND)
 {
   char s[80];
   view (fov = 20, quat = {0.475152,0.161235,0.235565,0.832313}, width = 800, height = 600);
@@ -291,7 +291,7 @@ event movie (t += 1; t <= TEND)
 /**
    Output 3-D field (not just the surface laye) if needed for Paraview visualization or other analyses. */
 
-event field_log (t=0; t+=10; t<=TEND) {
+event field_log (t=0; t+=0.1; t<=TEND) {
   char *suffix = "matrix";
   writefields (t, suffix);
 }
@@ -314,7 +314,7 @@ event adapt (i++) {
 }
 #endif
 
-event regulardump (t = 0; t += 20; t < TEND) {
+event regulardump (t = 0; t += 5; t < TEND) {
   char dname[100];
   sprintf (dname, "dump_t%g", t);
   dump(dname);

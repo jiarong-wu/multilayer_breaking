@@ -121,6 +121,7 @@ event init (i = 0)
     }
     fprintf (stderr,"Done initialization!\n");
     dump("initial");
+    writefields (t, "matrix");
   }
   else {
     // We limit the first time step after the restart

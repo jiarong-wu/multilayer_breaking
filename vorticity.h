@@ -16,8 +16,8 @@
 The following function computes vorticity vector omega. */
 
 face vector hu, hf, ha;
-vector omega;
-scalar omegaz;
+vector Omega; // Use capital Omega to avoid conflict with the wave frequency omega
+scalar Omegaz;
 vector dzdx; // dzdx from face field. declared and then assigned space in the function
 
 void vort ()
@@ -62,13 +62,13 @@ void vort ()
     }
   }
 
-  omega = new vector[nl];
-  reset ({omega}, 0.);
-  omegaz = new scalar[nl];
-  reset ({omegaz}, 0.);
+  Omega = new vector[nl];
+  reset ({Omega}, 0.);
+  Omegaz = new scalar[nl];
+  reset ({Omegaz}, 0.);
   foreach () { 
     foreach_layer () {
-      omegaz[] = (0.5*(u.y[] + u.y[1])*fm.x[1] - 0.5*(u.y[] + u.y[-1])*fm.x[] \
+      Omegaz[] = (0.5*(u.y[] + u.y[1])*fm.x[1] - 0.5*(u.y[] + u.y[-1])*fm.x[] \
 		  + 0.5*(u.x[] + u.x[0,-1])*fm.y[] - 0.5*(u.x[] + u.x[0,1])*fm.y[0,1])/Delta;
       foreach_dimension () {
 	if (point.l > 0) {
@@ -76,10 +76,10 @@ void vort ()
 	  area = Delta*(hf.y[] + hf.y[0,0,-1] + hf.y[0,1,0] + hf.y[0,1,-1])/4.; // Add fm later
 	  circ = (-u.y[] + u.y[0,0,-1])*Delta - 0.5*(w[0,0,-1] + w[0,-1,-1])*0.5*(hf.y[] + hf.y[0,0,-1]) + \
 	    0.5*(w[0,0,-1] + w[0,1,-1])*0.5*(hf.y[0,1,0] + hf.y[0,1,-1]);
-	  omega.x[] = circ/area;      
+	  Omega.x[] = circ/area;      
 	}
 	else
-	  omega.x[] = 0.; // not well defined for the bottom layer
+	  Omega.x[] = 0.; // not well defined for the bottom layer
       }
     }
   }
@@ -121,13 +121,16 @@ void slope () {
 
 /**
 ## Write to files
-A new writefields function with omega added. */
+A new writefields function with Omega added. */
 
 int writefields (double t, const char *suffix) {
+  // Compute the vorticity field and slopes everytime the writefields function is called  
+  vort ();
+  slope ();
   char s[80];
   char filename1[50], filename2[50], filename3[50], filename4[50], filename5[50], filename6[50], filename7[50], filename8[50], filename9[50], filename10[50], filename11[50];
-  vector u_temp, omega_temp, dzdx_temp, dzdxc_temp;
-  scalar w_temp, h_temp, omegaz_temp;
+  vector u_temp, Omega_temp, dzdx_temp, dzdxc_temp;
+  scalar w_temp, h_temp, Omegaz_temp;
   for (int j=0; j<nl; ++j) {
     sprintf (filename1, "field/ux_%s_t%g_l%d", suffix, t, j);
     sprintf (filename2, "field/uy_%s_t%g_l%d", suffix, t, j);  
@@ -148,10 +151,10 @@ int writefields (double t, const char *suffix) {
       w_temp = lookup_field (s);
       sprintf (s, "h");
       h_temp = lookup_field (s);
-      sprintf (s, "omega");
-      omega_temp = lookup_vector (s);
-      sprintf (s, "omegaz");
-      omegaz_temp = lookup_field (s);
+      sprintf (s, "Omega");
+      Omega_temp = lookup_vector (s);
+      sprintf (s, "Omegaz");
+      Omegaz_temp = lookup_field (s);
       sprintf (s, "dzdx");
       dzdx_temp = lookup_vector (s);
       sprintf (s, "dzdxc");
@@ -164,10 +167,10 @@ int writefields (double t, const char *suffix) {
       w_temp = lookup_field (s);
       sprintf (s, "h%d", j);
       h_temp = lookup_field (s);
-      sprintf (s, "omega%d", j);
-      omega_temp = lookup_vector (s);
-      sprintf (s, "omegaz%d", j);
-      omegaz_temp = lookup_field (s);
+      sprintf (s, "Omega%d", j);
+      Omega_temp = lookup_vector (s);
+      sprintf (s, "Omegaz%d", j);
+      Omegaz_temp = lookup_field (s);
       sprintf (s, "dzdx%d", j);
       dzdx_temp = lookup_vector (s);
       sprintf (s, "dzdxc%d", j);
@@ -185,15 +188,15 @@ int writefields (double t, const char *suffix) {
     FILE * fh = fopen (filename4, "w");
     output_matrix_mpi (h_temp, fh, N, linear = true);
     fclose (fh);    
-    FILE * fomegax = fopen (filename5, "w");
-    output_matrix_mpi (omega_temp.x, fomegax, N, linear = true);
-    fclose (fomegax);
-    FILE * fomegay = fopen (filename6, "w");
-    output_matrix_mpi (omega_temp.y, fomegay, N, linear = true);
-    fclose (fomegay);
-    FILE * fomegaz = fopen (filename7, "w");
-    output_matrix_mpi (omegaz_temp, fomegaz, N, linear = true);
-    fclose (fomegaz);
+    FILE * fOmegax = fopen (filename5, "w");
+    output_matrix_mpi (Omega_temp.x, fOmegax, N, linear = true);
+    fclose (fOmegax);
+    FILE * fOmegay = fopen (filename6, "w");
+    output_matrix_mpi (Omega_temp.y, fOmegay, N, linear = true);
+    fclose (fOmegay);
+    FILE * fOmegaz = fopen (filename7, "w");
+    output_matrix_mpi (Omegaz_temp, fOmegaz, N, linear = true);
+    fclose (fOmegaz);
     FILE * fdzdx = fopen (filename8, "w");
     output_matrix_mpi (dzdx_temp.x, fdzdx, N, linear = true);
     fclose (fdzdx);
