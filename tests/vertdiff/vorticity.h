@@ -19,6 +19,22 @@ face vector hu, hf, ha;
 vector Omega; // Use capital Omega to avoid conflict with the wave frequency omega
 scalar Omegaz;
 vector dzdx; // dzdx from face field. declared and then assigned space in the function
+// vector dzdxc; // centered dzdx, turns out to be the same
+
+/** Initialize the omega and slope fields. Did not define and restriction or prolongation stuff. */
+event defaults0 (i = 0)
+{
+  Omega = new vector[nl];
+  Omegaz = new scalar[nl];
+  dzdx = new vector[nl];
+  reset ({Omega, Omegaz, dzdx}, 0.);
+}
+
+event cleanup (t = end, last)
+{
+  delete ({Omega, Omegaz, dzdx});
+  free (tracers), tracers = NULL;
+}
 
 void vort ()
 {
@@ -62,10 +78,6 @@ void vort ()
     }
   }
 
-  Omega = new vector[nl];
-  reset ({Omega}, 0.);
-  Omegaz = new scalar[nl];
-  reset ({Omegaz}, 0.);
   foreach () { 
     foreach_layer () {
       Omegaz[] = (0.5*(u.y[] + u.y[1])*fm.x[1] - 0.5*(u.y[] + u.y[-1])*fm.x[] \
@@ -83,10 +95,9 @@ void vort ()
       }
     }
   }
-  
+  fprintf (stderr, "Done computing vorticity!\n");
+
   // Analyze the slope
-  dzdx = new vector[nl];
-  reset ({dzdx}, 0.);
   foreach () {
     coord dz;
     foreach_dimension ()
@@ -98,25 +109,9 @@ void vort ()
       }
     }
   }  
-  delete ((scalar *){hu,ha,hf});
-}
+  fprintf (stderr, "Done computing dzdx!\n");
 
-vector dzdxc; // centered dzdx
-void slope () {
-  // Analyze the slope, test if it's different when taking a centered value
-  dzdxc = new vector[nl];
-  reset ({dzdxc}, 0.);
-  foreach () {
-    coord dz;
-    foreach_dimension ()
-      dz.x = (fm.x[1]*(zb[1] + zb[]) - fm.x[]*(zb[-1] + zb[]))/2.;
-    foreach_layer () {
-      foreach_dimension () {
-	dzdxc.x[] = dz.x + hf.x[1] - hf.x[];
-	dz.x += hf.x[1] - hf.x[];
-      }
-    }
-  }
+  delete ((scalar *){hu,ha,hf});
 }
 
 /**
@@ -126,10 +121,9 @@ A new writefields function with Omega added. */
 int writefields (double t, const char *suffix) {
   // Compute the vorticity field and slopes everytime the writefields function is called  
   vort ();
-  slope ();
   char s[80];
-  char filename1[50], filename2[50], filename3[50], filename4[50], filename5[50], filename6[50], filename7[50], filename8[50], filename9[50], filename10[50], filename11[50];
-  vector u_temp, Omega_temp, dzdx_temp, dzdxc_temp;
+  char filename1[50], filename2[50], filename3[50], filename4[50], filename5[50], filename6[50], filename7[50], filename8[50], filename9[50];
+  vector u_temp, Omega_temp, dzdx_temp;
   scalar w_temp, h_temp, Omegaz_temp;
   for (int j=0; j<nl; ++j) {
     sprintf (filename1, "field/ux_%s_t%g_l%d", suffix, t, j);
@@ -141,8 +135,6 @@ int writefields (double t, const char *suffix) {
     sprintf (filename7, "field/omegaz_%s_t%g_l%d", suffix, t, j);
     sprintf (filename8, "field/dzdx_%s_t%g_l%d", suffix, t, j);
     sprintf (filename9, "field/dzdy_%s_t%g_l%d", suffix, t, j);
-    sprintf (filename10, "field/dzdxc_%s_t%g_l%d", suffix, t, j);
-    sprintf (filename11, "field/dzdyc_%s_t%g_l%d", suffix, t, j);
     if (j==0) {
       // The first layer is named u instead of u0
       sprintf (s, "u");
@@ -157,8 +149,6 @@ int writefields (double t, const char *suffix) {
       Omegaz_temp = lookup_field (s);
       sprintf (s, "dzdx");
       dzdx_temp = lookup_vector (s);
-      sprintf (s, "dzdxc");
-      dzdxc_temp = lookup_vector (s);
     }
     else {
       sprintf (s, "u%d", j);
@@ -173,8 +163,6 @@ int writefields (double t, const char *suffix) {
       Omegaz_temp = lookup_field (s);
       sprintf (s, "dzdx%d", j);
       dzdx_temp = lookup_vector (s);
-      sprintf (s, "dzdxc%d", j);
-      dzdxc_temp = lookup_vector (s);
     }
     FILE * fux = fopen (filename1, "w");
     output_matrix_mpi (u_temp.x, fux, N, linear = true);
@@ -203,12 +191,6 @@ int writefields (double t, const char *suffix) {
     FILE * fdzdy = fopen (filename9, "w");
     output_matrix_mpi (dzdx_temp.y, fdzdy, N, linear = true);
     fclose (fdzdy);
-    FILE * fdzdxc = fopen (filename10, "w");
-    output_matrix_mpi (dzdxc_temp.x, fdzdxc, N, linear = true);
-    fclose (fdzdxc);
-    FILE * fdzdyc = fopen (filename11, "w");
-    output_matrix_mpi (dzdxc_temp.y, fdzdyc, N, linear = true);
-    fclose (fdzdyc);
   }
   return 0;
 }

@@ -121,7 +121,6 @@ event init (i = 0)
     }
     fprintf (stderr,"Done initialization!\n");
     dump("initial");
-    writefields (t, "matrix");
   }
   else {
     // We limit the first time step after the restart
@@ -193,7 +192,7 @@ event energy_before_remap (i+=10, last)
    Note that the movie generation below is very expensive. */
 #  define POPEN(name, mode) fopen (name ".ppm", mode)
 #if 1
-event movie (t += 1; t <= TEND)
+event movie (t += 0.1; t <= TEND)
 {
   char s[80];
   view (fov = 20, quat = {0.475152,0.161235,0.235565,0.832313}, width = 800, height = 600);
@@ -217,10 +216,11 @@ event movie (t += 1; t <= TEND)
   /* static FILE * fp = POPEN ("slope", "a"); */
   /* save (fp = fp); */
   /* } */
-  char filename1[50], filename2[50], filename3[50];
+  char filename1[50], filename2[50], filename3[50], filename4[50];
   sprintf (filename1, "surface/eta_matrix_%g", t);
   sprintf (filename2, "surface/ux_matrix_%g", t);
   sprintf (filename3, "surface/uy_matrix_%g", t);  
+  sprintf (filename4, "surface/uz_matrix_%g", t);  
   FILE * feta = fopen (filename1, "w");
   // Might need to change to mpi function later
   output_matrix_mpi (eta, feta, N, linear = true);
@@ -233,6 +233,10 @@ event movie (t += 1; t <= TEND)
   FILE * fuy = fopen (filename3, "w");
   output_matrix_mpi (u_temp.y, fuy, N, linear = true);
   fclose (fuy);  
+  sprintf (s, "w%d", nl-1);
+  scalar w_temp = lookup_field (s);
+  FILE * fuz = fopen (filename4, "w");
+  output_matrix_mpi (w_temp, fuz, N, linear = true);
 }
 #endif
 
