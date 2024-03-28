@@ -305,7 +305,7 @@ event adapt (i++) {
 }
 #endif
 
-event regulardump (t = 0; t += 20; t < TEND) {
+event regulardump (t = 0; t += 10; t < TEND) {
   char dname[100];
   sprintf (dname, "dump_t%g", t);
   dump(dname);

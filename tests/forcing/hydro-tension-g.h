@@ -104,10 +104,13 @@ decoupling. */
 		eta[i+1,-1] - eta[i-1,1]))/sq(Delta))
 #endif // dimension == 2
 
-
-#define p_baro(eta,i) (- G_var[i]*eta[i] + sigma_kappa(eta, i))
-#define a_baro(eta, i)						\
+#ifndef p_baro
+  #define p_baro(eta,i) (- G_var[i]*eta[i] + sigma_kappa(eta, i))
+#endif
+#ifndef a_baro
+  #define a_baro(eta, i)						\
   (gmetric(i)*(p_baro (eta, i) - p_baro (eta, i - 1))/Delta)
+#endif
 
 #include "layered/hydro.h"
 
