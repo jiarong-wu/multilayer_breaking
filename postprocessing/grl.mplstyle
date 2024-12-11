@@ -1,0 +1,120 @@
+# GRL journal
+# textwidth = 32pc = 384pt = 5.31in = 134.96mm
+# pagewidth = 174mm = 6.85in
+
+font.size: 8
+figure.titlesize: large
+
+# Could not make latex work on tigeressdata, therefore changing only the default font of dejavu
+# There are five fonts for math 
+# dejavusans: DejaVu Sans
+# dejavuserif: DejaVu Serif
+# cm: Computer Modern (TeX)
+# stix: STIX (designed to blend well with Times)
+# stixsans: STIX sans-serif
+
+# text.latex.preamble: r"\usepackage[T1]{fontenc} \usepackage{cmbright}"
+# text.latex.preamble: [
+# r"\usepackage{amssymb}",
+# r"\usepackage{amsmath}",
+# r"\usepackage{fontspec}",
+# r"\setmainfont{Gentium Book Basic}",
+# r"\setsansfont{Open Sans Light}",
+# r"\usepackage{unicode-math}",
+# r"\setmathfont{TeX Gyre Termes Math}"
+# ]
+mathtext.fontset: dejavusans
+mathtext.fallback: stixsans
+font.family:  sans-serif
+font.sans-serif: CMU Bright
+
+text.usetex: True          
+text.latex.preamble: \usepackage{cmbright}
+# axes.unicode_minus :  False
+
+savefig.transparent: True
+figure.dpi: 600
+figure.figsize: 5.2, 3.9  #ratio 4/3 based on JFM textwidth 32pc=384pt=5.313in
+
+## ***************************************************************************
+## * AXES                                                                    *
+## ***************************************************************************
+axes.linewidth      : 0.5     # edge linewidth
+axes.grid           : False   # display grid or not
+axes.titlesize      : medium   # fontsize of the axes title
+axes.labelsize      : medium  # fontsize of the x any y labels
+axes.labelcolor     : black
+axes.labelpad       : 4.0     # space between label and axis
+axes.formatter.limits : -4, 4 # use scientific notation if log10
+                               # of the axis range is smaller than the
+                               # first or larger than the second
+axes.prop_cycle     : cycler(color='bgrcmyk')
+axes.formatter.use_mathtext: False
+
+## ***************************************************************************
+## * TICKS                                                                   *
+## ***************************************************************************
+xtick.major.size     : 2      # major tick size in points
+xtick.minor.size     : 1      # minor tick size in points
+xtick.major.pad      : 4      # distance to major tick label in points
+xtick.minor.pad      : 2      # distance to the minor tick label in points
+xtick.major.width:   0.5     # major tick width in points
+xtick.minor.width:   0.4     # minor tick width in points
+xtick.color          : k      # color of the tick labels
+xtick.labelsize      : x-small  # fontsize of the tick labels
+xtick.direction      : in     # direction: in or out
+
+ytick.major.size     : 2      # major tick size in points
+ytick.minor.size     : 1      # minor tick size in points
+ytick.major.pad      : 4      # distance to major tick label in points
+ytick.minor.pad      : 2      # distance to the minor tick label in points
+ytick.major.width:   0.5     # major tick width in points
+ytick.minor.width:   0.4     # minor tick width in points
+ytick.color          : k      # color of the tick labels
+ytick.labelsize      : x-small # fontsize of the tick labels
+ytick.direction      : in     # direction: in or out
+
+
+## ***************************************************************************
+## * LEGEND                                                                  *
+## ***************************************************************************
+legend.loc:           best
+legend.frameon:       True     # if True, draw the legend on a background patch
+legend.framealpha:    0.8      # legend patch transparency
+legend.fancybox:      False     # if True, use a rounded box for the
+                                # legend background, else a rectangle
+legend.shadow:        False    # if True, give background a shadow effect
+#legend.numpoints:     1        # the number of marker points in the legend line
+#legend.scatterpoints: 1        # number of scatter points
+legend.markerscale:   1.0      # the relative size of legend markers vs. original
+legend.fontsize:      small
+
+## Dimensions as fraction of font size:
+legend.borderpad:     0.4  # border whitespace
+legend.labelspacing:  0.4  # the vertical space between the legend entries
+legend.handlelength:  1.4  # the length of the legend lines
+legend.handleheight:  0.5  # the height of the legend handle
+legend.handletextpad: 0.2  # the space between the legend line and legend text
+legend.borderaxespad: 0.6  # the border between the axes and legend edge
+legend.columnspacing: 1.0  # column separation
+
+
+## ***************************************************************************
+## * LINES                                                                   *
+## ***************************************************************************
+## See https://matplotlib.org/stable/api/artist_api.html#module-matplotlib.lines
+## for more information on line properties.
+lines.linewidth: 0.5               # line width in points
+lines.linestyle: -                 # solid line
+lines.marker:          None        # the default marker
+lines.markerfacecolor: None        # the default marker face color
+lines.markeredgecolor: auto        # the default marker edge color
+lines.markeredgewidth: 0.3        # the line width around the marker symbol
+lines.markersize:      2       # marker size, in points
+markers.fillstyle: full  # {full, left, right, bottom, top, none}
+
+#pcolor.shading: auto
+#pcolormesh.snap: True  # Whether to snap the mesh to pixel boundaries. This is
+                        # provided solely to allow old test images to remain
+                        # unchanged. Set to False to obtain the previous behavior.
+
