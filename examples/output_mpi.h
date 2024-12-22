@@ -2,122 +2,113 @@
 This function is an extension of output_matrix() inside "output.h" which allows
 to write 2D fields in a gnuplot-complatible format when running in MPI by
 performing a MPI_Reduce.
+Updated 2024/12/20: the newest Basilisk output_matrix is already compatible with MPI so this file will not be needed.
 */
-void output_matrix_mpi (struct OutputMatrix p)
-{
-  if (p.n == 0) p.n = N;
-  if (!p.fp) p.fp = stdout;
-  float fn = p.n, Delta = L0/fn;
-  float ** field = matrix_new (p.n, p.n, sizeof(float));
 
-  for (int i = 0; i < p.n; i++) {
-    float xp = Delta*i + X0 + Delta/2.;
-    for (int j = 0; j < p.n; j++) {
-      float yp = Delta*j + Y0 + Delta/2.;
-      if (p.linear) {
-        field[i][j] = interpolate (p.f, xp, yp);
-      }
-      else {
-        Point point = locate (xp, yp);
-        field[i][j] = point.level >= 0 ? val(p.f) : nodata;
-      }
-    }
-  }
+// trace
+// void output_matrix_mpi (scalar f,
+// 		    FILE * fp = stdout,
+// 		    int n = N,
+// 		    bool linear = false,
+// 		    const char * file = NULL,
+// 		    coord box[2] = {{X0, Y0}, {X0 + L0, Y0 + L0}})
+// {
+//   coord cn = {n}, p;
+//   double delta = (box[1].x - box[0].x)/n;
+//   cn.y = (int)((box[1].y - box[0].y)/delta);
+    
+//   double ** ppm = (double **) matrix_new (cn.x, cn.y, sizeof(double));
+//   double * ppm0 = &ppm[0][0];
+//   unsigned int len = cn.x*cn.y;
+//   for (int i = 0; i < len; i++)
+//     ppm0[i] = - HUGE;
 
-  if (pid() == 0) { // master
-@if _MPI
-    MPI_Reduce (MPI_IN_PLACE, field[0], p.n*p.n, MPI_FLOAT, MPI_MIN, 0,MPI_COMM_WORLD);
-@endif
-
-
-    fwrite (&fn, sizeof(float), 1, p.fp);
-    for (int j = 0; j < p.n; j++) {
-      float yp = Delta*j + Y0 + Delta/2.;
-      fwrite (&yp, sizeof(float), 1, p.fp);
-    }
-
-    for (int i = 0; i < p.n; i++){
-      float xp = Delta*i + X0 + Delta/2.;
-      fwrite (&xp, sizeof(float), 1, p.fp);
-      for (int j = 0; j < p.n; j++) {
-        fwrite (&field[i][j], sizeof(float), 1, p.fp);
-      }
-    }
-    fflush (p.fp);
-  }
-@if _MPI
-  else // slave
-  MPI_Reduce (field[0], NULL, p.n*p.n, MPI_FLOAT, MPI_MIN, 0,MPI_COMM_WORLD);
-@endif
-
-  matrix_free (field);
-}
-
-struct OutputMatrix_part {
-  scalar f;
-  FILE * fp;
-  int n;
-  bool linear;
-  double box[2][2];
-};
-
-void output_matrix_part_mpi (struct OutputMatrix_part p)
-{
-  if (p.n == 0) p.n = N;
-  if (!p.fp) p.fp = stdout;
-  if (p.box[0][0] == 0. && p.box[0][1] == 0. && 
-      p.box[1][0] == 0. && p.box[1][1] == 0.) {
-    p.box[0][0] = X0;      p.box[0][1] = Y0;
-    p.box[1][0] = X0 + L0; p.box[1][1] = Y0 + L0;
-  }
-  float fn = p.n, //Delta = L0/fn;
-  Delta = (p.box[1][0] - p.box[0][0])/fn;
-  float ny = (p.box[1][1] - p.box[0][1])/Delta;
-  float nx = (p.box[1][0] - p.box[0][0])/Delta;
+// #if _MPI
+//   foreach_region (p, box, cn, reduction(max:ppm0[:len]))
+// #else
+//   foreach_region (p, box, cn, cpu)
+// #endif
+//   {
+//     int i = (p.x - box[0].x)/(box[1].x - box[0].x)*cn.x;
+//     int j = (p.y - box[0].y)/(box[1].y - box[0].y)*cn.y;
+//     double ** alias = ppm; // so that qcc considers ppm a local variable
+//     alias[i][j] = linear ? interpolate_linear (point, f, p.x, p.y, p.z) : f[];
+//   }
   
-  float ** field = matrix_new ((int)nx,(int)ny, sizeof(float));
+//   if (pid() == 0) {
+//     if (file) {
+//       fp = fopen (file, "wb");
+//       if (!fp) {
+// 	perror (file);
+// 	exit (1);
+//       }
+//     }
+//     float fn = cn.y;
+//     fwrite (&fn, sizeof(float), 1, fp);
+//     coord delta = {(box[1].x - box[0].x)/cn.x, (box[1].y - box[0].y)/cn.y};
+//     for (int j = 0; j < cn.y; j++) {
+//       float yp = box[0].y + delta.y*(j + 0.5);
+//       fwrite (&yp, sizeof(float), 1, fp);
+//     }
+//     for (int i = 0; i < cn.x; i++) {
+//       float xp = box[0].x + delta.x*(i + 0.5);
+//       fwrite (&xp, sizeof(float), 1, fp);
+//       for (int j = 0; j < cn.y; j++) {
+// 	float z = ppm[i][j];
+// 	fwrite (&z, sizeof(float), 1, fp);
+//       }
+//     }
+//     if (file)
+//       fclose (fp);
+//     else
+//       fflush (fp);
+//   }
+    
+//   matrix_free (ppm);
+// }
 
-  for (int i = 0; i < nx; i++) {
-    float xp = Delta*i + p.box[0][0] + Delta/2.;
-    for (int j = 0; j < ny; j++) {
-      float yp = Delta*j + p.box[0][1] + Delta/2.;
-      if (p.linear) {
-        field[i][j] = interpolate (p.f, xp, yp);
-      }
-      else {
-        Point point = locate (xp, yp);
-        field[i][j] = point.level >= 0 ? val(p.f) : nodata;
-      }
+void output_matrix_mpi (scalar f,
+		    FILE * fp = stdout,
+		    int n = N,
+		    bool linear = false)
+{
+  if (n == 0) n = N;
+  if (!fp) fp = stdout;
+  float fn = n, Delta = L0/fn;
+  float ** field = matrix_new (n, n, sizeof(float));
+
+  for (int i = 0; i < n; i++) {
+    float xp = Delta*i + X0 + Delta/2.;
+    for (int j = 0; j < n; j++) {
+      float yp = Delta*j + Y0 + Delta/2.;
+      field[i][j] = interpolate(f, xp, yp, linear);
     }
   }
 
   if (pid() == 0) { // master
 @if _MPI
-    MPI_Reduce (MPI_IN_PLACE, field[0], nx*ny, MPI_FLOAT, MPI_MIN, 0,MPI_COMM_WORLD);
+    MPI_Reduce (MPI_IN_PLACE, field[0], n*n, MPI_FLOAT, MPI_MIN, 0,MPI_COMM_WORLD);
 @endif
 
-
-    fwrite (&nx, sizeof(float), 1, p.fp);
-	fwrite (&ny, sizeof(float), 1, p.fp);
-    for (int j = 0; j < ny; j++) {
-      float yp = Delta*j + p.box[0][1] + Delta/2.;
-      fwrite (&yp, sizeof(float), 1, p.fp);
+    fwrite (&fn, sizeof(float), 1, fp);
+    for (int j = 0; j < n; j++) {
+      float yp = Delta*j + Y0 + Delta/2.;
+      fwrite (&yp, sizeof(float), 1, fp);
     }
 
-    for (int i = 0; i < nx; i++){
-      float xp = Delta*i + p.box[0][0] + Delta/2.;
-      fwrite (&xp, sizeof(float), 1, p.fp);
-      for (int j = 0; j < ny; j++) {
-        fwrite (&field[i][j], sizeof(float), 1, p.fp);
+    for (int i = 0; i < n; i++){
+      float xp = Delta*i + X0 + Delta/2.;
+      fwrite (&xp, sizeof(float), 1, fp);
+      for (int j = 0; j < n; j++) {
+        fwrite (&field[i][j], sizeof(float), 1, fp);
       }
     }
-    fflush (p.fp);
+    fflush (fp);
   }
 @if _MPI
   else // slave
-  MPI_Reduce (field[0], NULL, nx*ny, MPI_FLOAT, MPI_MIN, 0,MPI_COMM_WORLD);
+  MPI_Reduce (field[0], NULL, n*n, MPI_FLOAT, MPI_MIN, 0, MPI_COMM_WORLD);
 @endif
 
   matrix_free (field);
 }
-

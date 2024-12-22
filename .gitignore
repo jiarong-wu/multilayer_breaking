@@ -2,3 +2,5 @@ _*
 *.pkl
 *~
 .DS_Store
+examples/.qccNgzwba/
+*checkpoint*

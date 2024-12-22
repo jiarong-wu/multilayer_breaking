@@ -32,9 +32,7 @@ void power_input() {
 /* If using MPI. **/
 #if _MPI 
   int length1D, length2D; // The length of the array to be read
-  char message[20];
-  int i, rank, size;
-  MPI_Status status;
+  int rank, size;
   int root = 0;
   MPI_Comm_size(MPI_COMM_WORLD, &size);
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
@@ -109,7 +107,8 @@ void power_input() {
 /**
    If not using MPI. */ 
 #else
-  int length2D = N_mode_*(N_mode_+1);
+  int length1D, length2D;
+  length2D = N_mode_*(N_mode_+1);
   float * a = (float*) malloc (sizeof(float)*length2D);
   char filename[100];
   sprintf (filename, "F_kxky");
