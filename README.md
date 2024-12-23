@@ -41,6 +41,9 @@ Folder `test/` contains files that are still under testing
 * `test/disp/` contains some tests on the basic dispersion relation that I did not have time to pursue.
 * `test/current/` contains the first attempt to put current in the simulation.
 
+## Postprocessing code
+In the folder of postprocessing, install package of mlpython by running `pip install -e .`
+
 ## To-dos
 * Replace the output_mpi.h since the field is already structured and does not require further interpolation. We should also use less precision (instead of floating number precision now) to save disk space.
 * Find a better way to read in the spectrum and initialize instead of using the fixed length wavenumber array now.
