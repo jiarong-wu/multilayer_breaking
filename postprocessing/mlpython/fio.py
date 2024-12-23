@@ -1,4 +1,34 @@
 import xarray as xr
+import numpy as np
+
+''' Basic reading files '''
+def read (filepath='/projects/DEIKE/jiarongw/multilayer/stokes/stokes_8_20_Htheta0.51/field_t5/',
+          pre='eta_matrix_', index=0, N=512):
+    filename = filepath + pre + '%g' %index
+    f = np.fromfile(filename, dtype=np.float32)
+    f = f.reshape(N+1,N+1); f = f[1:,1:]
+    return f
+
+def read_t(fieldnames=['h','ux','uy','uz'], t=5, Nh=30, Nl=512, path='/projects/DEIKE/jiarongw/multilayer/revision/stokes_ml_1/'):
+    ''' Arguments:
+            fieldnames: field names list
+            Nh: horizontal resolution
+            NL: layer numbers 
+            path: path to the main folder        
+        Returns:
+            fields corresponding to fieldnames (Nl*Nx*Ny)
+            Notice that in some cases the first layer was not written correctly and requires further filtering.
+        '''
+    folder = path + 'field/'
+    fields = []
+    for fieldname in fieldnames:
+        field = []
+        """ axis0-z; axis1-x; aixs2-y"""
+        for l in range (0, Nl):
+            fieldl = read(filepath = folder, pre = fieldname + '_matrix_t%g_l' %t, index = l, N = Nh)
+            field.append(fieldl)
+        fields.append(np.array(field))
+    return fields
 
 ''' Function to read files and assemble them into an xarray dataset '''
 def read_netcdf (path, config, t, fieldnames=['h','ux','uy','uz','omegax','omegay','omegaz','dzdx','dzdy','dzdxc','dzdyc']):

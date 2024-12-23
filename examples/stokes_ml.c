@@ -35,9 +35,10 @@
 double ak = 0.1;
 double RE = 40000.;
 double gpe_base = 0;
-double k_ = 2.*pi, h_ = 0.5, g_ = 1.;
-
-#define T0  (k_*L0/sqrt(g_*k_))
+#define k_  (2.*pi)
+#define h_   0.5
+#define g_   1
+#define T0  (k_/sqrt(g_*k_))
 
 /** Function for writing fields at time t.
 */
@@ -206,13 +207,12 @@ event movie (t += 0.01*T0)
   draw_string (s, size = 100);
   sprintf (s, "u%d.x", nl-1);
   for (double x = -1; x <= 1; x++)
-    translate (x) {
-      squares (s, linear = true, z = "eta", min = -0.15, max = 0.6);
-    }
-    {
-      static FILE * fp = fopen ("movie.ppm", "w");
-      save (fp = fp);
-    }
+    translate (x);
+    squares (s, linear = true, z = "eta", min = -0.15, max = 0.6);
+  {
+    static FILE * fp = fopen ("movie.ppm", "w");
+    save (fp = fp);
+  }
   char filename1[50], filename2[50], filename3[50], filename4[50];
   sprintf (filename1, "surface/eta_matrix_%g", t/T0);
   sprintf (filename2, "surface/ux_matrix_%g", t/T0);

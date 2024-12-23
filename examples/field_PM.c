@@ -11,6 +11,7 @@
 //#include "remap_test.h"
 #include "layered/perfs.h"
 #include "input.h" // Used for older input method (matrices of quantities)
+// Updated 2024/12/20: the newest Basilisk output_matrix is already compatible with MPI
 #include "output_mpi.h" // Antoon's function for MPI compatible matrix output
 
 /**
@@ -164,6 +165,8 @@ event init (i = 0)
     }
     fprintf (stderr,"Done initialization!\n");
     dump("initial");
+    char *suffix = "matrix";
+    writefields (t, suffix);
   }
   else {
     // We limit the first time step after the restart
@@ -247,34 +250,22 @@ event movie (t += 1; t <= TEND)
   static FILE * fp = POPEN ("ux", "a");
   save (fp = fp);
   }
-  /* scalar slope[]; */
-  /* foreach () { */
-  /*   slope[] = (eta[1]-eta[-1])/(2.*Delta); */
-  /* } */
-  /* clear(); */
-  /* squares ("slope", linear = true, z = "eta", min = -1./50.*L0, max = 1./50.*L0); */
-  /* sprintf (s, "t = %.2f", t); */
-  /* draw_string (s, size = 30); */
-  /* { */
-  /* static FILE * fp = POPEN ("slope", "a"); */
-  /* save (fp = fp); */
-  /* } */
-  char filename1[50], filename2[50], filename3[50];
-  sprintf (filename1, "surface/eta_matrix_%g", t);
-  sprintf (filename2, "surface/ux_matrix_%g", t);
-  sprintf (filename3, "surface/uy_matrix_%g", t);  
-  FILE * feta = fopen (filename1, "w");
-  // Might need to change to mpi function later
-  output_matrix_mpi (eta, feta, N, linear = true);
-  fclose (feta);
-  sprintf (s, "u%d", nl-1);
-  vector u_temp = lookup_vector (s);
-  FILE * fux = fopen (filename2, "w");
-  output_matrix_mpi (u_temp.x, fux, N, linear = true);
-  fclose (fux);
-  FILE * fuy = fopen (filename3, "w");
-  output_matrix_mpi (u_temp.y, fuy, N, linear = true);
-  fclose (fuy);  
+  // char filename1[50], filename2[50], filename3[50];
+  // sprintf (filename1, "surface/eta_matrix_%g", t);
+  // sprintf (filename2, "surface/ux_matrix_%g", t);
+  // sprintf (filename3, "surface/uy_matrix_%g", t);  
+  // FILE * feta = fopen (filename1, "w");
+  // // Might need to change to mpi function later
+  // output_matrix_mpi (eta, feta, N, linear=true);
+  // fclose (feta);
+  // sprintf (s, "u%d", nl-1);
+  // vector u_temp = lookup_vector (s);
+  // FILE * fux = fopen (filename2, "w");
+  // output_matrix_mpi (u_temp.x, fux, N, linear=true);
+  // fclose (fux);
+  // FILE * fuy = fopen (filename3, "w");
+  // output_matrix_mpi (u_temp.y, fuy, N, linear=true);
+  // fclose (fuy);  
 }
 #endif
 
@@ -282,17 +273,17 @@ event movie (t += 1; t <= TEND)
 /**
    Output 3-D field (not just the surface laye) if needed for Paraview visualization or other analyses. */
 
-event field_log (t=0; t+=10; t<=TEND) {
-  char *suffix = "matrix";
-  writefields (t, suffix);
-}
+// event field_log (t=0; t+=10; t<=TEND) {
+//   char *suffix = "matrix";
+//   writefields (t, suffix);
+// }
 
-#if PARAVIEW
-event paraview (t = 100; t += 0.2; t <= TEND) {
-  char *suffix = "matrix";
-  writefields (t, suffix);
-}
-#endif
+// #if PARAVIEW
+// event paraview (t = 100; t += 0.2; t <= TEND) {
+//   char *suffix = "matrix";
+//   writefields (t, suffix);
+// }
+// #endif
 
 /** 
 The mesh is not adaptive yet. */
