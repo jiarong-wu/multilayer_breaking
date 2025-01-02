@@ -1,5 +1,6 @@
 import xarray as xr
 import numpy as np
+import pickle
 
 ''' Basic reading files '''
 def read (filepath='/projects/DEIKE/jiarongw/multilayer/stokes/stokes_8_20_Htheta0.51/field_t5/',
@@ -60,3 +61,12 @@ def read_netcdf (path, config, t, fieldnames=['h','ux','uy','uz','omegax','omega
     # Same as float16 to save space? Optional. Can save about half the space.
     ds = ds.astype('float32')
     return ds
+
+''' Pickle objects. '''
+def save_object(obj, filename):
+    with open(filename, 'wb') as output:  # Overwrites any existing file.
+        pickle.dump(obj, output, pickle.HIGHEST_PROTOCOL)
+def load_object(filename):
+    with open(filename, 'rb') as input:  # Overwrites any existing file.
+        obj = pickle.load(input)
+    return obj

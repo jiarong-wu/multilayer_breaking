@@ -1,0 +1,26 @@
+case = Case(NL=15, LEVEL=10, path='/projects/DEIKE/jiarongw/multilayer/JFM/field_new_200m_P0.008_RE40000_10_15_rand2_Htheta0.503/')
+case.label = 'C1'
+
+case = Case(NL=15, LEVEL=10, path='/projects/DEIKE/jiarongw/multilayer/JFM/field_new_200m_P0.01_RE40000_10_15_rand2_Htheta0.503/')
+case.label = 'C2'
+
+case = Case(NL=15, LEVEL=10, path='/projects/DEIKE/jiarongw/multilayer/JFM/field_new_200m_P0.016_RE40000_10_15_rand2_Htheta0.503/')
+case.label = 'C3'
+
+case = Case(NL=15, LEVEL=10, path='/projects/DEIKE/jiarongw/multilayer/revision/field_new_200m_P0.02_RE40000_10_15_rand2_Htheta0.503/')
+case.label = 'C4'
+
+case = Case(NL=15, LEVEL=10, path='/projects/DEIKE/jiarongw/multilayer/revision/field_new_200m_P0.02_RE40000_10_15_rand4_Htheta0.503/')
+case.label = 'C4_rand4'
+
+case = Case(NL=15, LEVEL=10, path='/projects/DEIKE/jiarongw/multilayer/revision/field_new_200m_P0.02_RE40000_10_30_rand2_Htheta0.503/')
+case.label = 'C4_NL30'
+
+case = Case(NL=15, LEVEL=10, path='/projects/DEIKE/jiarongw/multilayer/revision/field_new_200m_P0.02_RE40000_10_45_rand2_Htheta0.503/')
+case.label = 'C4_NL45'
+
+case = Case(NL=15, LEVEL=10, path='/projects/DEIKE/jiarongw/multilayer/revision/field_new_200m_P0.03_RE40000_10_15_rand2_Htheta0.503/')
+case.label = 'C5'
+
+case = Case(NL=15, LEVEL=10, path='/projects/DEIKE/jiarongw/multilayer/revision/field_new_200m_P0.03_RE40000_10_15_rand4_Htheta0.503/')
+case.label = 'C5_rand4'
