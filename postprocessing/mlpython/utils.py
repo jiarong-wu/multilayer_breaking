@@ -93,3 +93,80 @@ def spectrum_us(k, F, zarray):
         us[i] = 2*g**0.5*np.sum(k**1.5*F*dk*np.exp(2*k*z))
         
     return us
+
+##### Converting different mesh format #####
+
+""" Assemble the 3D array of vertice for pcolormesh. We construct the x_mesh, y_mesh, and z_mesh 
+    (of dimension Nl+1, Nh+1, Nh+1) based on h field (and the horizontal dimensions L0), 
+    while the other field remains unchanged. """
+def array_to_mesh (h_ensem, L0=200, H=40, Nh=512, Nl=15):
+ 
+    x_mesh = np.zeros([Nl+1,Nh+1,Nh+1]) # Different from the vtk format
+    y_mesh = np.zeros([Nl+1,Nh+1,Nh+1])
+    z_mesh = np.zeros([Nl+1,Nh+1,Nh+1])
+
+    h_ensem_expand = np.zeros([Nl,Nh+1,Nh+1]) # Need to go from centered to grid, pad the array
+    h_ensem_expand[:,:Nh,:Nh] = np.copy(h_ensem) # Need to go from centered to grid
+    h_ensem_expand[:,Nh,:Nh] = np.copy(h_ensem[:,Nh-1,:Nh])
+    h_ensem_expand[:,:Nh,Nh] = np.copy(h_ensem[:,:Nh,Nh-1])
+    h_ensem_expand[:,Nh,Nh] = np.copy(h_ensem[:,Nh-1,Nh-1])
+    h_ensem_expand = np.array(h_ensem_expand)
+
+    xarray = np.linspace(-L0/2, L0/2, Nh+1, endpoint=True)
+    yarray = np.linspace(-L0/2, L0/2, Nh+1, endpoint=True)
+    
+    for k in range(Nl+1):
+        for i in range(Nh+1):
+            for j in range(Nh+1):
+                z_mesh[k,i,j] = np.sum(h_ensem_expand[:k,i,j]) - H
+                x_mesh[k,i,j] = xarray[i]
+                y_mesh[k,i,j] = yarray[j]
+
+    return x_mesh, y_mesh, z_mesh
+
+
+""" convert the 3D array to vtk file for paraview. Need to specify L0 and H """
+
+def array_to_vtk (h_ensem, ux_ensem, uy_ensem, uz_ensem, ichoice, 
+                  filepath='/projects/DEIKE/jiarongw/multilayer/paraview/vtk/', 
+                  L0=200, H=40, Nh=512, Nl=15):
+    fieldnames = ['x', 'y', 'z', 'ux', 'uy', 'uz', 'f']
+
+    x_vtk = np.zeros([Nh+1,Nh+1,Nl+1])
+    y_vtk = np.zeros([Nh+1,Nh+1,Nl+1])
+    z_vtk = np.zeros([Nh+1,Nh+1,Nl+1])
+    f_vtk = np.zeros([Nh,Nh,Nl])
+    ux_vtk = np.zeros([Nh,Nh,Nl])
+    uy_vtk = np.zeros([Nh,Nh,Nl])
+    uz_vtk = np.zeros([Nh,Nh,Nl])
+
+    h_ensem_expand = np.zeros([Nl,Nh+1,Nh+1]) # Need to go from centered to grid, pad the array
+    h_ensem_expand[:,:Nh,:Nh] = np.copy(h_ensem) # Need to go from centered to grid
+    h_ensem_expand[:,Nh,:Nh] = np.copy(h_ensem[:,Nh-1,:Nh])
+    h_ensem_expand[:,:Nh,Nh] = np.copy(h_ensem[:,:Nh,Nh-1])
+    h_ensem_expand[:,Nh,Nh] = np.copy(h_ensem[:,Nh-1,Nh-1])
+    h_ensem_expand = np.array(h_ensem_expand)
+
+    xarray = np.linspace(-L0/2, L0/2, Nh+1, endpoint=True)
+    yarray = np.linspace(-L0/2, L0/2, Nh+1, endpoint=True)
+
+    for k in range(Nl+1):
+        for i in range(Nh+1):
+            for j in range(Nh+1):
+                z_vtk[i,j,k] = np.sum(h_ensem_expand[:k,i,j]) - H
+                x_vtk[i,j,k] = xarray[i]
+                y_vtk[i,j,k] = yarray[j]
+
+    for k in range(Nl):
+        for i in range(Nh):
+            for j in range(Nh):
+                ux_vtk[i,j,k] = ux_ensem[k,i,j]
+                uy_vtk[i,j,k] = uy_ensem[k,i,j]
+                uz_vtk[i,j,k] = uz_ensem[k,i,j]
+                if k == Nl-1: # surface layer
+                    f_vtk[i,j,k] = 0
+                else:
+                    f_vtk[i,j,k] = 1
+                    
+    gridToVTK(filepath + "structured_%g" %ichoice, x_vtk, y_vtk, z_vtk, cellData = {"f": f_vtk, "ux": ux_vtk, "uy": uy_vtk, "uz": uz_vtk})
+    return x_vtk, y_vtk, z_vtk

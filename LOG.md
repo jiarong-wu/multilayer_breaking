@@ -1,7 +1,3 @@
-This folder contains code run on Della.
-
-`read.py` read [h,ux,uy,uz] and save to netcdf.
-
 2024/12/12:
 
 We corrected the `vorticity.c` file. 
