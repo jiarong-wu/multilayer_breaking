@@ -17,7 +17,6 @@ lvl1_snapshots: full depth fields at given time snapshots.
 Read from a named directory, e.g. `field_new_200m_P0.008_RE40000_10_15_rand2_Htheta0.503`, and create a config file in the processed folder. Run it by calling `python lvl1_snapshots.py --path='/projects/DEIKE/jiarongw/multilayer/JFM/field_new_200m_P0.008_RE40000_10_15_rand2_Htheta0.503/' --label='Case1'` with **absolute path**. (Moving forward, a better way to streamline thing would be to create the config file with all parameters at the time of running the simulation. This eliminates the need to use long names for folders.)
 
 lvl2_long: long time series of surface elevation, integrated quantities like energy, etc.
-Assuming we already have the config files.
 
 
 Step2: data analysis (level2). Deals with saved xarray datasets.

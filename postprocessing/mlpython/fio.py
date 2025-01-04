@@ -33,7 +33,7 @@ def read_t(fieldnames=['h','ux','uy','uz'], t=5, Nh=30, Nl=512, path='/projects/
     return fields
 
 
-''' Function to read files and assemble them into an xarray dataset '''
+''' Function to read files (3D full depth) and assemble them into an xarray dataset '''
 def read_netcdf (field_path, config, t, fieldnames=['h','ux','uy','uz','omegax','omegay','omegaz','dzdx','dzdy','dzdxc','dzdyc']):
     # 3D field path and 2D eta path relative to the main path
 #     field_path = path + 'vort/'
