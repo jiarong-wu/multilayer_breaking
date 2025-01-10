@@ -12,20 +12,22 @@ from mlpython.breaking import simple_mapping, get_bins
 #          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C5',
 #          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C2',
 #          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_NL45']
-paths = ['/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C1',
-         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C2',
-         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C3',
-         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4',
-         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C5',]
+# paths = ['/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C1',
+#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C2',
+#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C3',
+#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4',
+#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C5',]
 
-paths = ['/projects/DEIKE/jiarongw/multilayer/JFM/field_new_200m_P0.008_RE40000_10_15_rand2_Htheta0.503/',
-         '/projects/DEIKE/jiarongw/multilayer/JFM/field_new_200m_P0.01_RE40000_10_15_rand2_Htheta0.503/',
-         '/projects/DEIKE/jiarongw/multilayer/JFM/field_new_200m_P0.016_RE40000_10_15_rand2_Htheta0.503/',
-         '/projects/DEIKE/jiarongw/multilayer/revision/field_new_200m_P0.02_RE40000_10_15_rand2_Htheta0.503/',
-         '/projects/DEIKE/jiarongw/multilayer/revision/field_new_200m_P0.02_RE40000_10_15_rand4_Htheta0.503/',
-         '/projects/DEIKE/jiarongw/multilayer/revision/field_new_200m_P0.03_RE40000_10_15_rand2_Htheta0.503/',
-         '/projects/DEIKE/jiarongw/multilayer/revision/field_new_200m_P0.03_RE40000_10_15_rand4_Htheta0.503/']
+# paths = ['/projects/DEIKE/jiarongw/multilayer/JFM/field_new_200m_P0.008_RE40000_10_15_rand2_Htheta0.503/',
+#          '/projects/DEIKE/jiarongw/multilayer/JFM/field_new_200m_P0.01_RE40000_10_15_rand2_Htheta0.503/',
+#          '/projects/DEIKE/jiarongw/multilayer/JFM/field_new_200m_P0.016_RE40000_10_15_rand2_Htheta0.503/',
+#          '/projects/DEIKE/jiarongw/multilayer/revision/field_new_200m_P0.02_RE40000_10_15_rand2_Htheta0.503/',
+#          '/projects/DEIKE/jiarongw/multilayer/revision/field_new_200m_P0.02_RE40000_10_15_rand4_Htheta0.503/',
+#          '/projects/DEIKE/jiarongw/multilayer/revision/field_new_200m_P0.03_RE40000_10_15_rand2_Htheta0.503/',
+#          '/projects/DEIKE/jiarongw/multilayer/revision/field_new_200m_P0.03_RE40000_10_15_rand4_Htheta0.503/']
 
+paths = ['/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_NL30',
+         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_NL45',]
 
 #### Pick time windows of analyzing ####
 time = np.arange(100,181,1)
@@ -49,7 +51,7 @@ for path in paths:
         input_core_dims=[['x','y'], ['x','y'], ['x','y']],  # Core dimensions for each input
         output_core_dims=[['c']],  # Core dimensions for the output
         # exclude_dims=set(('zl',)),
-        # output_sizes={'c':len(znew)},
+        output_sizes={'c':len(bins_center)},
         output_dtypes=['float32'],
         vectorize=True,  # Enable vectorization
         dask="parallelized",  # Parallelize using Dask if the data is large

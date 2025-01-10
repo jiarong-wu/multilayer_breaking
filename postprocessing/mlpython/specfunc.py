@@ -131,3 +131,10 @@ def eta_focusing(kx_tile, ky_tile, F_kxky_tile, dkx, dky, omega_title, x_tile, y
             mode = ampl*(np.cos(a)) # uniform space in kx and ky
             eta_tile[i1,i2] = np.sum(mode)  
     return eta_tile, phase_tile
+
+''' Spectrally integrated quantities.'''
+def get_mss_Hs_spectrum (eta, L, N):
+    kmod, theta, Fkmod = spectrum_integration_log(eta, CHECK=False, L=L, N=N)
+    mu, Hs = steepness_trunc_non_uniform (Fkmod, kmod)
+    Hs = np.var(eta)**0.5*4
+    return mu[-1], Hs, kmod, Fkmod
