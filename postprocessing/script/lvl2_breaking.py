@@ -3,37 +3,34 @@ import numpy as np
 import xarray as xr
 import gc
 from mlpython.breaking import simple_mapping, get_bins
+from dask.diagnostics import ProgressBar
 
-# paths = ['/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_rand4',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C1',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C5_rand4',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C3',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C5',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C2',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_NL45']
-# paths = ['/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C1',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C2',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C3',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C5',]
-
-# paths = ['/projects/DEIKE/jiarongw/multilayer/JFM/field_new_200m_P0.008_RE40000_10_15_rand2_Htheta0.503/',
-#          '/projects/DEIKE/jiarongw/multilayer/JFM/field_new_200m_P0.01_RE40000_10_15_rand2_Htheta0.503/',
-#          '/projects/DEIKE/jiarongw/multilayer/JFM/field_new_200m_P0.016_RE40000_10_15_rand2_Htheta0.503/',
-#          '/projects/DEIKE/jiarongw/multilayer/revision/field_new_200m_P0.02_RE40000_10_15_rand2_Htheta0.503/',
-#          '/projects/DEIKE/jiarongw/multilayer/revision/field_new_200m_P0.02_RE40000_10_15_rand4_Htheta0.503/',
-#          '/projects/DEIKE/jiarongw/multilayer/revision/field_new_200m_P0.03_RE40000_10_15_rand2_Htheta0.503/',
-#          '/projects/DEIKE/jiarongw/multilayer/revision/field_new_200m_P0.03_RE40000_10_15_rand4_Htheta0.503/']
-
-paths = ['/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_NL30',
-         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_NL45',]
+# paths = ['/projects/DEIKE/jiarongw/multilayer/JPO/processed/C1',
+#          '/projects/DEIKE/jiarongw/multilayer/JPO/processed/C2',
+#          '/projects/DEIKE/jiarongw/multilayer/JPO/processed/C3',
+#          '/projects/DEIKE/jiarongw/multilayer/JPO/processed/C4',
+#          '/projects/DEIKE/jiarongw/multilayer/JPO/processed/C5',
+#          '/projects/DEIKE/jiarongw/multilayer/JPO/processed/C4',
+#          '/projects/DEIKE/jiarongw/multilayer/JPO/processed/C4_rand4',
+#          '/projects/DEIKE/jiarongw/multilayer/JPO/processed/C5',
+#          '/projects/DEIKE/jiarongw/multilayer/JPO/processed/C5_rand4',]
+#### Files that admits finer time stepping, for smoother stats lines ####
+paths = ['/projects/DEIKE/jiarongw/multilayer/JPO/processed/C1',
+         '/projects/DEIKE/jiarongw/multilayer/JPO/processed/C2',
+         '/projects/DEIKE/jiarongw/multilayer/JPO/processed/C3',
+         '/projects/DEIKE/jiarongw/multilayer/JPO/processed/C4_rand4',
+         '/projects/DEIKE/jiarongw/multilayer/JPO/processed/C5']
 
 #### Pick time windows of analyzing ####
-time = np.arange(100,181,1)
+time = np.arange(100,181,0.5)
+
+#### Parallel computing doesn't seem to work yet ####
+# from dask.distributed import Client
+# client = Client(processes=False)  # threads only
+# print(client.dashboard_link)  # View the dashboard at the provided link
 
 for path in paths:
-    ds = xr.open_dataset(path + '/series.nc', chunks={'t': 8})
+    ds = xr.open_dataset(path + '/series.nc', chunks={'t': 100, 'x':-1, 'y':-1})
     ds = ds.sel(t=time, method='nearest')
     #### Some metadata ####
     delta = ds.attrs['L']/2**ds.attrs['LEVEL'] # Normalize the curvature by grid size
@@ -42,26 +39,32 @@ for path in paths:
     bins = get_bins(kp)
     bins_center = bins[1:] - (bins[2] - bins[1])/2
     #### Compute stats ####
-    print('')
-    hist = xr.apply_ufunc (
-        simple_mapping,
-        ds.eta, 
-        ds.ux,  
-        ds.uy,
-        input_core_dims=[['x','y'], ['x','y'], ['x','y']],  # Core dimensions for each input
-        output_core_dims=[['c']],  # Core dimensions for the output
-        # exclude_dims=set(('zl',)),
-        output_sizes={'c':len(bins_center)},
-        output_dtypes=['float32'],
-        vectorize=True,  # Enable vectorization
-        dask="parallelized",  # Parallelize using Dask if the data is large
-        kwargs={'delta':delta, 'bins':bins, 'method':0, 'threshold':threshold} 
-    )
+    print('Computing stats for %s...' %path)
+    with ProgressBar():
+        hist = xr.apply_ufunc (
+            simple_mapping,
+            ds.eta, 
+            ds.ux,  
+            ds.uy,
+            input_core_dims=[['x','y'], ['x','y'], ['x','y']],  # Core dimensions for each input
+            output_core_dims=[['c']],  # Core dimensions for the output
+            # exclude_dims=set(('zl',)),
+            output_sizes={'c':len(bins_center)},
+            output_dtypes=['float32'],
+            vectorize=True,  # Enable vectorization
+            dask="parallelized",  # Parallelize using Dask if the data is large
+            kwargs={'delta':delta, 'bins':bins, 'method':0, 'threshold':threshold} 
+        ).compute()
     hist = hist.assign_coords(c=bins_center)
     
     #### Save to a separate file ####
-    filename = path + '/breaking_hist.nc'
-    hist.to_netcdf(filename, dtype='float32', zlib=True, engine='h5netcdf')
+    filename = path + '/breaking_hist_finer.nc'
+    compression_settings = {
+        'zlib': True,
+        'complevel': 5  # Compression level from 1 (fastest, least compression) to 9 (slowest, most compression)
+    }
+    hist.name = 'hist'
+    hist.to_netcdf(filename, encoding={'hist': compression_settings})
     print('Breaking stats saved!')
     del(hist) # Delete ds for memory 
     gc.collect()
