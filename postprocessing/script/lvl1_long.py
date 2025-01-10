@@ -13,9 +13,7 @@ def read_long (field_path, config, time, fieldnames=['eta','ux','uy']):
     Nt = len(time)
     N = 2**config['LEVEL'] # Change to config  
     L0 = config['L'] # Change to config
-
     #### Read in 2D fields ####
-    fieldnames = ['eta','ux','uy']
     fields = []
     for fieldname in fieldnames:
         f_series = np.zeros((Nt,N,N), dtype=np.float32)
@@ -31,24 +29,16 @@ def read_long (field_path, config, time, fieldnames=['eta','ux','uy']):
                     coords={'t': (['t'], time),
                             'x': (['x'], 0.5*(x_mesh[:-1]+x_mesh[1:])),
                             'y': (['y'], 0.5*(x_mesh[:-1]+x_mesh[1:]))},
-                    attrs=dict(sourcepath=field_path, **config))
-
-    #### Read in energy and interpolate onto surface field time ####
-    energy = pd.read_table(field_path +'energy_before_remap.dat', delimiter=' ', names=['t','ke','gpe'])
-    energy = energy.drop_duplicates(subset=['t'])
-    df = energy.set_index('t'); ds_energy = df.to_xarray()
-    ds['ke'] = ds_energy.ke.interp(t=ds.t)
-    ds['gpe'] = ds_energy.gpe.interp(t=ds.t)
-    
+                    attrs=dict(sourcepath=field_path, **config))    
     return ds
 
 ##### Change these if needed before running the python file #####
 # time: a long series with small interval
 # fieldnames: variable names to read (surface fields)
 # savepath: the parent path for all processed cases
-time = np.arange(100,181,1) # For some cases eta saved every t=1
+time = np.arange(100,181,0.1) # For some cases eta saved every t=1
 # time = np.arange(100,120.1,0.1) # For others 0.1
-fieldnames = ['eta']
+fieldnames = ['eta', 'ux', 'uy']
 savepath = '/projects/DEIKE/jiarongw/multilayer/JPO/processed/'
 
 if __name__ == "__main__":
@@ -72,6 +62,14 @@ if __name__ == "__main__":
     # Read and save to individual netcdf for each time
     print('Assembling...')
     ds = read_long (args.path, config, time, fieldnames)
+    #### Read in energy and interpolate onto surface field time ####
+    # energy = pd.read_table(args.path +'energy_before_remap.dat', delimiter=' ', names=['t','ke','gpe']) 
+    energy = pd.read_table(savepath + args.label + '/energy.dat', delimiter=' ', names=['t','ke','gpe']) # the energy file already copied to processed folder
+    energy = energy.drop_duplicates(subset=['t'])
+    df = energy.set_index('t'); ds_energy = df.to_xarray()
+    ds['ke'] = ds_energy.ke.interp(t=ds.t)
+    ds['gpe'] = ds_energy.gpe.interp(t=ds.t)
+    
     filename = savepath + config['label'] + '/series.nc' 
     encoding = {}
     for var_name in ds.data_vars:
