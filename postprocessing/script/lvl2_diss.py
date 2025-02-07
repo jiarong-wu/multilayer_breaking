@@ -33,7 +33,10 @@ paths = ['/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_rand4',
          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4',
          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C5',
          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C2',
+         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_NL30',
          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_NL45']
+
+paths = ['/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_NL30',]
 
 for path in paths:
     print('Reading... dir='+path)

@@ -138,3 +138,35 @@ def get_mss_Hs_spectrum (eta, L, N):
     mu, Hs = steepness_trunc_non_uniform (Fkmod, kmod)
     Hs = np.var(eta)**0.5*4
     return mu[-1], Hs, kmod, Fkmod
+
+
+
+''' Obsolete function to compute omni-directional spectrum. '''
+import numpy as np
+from scipy.fftpack import fft2, fftshift
+
+def spectrum_1D (field):
+    # Step 1: Generate or load a 2D field (for example, a synthetic field)
+    # For demonstration, let's create a 2D Gaussian random field
+    size = 1024
+
+    # Step 2: Compute the 2D Fourier Transform
+    ft_field = fft2(field)
+    ft_field_shifted = fftshift(ft_field)  # Shift the zero frequency component to the center
+
+    # Step 3: Compute the 2D Power Spectrum
+    power_spectrum_2d = np.abs(ft_field_shifted)**2
+
+    # Step 4: Compute the 1D Power Spectrum by radially averaging the 2D Power Spectrum
+    # Create an array of the same shape as the field containing the radial distances
+    y, x = np.indices((size, size))
+    center = (size // 2, size // 2)
+    r = np.sqrt((x - center[0])**2 + (y - center[1])**2)
+
+    # Bin the power spectrum based on radial distance
+    r = r.astype(int)
+    tbin = np.bincount(r.ravel(), power_spectrum_2d.ravel())
+    nr = np.bincount(r.ravel())
+    radial_profile = tbin / nr
+    
+    return radial_profile

@@ -21,8 +21,11 @@ paths = ['/projects/DEIKE/jiarongw/multilayer/JPO/processed/C1',
          '/projects/DEIKE/jiarongw/multilayer/JPO/processed/C4_rand4',
          '/projects/DEIKE/jiarongw/multilayer/JPO/processed/C5']
 
+paths = ['/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_NL30',
+         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_NL45',]
+
 #### Pick time windows of analyzing ####
-time = np.arange(100,181,0.5)
+time = np.arange(100,181,1)
 
 #### Parallel computing doesn't seem to work yet ####
 # from dask.distributed import Client
@@ -58,7 +61,7 @@ for path in paths:
     hist = hist.assign_coords(c=bins_center)
     
     #### Save to a separate file ####
-    filename = path + '/breaking_hist_finer.nc'
+    filename = path + '/breaking_hist.nc'
     compression_settings = {
         'zlib': True,
         'complevel': 5  # Compression level from 1 (fastest, least compression) to 9 (slowest, most compression)

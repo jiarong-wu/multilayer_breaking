@@ -126,7 +126,7 @@ def array_to_mesh (h_ensem, L0=200, H=40, Nh=512, Nl=15):
 
 
 """ convert the 3D array to vtk file for paraview. Need to specify L0 and H """
-
+from pyevtk.hl import gridToVTK
 def array_to_vtk (h_ensem, ux_ensem, uy_ensem, uz_ensem, ichoice, 
                   filepath='/projects/DEIKE/jiarongw/multilayer/paraview/vtk/', 
                   L0=200, H=40, Nh=512, Nl=15):
