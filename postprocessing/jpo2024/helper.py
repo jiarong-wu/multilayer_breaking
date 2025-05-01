@@ -113,51 +113,35 @@ def lambdac_format (ax, cp):
 
 ''' For figure 4 plot literature data '''
 def plot_literature(ax, path):
+    plt.rcParams['lines.markerfacecolor'] = 'None'
     # Sutherland 2015
     for i in range(1,40):
         file = path + 'literature_data/SM15/SoCal2010_C1_B2_%d.txt' %i
         if os.path.isfile(file):
             S15 = pd.read_csv(file, delimiter=' ')
-            ax.plot(S15.epsilon, S15.z, '*', c='gray')
+            ax.plot(S15.epsilon, S15.z, 'o', c='k')
         file = path + 'literature_data/SM15/SoCal2010_C1_B3_%d.txt' %i
         if os.path.isfile(file):
             S15 = pd.read_csv(file, delimiter=' ')
-            ax.plot(S15.epsilon, S15.z, '*', c='gray')    
+            ax.plot(S15.epsilon, S15.z, 'o', c='k')    
         file = path + 'literature_data/SM15/SoCal2010_C1_VERT_%d.txt' %i
         if os.path.isfile(file):
             S15 = pd.read_csv(file, delimiter=' ')
-            ax.plot(S15.epsilon, S15.z, '-*', c='gray') 
+            ax.plot(S15.epsilon, S15.z, 'o', c='k') 
             
     for i in range(4,10):
         S15 = pd.read_csv(path + 'literature_data/SM15/SoCal2010_C2_B2_%d.txt' %i, delimiter=' ')
-        ax.plot(S15.epsilon, S15.z, '*', c='gray')   
+        ax.plot(S15.epsilon, S15.z, 'o', c='k')   
     for i in (2,4,5,6,7):    
         S15 = pd.read_csv(path + 'literature_data/SM15/SoCal2010_C3_B2_%d.txt' %i, delimiter=' ')
-        ax.plot(S15.epsilon, S15.z, '*', c='gray')   
+        ax.plot(S15.epsilon, S15.z, 'o', c='k')   
 
     S15 = pd.read_csv(path + 'literature_data/SM15/SoCal2010_C3_B2_%d.txt' %7, delimiter=' ')
-    ax.plot(S15.epsilon, S15.z, '*', c='gray', label='SM15')   
+    ax.plot(S15.epsilon, S15.z, 'o', c='k', label='SM15')   
 
-    # Other data
-    SL03 = pd.read_csv(path + 'literature_data/SL03.csv', names=['x', 'y'])
-    ax.plot(SL03.x, SL03.y, '-', c='k', label='SL03')
-
-    T96fit = pd.read_csv(path + 'literature_data/T96fit.csv', names=['x', 'y'])
-    # axes[1].plot(T96fit.x, T96fit.y, '--', c='k', label='T96 fit')
-    # Found the expression for the fit
-    ax.plot(T96fit.y**(-2)*0.3, T96fit.y, '--', c='k', label='T96 fit')
-    ax.vlines(x=0.83, ymin=-0.6, ymax=-0.1, linestyle='--', color='k')
-
-    ax.plot(12.0484, -0.2830, 'o', c='k')
     T96 = pd.read_csv(path + 'literature_data/T96.csv', names=['x', 'y'])
-    ax.plot(T96.x, T96.y, 'o', c='k', label='T96')
-
-    xstart = 0.01; ystart = -2.
-    ax.plot(T96fit.x[0:8], -T96fit.x[0:8]**(-0.5)/(-T96fit.x[0]**(-0.5))*(ystart), c='gray', alpha=0.8)
-    ax.annotate('$z^{-2}$',(T96fit.x[8],-T96fit.x[8]**(-0.5)/(-T96fit.x[0]**(-0.5))*(ystart)), fontsize=6)
-    ax.plot(T96fit.x[0:8], -T96fit.x[0:8]**(-1)/(-T96fit.x[0]**(-1))*(ystart), c='gray', alpha=0.8)
-    ax.annotate('$z^{-1}$',(T96fit.x[8],-T96fit.x[8]**(-1)/(-T96fit.x[0]**(-1))*(ystart)), fontsize=6)
-
+    ax.plot(T96.x, T96.y, '>', c='k', label='T96')
+    
     D96young = pd.read_csv(path + 'literature_data/D96young.csv', names=['x', 'y'])
     ax.plot(D96young.x, D96young.y, '^', c='k', label='D96')
     D96old = pd.read_csv(path + 'literature_data/D96old.csv', names=['x', 'y'])
@@ -165,6 +149,21 @@ def plot_literature(ax, path):
 
     AM95 = pd.read_csv(path + 'literature_data/AM95.csv', names=['x', 'y'])
     ax.plot(AM95.x, AM95.y, 's', c='k', label='AM95')
+    
+    # Other data
+    SL03 = pd.read_csv(path + 'literature_data/SL03.csv', names=['x', 'y'])
+    ax.plot(SL03.x, SL03.y, ':', c='k', label='SL03')
+
+    T96fit = pd.read_csv(path + 'literature_data/T96fit.csv', names=['x', 'y'])
+    # axes[1].plot(T96fit.x, T96fit.y, '--', c='k', label='T96 fit')
+    xstart = 0.01; ystart = -2.
+    ax.plot(T96fit.x[0:8], -T96fit.x[0:8]**(-0.5)/(-T96fit.x[0]**(-0.5))*(ystart)*0.5, c='gray', alpha=0.8)
+    ax.annotate('$z^{-2}$',(T96fit.x[8],-T96fit.x[8]**(-0.5)/(-T96fit.x[0]**(-0.5))*(ystart)*0.5), fontsize=6)
+    ax.plot(T96fit.x[0:8], -T96fit.x[0:8]**(-1)/(-T96fit.x[0]**(-1))*(ystart)*0.5, c='gray', alpha=0.8)
+    ax.annotate('$z^{-1}$',(T96fit.x[8],-T96fit.x[8]**(-1)*1.2/(-T96fit.x[0]**(-1))*(ystart)*0.5), fontsize=6)
+    # # Found the expression for the fit
+    # ax.plot(T96fit.y**(-2)*0.3, T96fit.y, '--', c='k', label='T96 fit')
+    # ax.vlines(x=0.83, ymin=-0.6, ymax=-0.1, linestyle='--', color='k')
 
     # S15 = pd.read_csv(path + 'literature_data/Sutherland_upper.txt', names=['x', 'y'])
     # axes[1].plot(S15.x, S15.y, '*', c='k', label='S15')
@@ -172,12 +171,69 @@ def plot_literature(ax, path):
     # axes[1].plot(S15.x, S15.y, '*', c='k')
 
     # After getting data from Peter Sutherland
-    # for i in range(1,5):
-    #     S15 = pd.read_csv(path + 'literature_data/HIRES2010_%d.txt' %i, delimiter=' ')
-    #     plt.plot(S15.epsilon, S15.z, '*', c='k', label='S15')
-    # for i in (10,11,13,14):
-    #     S15 = pd.read_csv(path + 'literature_data/RaDyO2019_%d.txt' %i, delimiter=' ')
-    #     plt.plot(S15.epsilon, S15.z, '*', c='k', label='S15')
+    for i in range(1,5):
+        S15 = pd.read_csv(path + 'literature_data/SM15/HIRES2010_%d.txt' %i, delimiter=' ')
+        ax.plot(S15.epsilon, S15.z, 'o', c='k')
+    for i in (10,11,13,14):
+        S15 = pd.read_csv(path + 'literature_data/SM15/RaDyO2019_%d.txt' %i, delimiter=' ')
+        ax.plot(S15.epsilon, S15.z, 'o', c='k')
+    
+    legend1 = ax.legend(loc='lower right', handlelength=1, handletextpad=0.8, ncols=2)
+    return legend1
+
+
+
+def plot_literature_alldots(ax, path):
+    plt.rcParams['lines.markerfacecolor'] = 'auto'
+    # Sutherland 2015
+    for i in range(1,40):
+        file = path + 'literature_data/SM15/SoCal2010_C1_B2_%d.txt' %i
+        if os.path.isfile(file):
+            S15 = pd.read_csv(file, delimiter=' ')
+            ax.plot(S15.epsilon, S15.z, '.', c='gray', alpha=0.5)
+        file = path + 'literature_data/SM15/SoCal2010_C1_B3_%d.txt' %i
+        if os.path.isfile(file):
+            S15 = pd.read_csv(file, delimiter=' ')
+            ax.plot(S15.epsilon, S15.z, '.', c='gray', alpha=0.5)    
+        file = path + 'literature_data/SM15/SoCal2010_C1_VERT_%d.txt' %i
+        if os.path.isfile(file):
+            S15 = pd.read_csv(file, delimiter=' ')
+            ax.plot(S15.epsilon, S15.z, '.', c='gray', alpha=0.5) 
+            
+    for i in range(4,10):
+        S15 = pd.read_csv(path + 'literature_data/SM15/SoCal2010_C2_B2_%d.txt' %i, delimiter=' ')
+        ax.plot(S15.epsilon, S15.z, '.', c='gray', alpha=0.5)   
+    for i in (2,4,5,6,7):    
+        S15 = pd.read_csv(path + 'literature_data/SM15/SoCal2010_C3_B2_%d.txt' %i, delimiter=' ')
+        ax.plot(S15.epsilon, S15.z, '.', c='gray', alpha=0.5)   
+
+    S15 = pd.read_csv(path + 'literature_data/SM15/SoCal2010_C3_B2_%d.txt' %7, delimiter=' ')
+    ax.plot(S15.epsilon, S15.z, '.', c='gray', alpha=0.5)   
+
+    T96 = pd.read_csv(path + 'literature_data/T96.csv', names=['x', 'y'])
+    ax.plot(T96.x, T96.y, '.', c='gray', alpha=0.5)
+    
+    D96young = pd.read_csv(path + 'literature_data/D96young.csv', names=['x', 'y'])
+    ax.plot(D96young.x, D96young.y, '.', c='gray', alpha=0.5)
+    D96old = pd.read_csv(path + 'literature_data/D96old.csv', names=['x', 'y'])
+    ax.plot(D96old.x, D96old.y, '.', c='gray', alpha=0.5)
+
+    AM95 = pd.read_csv(path + 'literature_data/AM95.csv', names=['x', 'y'])
+    ax.plot(AM95.x, AM95.y, '.', c='gray', alpha=0.5)
+    
+    # Other data
+    SL03 = pd.read_csv(path + 'literature_data/SL03.csv', names=['x', 'y'])
+    ax.plot(SL03.x, SL03.y, '.', c='gray', alpha=0.5)
+
+
+    # After getting data from Peter Sutherland
+    for i in range(1,5):
+        S15 = pd.read_csv(path + 'literature_data/SM15/HIRES2010_%d.txt' %i, delimiter=' ')
+        ax.plot(S15.epsilon, S15.z, '.', c='gray', alpha=0.5)
+    for i in (10,11,13,14):
+        S15 = pd.read_csv(path + 'literature_data/SM15/RaDyO2019_%d.txt' %i, delimiter=' ')
+        ax.plot(S15.epsilon, S15.z, '.', c='gray', alpha=0.5)
+    
     
 ''' Figure 4 axis locator? '''
 from matplotlib.ticker import Locator
