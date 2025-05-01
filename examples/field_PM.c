@@ -3,7 +3,7 @@
 */
 
 // #include "grid/multigrid.h"
-#include "view.h"
+// #include "view.h"
 #include "layered/hydro.h"
 //#include "layered/hydro_test.h"
 #include "layered/nh.h"
@@ -236,38 +236,38 @@ event energy_before_remap (i+=10, last)
 
 /**
    Note that the movie generation below is very expensive. */
-#  define POPEN(name, mode) fopen (name ".ppm", mode)
-#if 1
-event movie (t += 1; t <= TEND)
-{
-  char s[80];
-  view (fov = 20, quat = {0.475152,0.161235,0.235565,0.832313}, width = 800, height = 600);
-  sprintf (s, "t = %.2f", t);
-  draw_string (s, size = 30);
-  sprintf (s, "u%d.x", nl-1);
-  squares (s, linear = true, z = "eta", min = -2./7.*sqrt(L0), max = 2./7.*sqrt(L0));
-  {
-  static FILE * fp = POPEN ("ux", "a");
-  save (fp = fp);
-  }
-  // char filename1[50], filename2[50], filename3[50];
-  // sprintf (filename1, "surface/eta_matrix_%g", t);
-  // sprintf (filename2, "surface/ux_matrix_%g", t);
-  // sprintf (filename3, "surface/uy_matrix_%g", t);  
-  // FILE * feta = fopen (filename1, "w");
-  // // Might need to change to mpi function later
-  // output_matrix_mpi (eta, feta, N, linear=true);
-  // fclose (feta);
-  // sprintf (s, "u%d", nl-1);
-  // vector u_temp = lookup_vector (s);
-  // FILE * fux = fopen (filename2, "w");
-  // output_matrix_mpi (u_temp.x, fux, N, linear=true);
-  // fclose (fux);
-  // FILE * fuy = fopen (filename3, "w");
-  // output_matrix_mpi (u_temp.y, fuy, N, linear=true);
-  // fclose (fuy);  
-}
-#endif
+// #  define POPEN(name, mode) fopen (name ".ppm", mode)
+// #if 1
+// event movie (t += 1; t <= TEND)
+// {
+//   char s[80];
+//   view (fov = 20, quat = {0.475152,0.161235,0.235565,0.832313}, width = 800, height = 600);
+//   sprintf (s, "t = %.2f", t);
+//   draw_string (s, size = 30);
+//   sprintf (s, "u%d.x", nl-1);
+//   squares (s, linear = true, z = "eta", min = -2./7.*sqrt(L0), max = 2./7.*sqrt(L0));
+//   {
+//   static FILE * fp = POPEN ("ux", "a");
+//   save (fp = fp);
+//   }
+//   // char filename1[50], filename2[50], filename3[50];
+//   // sprintf (filename1, "surface/eta_matrix_%g", t);
+//   // sprintf (filename2, "surface/ux_matrix_%g", t);
+//   // sprintf (filename3, "surface/uy_matrix_%g", t);  
+//   // FILE * feta = fopen (filename1, "w");
+//   // // Might need to change to mpi function later
+//   // output_matrix_mpi (eta, feta, N, linear=true);
+//   // fclose (feta);
+//   // sprintf (s, "u%d", nl-1);
+//   // vector u_temp = lookup_vector (s);
+//   // FILE * fux = fopen (filename2, "w");
+//   // output_matrix_mpi (u_temp.x, fux, N, linear=true);
+//   // fclose (fux);
+//   // FILE * fuy = fopen (filename3, "w");
+//   // output_matrix_mpi (u_temp.y, fuy, N, linear=true);
+//   // fclose (fuy);  
+// }
+// #endif
 
 
 /**
@@ -288,13 +288,13 @@ event movie (t += 1; t <= TEND)
 /** 
 The mesh is not adaptive yet. */
 
-#if QUADTREE
-event adapt (i++) {
-  /* fprintf(stderr, "Adapting start!\n"); */
-  /* fflush(stderr); */
-  my_adapt();
-}
-#endif
+// #if QUADTREE
+// event adapt (i++) {
+//   /* fprintf(stderr, "Adapting start!\n"); */
+//   /* fflush(stderr); */
+//   my_adapt();
+// }
+// #endif
 
 event regulardump (t = 0; t += 10; t < TEND) {
   char dname[100];

@@ -26,18 +26,16 @@ znew = np.arange(-20,1,0.1)
 # for item in os.listdir(base_dir):
 #     full_path = os.path.join(base_dir, item)
 #     paths.append(full_path)
-# paths = ['/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_rand4',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C1',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C5_rand4',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C3',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C5',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C2',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_NL30',
-#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_NL45']
+paths = ['/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_rand4',
+         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C1',
+         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C5_rand4',
+         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C3',
+         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4',
+         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C5',
+         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C2',
+         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_NL45']
 
-paths = ['/projects/DEIKE/jiarongw/multilayer/JPO/processed/C4_NL30',
-         '/projects/DEIKE/jiarongw/multilayer/JPO/processed/C4_NL45']
+paths = ['/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_NL30',]
 
 for path in paths:
     print('Reading... dir='+path)
