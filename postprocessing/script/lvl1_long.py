@@ -36,7 +36,8 @@ def read_long (field_path, config, time, fieldnames=['eta','ux','uy']):
 # time: a long series with small interval
 # fieldnames: variable names to read (surface fields)
 # savepath: the parent path for all processed cases
-time = np.arange(100,181,0.1) # For some cases eta saved every t=1
+time = np.arange(100,181,1) # For some cases eta saved every t=1
+print(time)
 # time = np.arange(100,120.1,0.1) # For others 0.1
 fieldnames = ['eta', 'ux', 'uy']
 savepath = '/projects/DEIKE/jiarongw/multilayer/JPO/processed/'

@@ -45,15 +45,17 @@ def dissipation_layer(ds, grid):
     dzdy = grid.interp(grid.diff(ds.z, 'Y'), 'Y')/delta
     dzdzl = grid.interp(grid.diff(ds.z, 'Z'), 'Z')
     
-    ds['dudz'] = dudzl/dzdzl
-    ds['dudy'] = dudy - ds['dudz']*dzdy
-    ds['dudx'] = dudx - ds['dudz']*dzdx
-    ds['dvdz'] = dvdzl/dzdzl
-    ds['dvdy'] = dvdy - ds['dvdz']*dzdy
-    ds['dvdx'] = dvdx - ds['dvdz']*dzdx
-    ds['dwdz'] = dwdzl/dzdzl
-    ds['dwdy'] = dwdy - ds['dwdz']*dzdy
-    ds['dwdx'] = dwdx - ds['dwdz']*dzdx
+    ds['dudz'] = (dudzl/dzdzl).compute()
+    ds['dudy'] = (dudy - ds['dudz']*dzdy).compute()
+    ds['dudx'] = (dudx - ds['dudz']*dzdx).compute()
+    ds['dvdz'] = (dvdzl/dzdzl).compute()
+    ds['dvdy'] = (dvdy - ds['dvdz']*dzdy).compute()
+    ds['dvdx'] = (dvdx - ds['dvdz']*dzdx).compute()
+    ds['dwdz'] = (dwdzl/dzdzl).compute()
+    ds['dwdy'] = (dwdy - ds['dwdz']*dzdy).compute()
+    ds['dwdx'] = (dwdx - ds['dwdz']*dzdx).compute()
+    
+    print('Field gradient computed!')
     
     del(dudx, dudy, dudzl, dvdx, dvdy, dvdzl, dwdx, dwdy, dwdzl, dzdx, dzdy, dzdzl)
     gc.collect()

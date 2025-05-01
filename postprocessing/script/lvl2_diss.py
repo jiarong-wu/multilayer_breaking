@@ -26,14 +26,18 @@ znew = np.arange(-20,1,0.1)
 # for item in os.listdir(base_dir):
 #     full_path = os.path.join(base_dir, item)
 #     paths.append(full_path)
-paths = ['/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_rand4',
-         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C1',
-         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C5_rand4',
-         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C3',
-         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4',
-         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C5',
-         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C2',
-         '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_NL45']
+# paths = ['/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_rand4',
+#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C1',
+#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C5_rand4',
+#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C3',
+#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4',
+#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C5',
+#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C2',
+#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_NL30',
+#          '/Users/jiarongw/Data/multilayer_data/JPO2024/processed/C4_NL45']
+
+paths = ['/projects/DEIKE/jiarongw/multilayer/JPO/processed/C4_NL30',
+         '/projects/DEIKE/jiarongw/multilayer/JPO/processed/C4_NL45']
 
 for path in paths:
     print('Reading... dir='+path)
@@ -57,7 +61,7 @@ for path in paths:
     encoding = {}
     for var_name in ds1d.data_vars:
         encoding[var_name] = {'dtype': 'float32', 'zlib': True}
-    ds1d.to_netcdf(filename, encoding=encoding, engine='h5netcdf')
+    ds1d.to_netcdf(filename, encoding=encoding)
     print('Layer averaged 1D profiles saved!')
 
     # Interpolate to cartesian grid
@@ -68,6 +72,7 @@ for path in paths:
         for t in ds.t:
             field_interp = interpz(znew, ds.z.sel(t=t), ds[field].sel(t=t), fill_value=np.nan).mean(dim=['x','y']).compute() 
             fieldt.append(field_interp)
+            print(f't={t} finished!')
         fields_t.append(np.array(fieldt))
         
     ds1d_interp = xr.Dataset(data_vars={name: (['t','z'], array) for name, array in zip(fields, fields_t)},
@@ -79,7 +84,7 @@ for path in paths:
     encoding = {}
     for var_name in ds1d_interp.data_vars:
         encoding[var_name] = {'dtype': 'float32', 'zlib': True}
-    ds1d_interp.to_netcdf(filename, encoding=encoding, engine='h5netcdf')
+    ds1d_interp.to_netcdf(filename, encoding=encoding)
     print('Interpolated averaged 1D profiles saved!')
     
     # Delete ds for memory 
