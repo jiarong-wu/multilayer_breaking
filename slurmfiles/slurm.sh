@@ -16,6 +16,7 @@ TEND=200
 nu=0.000025
 RAND=2
 L0=200
+Lp=40
 Htheta=0.503
 # Initial field info
 FIELD=P0.02
@@ -26,5 +27,5 @@ mkdir ./field
 cp ${SCRATCH}/multilayer/spectra/F_kxky_${FIELD}_200m ./F_kxky
 cp ${SCRATCH}/multilayer/spectra/kx_200m ./kx
 cp ${SCRATCH}/multilayer/spectra/ky_200m ./ky
-echo srun ./$EXE NLAYER=$NLAYER LEVEL=$LEVEL TEND=$TEND nu=$nu RAND=${RAND} L0=$L0 Htheta=${Htheta}
-srun ./$EXE $NLAYER $LEVEL $TEND $nu $RAND $L0 $Htheta > message 2>&1
+echo srun ./$EXE NLAYER=$NLAYER LEVEL=$LEVEL TEND=$TEND nu=$nu RAND=${RAND} L0=$L0 Lp=$Lp Htheta=${Htheta}
+srun ./$EXE $NLAYER $LEVEL $TEND $nu $RAND $L0 $Lp $Htheta > message 2>&1
